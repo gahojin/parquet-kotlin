@@ -1,0 +1,22 @@
+{
+  "name": "parquet-kotlin",
+  "private": true,
+  "scripts": {
+    "preinstall": "pnpm dlx only-allow pnpm",
+    "prepare": "husky",
+    "ncu": "npm-check-updates -u"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.6.1",
+    "@commitlint/config-conventional": "19.6.0",
+    "husky": "9.1.7",
+    "npm-check-updates": "17.1.14"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20.x",
+    "npm": "use pnpm",
+    "pnpm": ">=9",
+    "yarn": "use pnpm"
+  }
+}
