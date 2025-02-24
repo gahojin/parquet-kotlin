@@ -178,6 +178,13 @@
 
 --------------------------------------------------------------------------------
 
+This project includes code from Apache Parquet Java project.
+
+Apache Parquet Java
+Copyright 2014-2024 The Apache Software Foundation
+
+--------------------------------------------------------------------------------
+
 This project includes code from Daniel Lemire's JavaFastPFOR project in this
 binary artifact. The "Lemire" bit packing classes produced by parquet-generator
 are derived from the JavaFastPFOR project.

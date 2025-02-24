@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>TooGenericExceptionThrown:ByteBasedBitPackingEncoderTest.kt$ByteBasedBitPackingEncoderTest$throw RuntimeException("$i: error writing $j", e)</ID>
+  </CurrentIssues>
 </SmellBaseline>
