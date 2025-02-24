@@ -334,6 +334,17 @@ public class TestBytesInput {
     validate(data, factory);
   }
 
+  @Test
+  public void testWriteInt() throws Throwable {
+    int[] testVals = {Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 100, 1000, 0xdaedbeef};
+    for (Integer testVal : testVals) {
+      BytesInput varInt = BytesInput.fromUnsignedVarInt(testVal);
+      byte[] rno = varInt.toByteArray();
+      int i = BytesUtils.readUnsignedVarInt(new ByteArrayInputStream(rno));
+      assertEquals((int) testVal, i);
+    }
+  }
+
   private ByteBuffer toByteBuffer(byte[] data) {
     return toByteBuffer(data, 0, data.length);
   }
