@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:ByteBasedBitPackingGenerator.kt$ByteBasedBitPackingGenerator$private fun generateScheme(isLong: Boolean, msbFirst: Boolean, basePath: Path)</ID>
+    <ID>LongMethod:IncrementallyUpdatedFilterPredicateGenerator.kt$IncrementallyUpdatedFilterPredicateGenerator$fun main(args: Array&lt;String>)</ID>
+    <ID>LongMethod:IncrementallyUpdatedFilterPredicateGenerator.kt$IncrementallyUpdatedFilterPredicateGenerator$private fun TypeSpec.Builder.addContainsBegin(block: TypeSpec.Builder.() -> TypeSpec.Builder)</ID>
+    <ID>MaxLineLength:IncrementallyUpdatedFilterPredicateGenerator.kt$IncrementallyUpdatedFilterPredicateGenerator$.</ID>
+  </CurrentIssues>
 </SmellBaseline>

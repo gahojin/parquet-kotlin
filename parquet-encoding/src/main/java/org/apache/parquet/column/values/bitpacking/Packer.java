@@ -66,17 +66,7 @@ public enum Packer {
 
     @Override
     public BytePacker newBytePackerVector(int width) {
-      if (leBytePacker512VectorFactory == null) {
-        synchronized (Packer.class) {
-          if (leBytePacker512VectorFactory == null) {
-            leBytePacker512VectorFactory = getBytePackerFactory("ByteBitPacking512VectorLE");
-          }
-        }
-      }
-      if (leBytePacker512VectorFactory == null) {
-        throw new RuntimeException("No enable java vector plugin on little endian architectures");
-      }
-      return leBytePacker512VectorFactory.newBytePacker(width);
+      throw new RuntimeException("No enable java vector plugin on little endian architectures");
     }
 
     @Override
@@ -85,40 +75,12 @@ public enum Packer {
     }
   };
 
-  private static IntPackerFactory getIntPackerFactory(String name) {
-    return (IntPackerFactory) getStaticField("org.apache.parquet.column.values.bitpacking." + name, "factory");
-  }
-
-  private static BytePackerFactory getBytePackerFactory(String name) {
-    return (BytePackerFactory) getStaticField("org.apache.parquet.column.values.bitpacking." + name, "factory");
-  }
-
-  private static BytePackerForLongFactory getBytePackerForLongFactory(String name) {
-    return (BytePackerForLongFactory)
-        getStaticField("org.apache.parquet.column.values.bitpacking." + name, "factory");
-  }
-
-  private static Object getStaticField(String className, String fieldName) {
-    try {
-      return Class.forName(className).getField(fieldName).get(null);
-    } catch (IllegalArgumentException
-        | IllegalAccessException
-        | NoSuchFieldException
-        | SecurityException
-        | ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  static IntPackerFactory beIntPackerFactory = getIntPackerFactory("LemireBitPackingBE");
-  static IntPackerFactory leIntPackerFactory = getIntPackerFactory("LemireBitPackingLE");
-  static BytePackerFactory beBytePackerFactory = getBytePackerFactory("ByteBitPackingBE");
-  static BytePackerFactory leBytePackerFactory = getBytePackerFactory("ByteBitPackingLE");
-  // ByteBitPacking512VectorLE is not enabled default, so leBytePacker512VectorFactory cannot be initialized as a
-  // static property
-  static BytePackerFactory leBytePacker512VectorFactory = null;
-  static BytePackerForLongFactory beBytePackerForLongFactory = getBytePackerForLongFactory("ByteBitPackingForLongBE");
-  static BytePackerForLongFactory leBytePackerForLongFactory = getBytePackerForLongFactory("ByteBitPackingForLongLE");
+  static final IntPackerFactory beIntPackerFactory = LemireBitPackingBE.factory;
+  static final IntPackerFactory leIntPackerFactory = LemireBitPackingLE.factory;
+  static final BytePackerFactory beBytePackerFactory = ByteBitPackingBE.factory;
+  static final BytePackerFactory leBytePackerFactory = ByteBitPackingLE.factory;
+  static final BytePackerForLongFactory beBytePackerForLongFactory = ByteBitPackingForLongBE.factory;
+  static final BytePackerForLongFactory leBytePackerForLongFactory = ByteBitPackingForLongLE.factory;
 
   /**
    * @param width the width in bits of the packed values
