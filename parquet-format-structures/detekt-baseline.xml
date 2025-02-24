@@ -1,5 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>ClassOrdering:LogicalTypes.kt$LogicalTypes$@Suppress("FunctionName") @JvmStatic fun DECIMAL(scale: Int, precision: Int): LogicalType</ID>
+    <ID>CyclomaticComplexMethod:Util.kt$SkipFileMetaDataAdapter$override fun read(protocol: Protocol): FileMetaData</ID>
+    <ID>FunctionParameterNaming:BlockCipher.kt$BlockCipher.Decryptor$AAD: ByteArray</ID>
+    <ID>FunctionParameterNaming:BlockCipher.kt$BlockCipher.Encryptor$AAD: ByteArray</ID>
+    <ID>FunctionParameterNaming:Util.kt$AAD: ByteArray? = null</ID>
+    <ID>FunctionParameterNaming:Util.kt$Util$AAD: ByteArray?</ID>
+    <ID>FunctionParameterNaming:Util.kt$Util$AAD: ByteArray? = null</ID>
+    <ID>LongMethod:Util.kt$SkipFileMetaDataAdapter$override fun read(protocol: Protocol): FileMetaData</ID>
+    <ID>NestedBlockDepth:Util.kt$SkipFileMetaDataAdapter$override fun read(protocol: Protocol): FileMetaData</ID>
+    <ID>UnusedPrivateProperty:Util.kt$SkipFileMetaDataAdapter$i0</ID>
+  </CurrentIssues>
 </SmellBaseline>
