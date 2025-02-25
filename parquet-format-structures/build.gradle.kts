@@ -1,9 +1,10 @@
-import com.linecorp.thrift.plugin.CompileThrift
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import jp.co.gahojin.thrifty.gradle.FieldNameStyle
+import jp.co.gahojin.thrifty.gradle.ThriftyTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -13,7 +14,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.dokka.javadoc)
     alias(libs.plugins.maven.publish)
-    alias(libs.plugins.thrift)
+    alias(libs.plugins.thrifty)
     id("signing")
 }
 
@@ -34,7 +35,9 @@ dependencies {
 
     thrift(libs.parquet.format)
 
-    api(libs.libthrift)
+    api(libs.thrifty.runtime) {
+        exclude(group = "io.ktor")
+    }
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
@@ -73,13 +76,21 @@ tasks.register<Copy>("copySchema") {
     }
 }
 
-compileThrift {
-    thriftExecutable = "/opt/homebrew/bin/thrift"
-    sourceItems(project.layout.buildDirectory.dir("thrift").get().asFile)
-    generator("java", "private_members", "generated_annotations=suppress")
+thrifty {
+    kotlin {
+        isGenerateServer = false
+        generateServiceClients = false
+        mutableFields = true
+        jvmOverloads = true
+        deepCopyFunc = true
+        nameStyle = FieldNameStyle.JAVA
+    }
+    sourceDir(project.layout.buildDirectory.dir("thrift").get().toString()) {
+        include("**/*.thrift")
+    }
 }
 
-tasks.withType<CompileThrift>().configureEach {
+tasks.withType<ThriftyTask>().configureEach {
     dependsOn("copySchema")
 }
 

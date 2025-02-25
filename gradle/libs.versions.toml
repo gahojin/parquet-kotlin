@@ -14,7 +14,7 @@ kotlinx-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kotlin-kove
 
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 
-thrift = { id = "com.linecorp.thrift-gradle-plugin", version.ref = "thrift" }
+thrifty = { id = "jp.co.gahojin.thrifty", version.ref = "thrifty" }
 
 [versions]
 
@@ -44,8 +44,6 @@ kotlin-poet = "2.0.0"
 
 kotest = "5.9.1"
 
-libthrift = "0.21.0"
-
 maven-publish = "0.30.0"
 
 mockito = "5.15.2"
@@ -64,7 +62,7 @@ slf4j = "2.0.16"
 
 snappy = "1.1.10.7"
 
-thrift = "0.6.1"
+thrifty = "4.4.0"
 
 zero-allocation-hashing = "0.27ea0"
 
@@ -104,8 +102,6 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib" }
 
 kotlin-poet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlin-poet" }
 
-libthrift = { group = "org.apache.thrift", name = "libthrift", version.ref = "libthrift" }
-
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
@@ -123,6 +119,8 @@ slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 
 snappy-java = { group = "org.xerial.snappy", name = "snappy-java", version.ref = "snappy" }
+
+thrifty-runtime = { group = "jp.co.gahojin.thrifty", name = "thrifty-runtime-jvm", version.ref = "thrifty" }
 
 zero-allocation-hashing = { group = "net.openhft", name = "zero-allocation-hashing", version.ref = "zero-allocation-hashing" }
 
