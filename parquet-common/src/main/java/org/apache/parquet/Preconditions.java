@@ -67,7 +67,7 @@ public final class Preconditions {
    */
   public static void checkArgument(boolean isValid, String message, Object arg0) throws IllegalArgumentException {
     if (!isValid) {
-      throw new IllegalArgumentException(String.format(String.valueOf(message), strings(arg0)));
+      throw new IllegalArgumentException(String.format(String.valueOf(message), (Object[]) strings(arg0)));
     }
   }
 
@@ -84,7 +84,7 @@ public final class Preconditions {
   public static void checkArgument(boolean isValid, String message, Object arg0, Object arg1)
       throws IllegalArgumentException {
     if (!isValid) {
-      throw new IllegalArgumentException(String.format(String.valueOf(message), strings(arg0, arg1)));
+      throw new IllegalArgumentException(String.format(String.valueOf(message), (Object[]) strings(arg0, arg1)));
     }
   }
 
@@ -102,7 +102,7 @@ public final class Preconditions {
   public static void checkArgument(boolean isValid, String message, Object arg0, Object arg1, Object arg2)
       throws IllegalArgumentException {
     if (!isValid) {
-      throw new IllegalArgumentException(String.format(String.valueOf(message), strings(arg0, arg1, arg2)));
+      throw new IllegalArgumentException(String.format(String.valueOf(message), (Object[]) strings(arg0, arg1, arg2)));
     }
   }
 
@@ -117,7 +117,7 @@ public final class Preconditions {
    */
   public static void checkArgument(boolean isValid, String message, Object... args) throws IllegalArgumentException {
     if (!isValid) {
-      throw new IllegalArgumentException(String.format(String.valueOf(message), strings(args)));
+      throw new IllegalArgumentException(String.format(String.valueOf(message), (Object[]) strings(args)));
     }
   }
 
@@ -146,7 +146,7 @@ public final class Preconditions {
    */
   public static void checkState(boolean isValid, String message, Object arg0) throws IllegalStateException {
     if (!isValid) {
-      throw new IllegalStateException(String.format(String.valueOf(message), strings(arg0)));
+      throw new IllegalStateException(String.format(String.valueOf(message), (Object[]) strings(arg0)));
     }
   }
 
@@ -163,7 +163,7 @@ public final class Preconditions {
   public static void checkState(boolean isValid, String message, Object arg0, Object arg1)
       throws IllegalStateException {
     if (!isValid) {
-      throw new IllegalStateException(String.format(String.valueOf(message), strings(arg0, arg1)));
+      throw new IllegalStateException(String.format(String.valueOf(message), (Object[]) strings(arg0, arg1)));
     }
   }
 
@@ -181,7 +181,7 @@ public final class Preconditions {
   public static void checkState(boolean isValid, String message, Object arg0, Object arg1, Object arg2)
       throws IllegalStateException {
     if (!isValid) {
-      throw new IllegalStateException(String.format(String.valueOf(message), strings(arg0, arg1, arg2)));
+      throw new IllegalStateException(String.format(String.valueOf(message), (Object[]) strings(arg0, arg1, arg2)));
     }
   }
 
@@ -196,7 +196,7 @@ public final class Preconditions {
    */
   public static void checkState(boolean isValid, String message, Object... args) throws IllegalStateException {
     if (!isValid) {
-      throw new IllegalStateException(String.format(String.valueOf(message), strings(args)));
+      throw new IllegalStateException(String.format(String.valueOf(message), (Object[]) strings(args)));
     }
   }
 

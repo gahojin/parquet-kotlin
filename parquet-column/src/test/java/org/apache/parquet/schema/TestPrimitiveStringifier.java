@@ -42,6 +42,7 @@ import static org.apache.parquet.schema.PrimitiveStringifier.TIME_UTC_STRINGIFIE
 import static org.apache.parquet.schema.PrimitiveStringifier.UNSIGNED_STRINGIFIER;
 import static org.apache.parquet.schema.PrimitiveStringifier.UTF8_STRINGIFIER;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import java.math.BigInteger;
@@ -51,7 +52,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import org.apache.parquet.TestUtils;
 import org.apache.parquet.io.api.Binary;
 import org.junit.Test;
 
@@ -416,7 +416,7 @@ public class TestPrimitiveStringifier {
             0x00, 0x00, 0x00)));
 
     // As there is no validation implemented, if the 16 bytes is not available, the array will be over-indexed
-    TestUtils.assertThrows(
+    assertThrows(
         "Expected exception for over-indexing",
         ArrayIndexOutOfBoundsException.class,
         () -> stringifier.stringify(toBinary(

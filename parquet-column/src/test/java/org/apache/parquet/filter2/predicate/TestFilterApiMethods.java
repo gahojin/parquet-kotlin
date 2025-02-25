@@ -202,6 +202,7 @@ public class TestFilterApiMethods {
       return this.of == that.of;
     }
 
+    @SuppressWarnings("removal")
     @Override
     public int hashCode() {
       return new Long(of).hashCode();

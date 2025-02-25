@@ -1329,7 +1329,7 @@ public class ParquetFileWriter implements AutoCloseable {
       } else {
         LOG.info(
             "No need to write bloom filter because column {} data pages are all encoded as dictionary.",
-            descriptor.getPath());
+            (Object[]) descriptor.getPath());
       }
     }
     LOG.debug("{}: write data pages", out.getPos());

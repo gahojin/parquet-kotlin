@@ -1893,7 +1893,7 @@ public class ParquetFileReader implements Closeable {
         int uncompressedPageSize = pageHeader.getUncompressed_page_size();
         int compressedPageSize = pageHeader.getCompressed_page_size();
         final BytesInput pageBytes;
-        switch (pageHeader.type) {
+        switch (pageHeader.getType()) {
           case DICTIONARY_PAGE:
             // there is only one dictionary page per column chunk
             if (dictionaryPage != null) {

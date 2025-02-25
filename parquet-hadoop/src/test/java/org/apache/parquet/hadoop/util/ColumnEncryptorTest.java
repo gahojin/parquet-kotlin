@@ -306,11 +306,11 @@ public class ColumnEncryptorTest {
       PageHeader inPageHeader = inReader.readPageHeader();
       PageHeader outPageHeader = outReader.readPageHeader();
       assertEquals(inPageHeader, outPageHeader);
-      DataPageHeader inHeaderV1 = inPageHeader.data_page_header;
-      DataPageHeader outHeaderV1 = outPageHeader.data_page_header;
+      DataPageHeader inHeaderV1 = inPageHeader.getData_page_header();
+      DataPageHeader outHeaderV1 = outPageHeader.getData_page_header();
       assertEquals(inHeaderV1, outHeaderV1);
-      BytesInput inPageLoad = readBlockAllocate(inReader, inPageHeader.compressed_page_size);
-      BytesInput outPageLoad = readBlockAllocate(outReader, outPageHeader.compressed_page_size);
+      BytesInput inPageLoad = readBlockAllocate(inReader, inPageHeader.getCompressed_page_size());
+      BytesInput outPageLoad = readBlockAllocate(outReader, outPageHeader.getCompressed_page_size());
       assertEquals(inPageLoad.toByteBuffer(), outPageLoad.toByteBuffer());
     }
   }

@@ -381,6 +381,7 @@ public class DynMethods {
      * @param argClasses  argument classes for the method
      * @return this Builder for method chaining
      */
+    @SuppressWarnings("removal")
     public Builder hiddenImpl(Class<?> targetClass, String methodName, Class<?>... argClasses) {
       // don't do any work if an implementation has been found
       if (method != null) {

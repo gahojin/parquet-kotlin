@@ -219,18 +219,18 @@ public class CompressionConverterTest {
     while (readValues < totalChunkValues) {
       long curOffset = reader.getPos();
       PageHeader pageHeader = reader.readPageHeader();
-      switch (pageHeader.type) {
+      switch (pageHeader.getType()) {
         case DICTIONARY_PAGE:
           compressionConverter.readBlock(pageHeader.getCompressed_page_size(), reader);
           break;
         case DATA_PAGE:
-          DataPageHeader headerV1 = pageHeader.data_page_header;
+          DataPageHeader headerV1 = pageHeader.getData_page_header();
           offsets.add(curOffset);
           compressionConverter.readBlock(pageHeader.getCompressed_page_size(), reader);
           readValues += headerV1.getNum_values();
           break;
         case DATA_PAGE_V2:
-          DataPageHeaderV2 headerV2 = pageHeader.data_page_header_v2;
+          DataPageHeaderV2 headerV2 = pageHeader.getData_page_header_v2();
           offsets.add(curOffset);
           int rlLength = headerV2.getRepetition_levels_byte_length();
           compressionConverter.readBlock(rlLength, reader);

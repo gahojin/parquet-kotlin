@@ -80,7 +80,8 @@ public class CleanUtil {
           | SecurityException
           | IllegalAccessException
           | IllegalArgumentException
-          | InvocationTargetException e) {
+          | InvocationTargetException
+          | NullPointerException e) {
         logger.warn("Cannot use direct ByteBuffer cleaner, memory leaking may occur", e);
         cleanerMethodLocal = null;
         cleanMethodLocal = null;

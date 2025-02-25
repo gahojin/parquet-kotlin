@@ -42,6 +42,7 @@ import static org.apache.parquet.schema.LogicalTypeAnnotation.timeType;
 import static org.apache.parquet.schema.LogicalTypeAnnotation.timestampType;
 import static org.apache.parquet.schema.LogicalTypeAnnotation.uuidType;
 import static org.apache.parquet.schema.MessageTypeParser.parseMessageType;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -220,8 +221,8 @@ public class TestParquetMetadataConverter {
     FileMetaData fmd1 = converter.toParquetMetadata(1, parquetMetaData);
 
     // Flag should be true
-    fmd1.row_groups.forEach(rowGroup -> rowGroup.columns.forEach(column -> {
-      assertTrue(column.meta_data.isSetDictionary_page_offset());
+    fmd1.getRow_groups().forEach(rowGroup -> rowGroup.getColumns().forEach(column -> {
+      assertTrue(column.getMeta_data().isSetDictionary_page_offset());
     }));
 
     ByteArrayOutputStream metaDataOutputStream = new ByteArrayOutputStream();
@@ -246,8 +247,8 @@ public class TestParquetMetadataConverter {
     FileMetaData fmd1 = converter.toParquetMetadata(1, parquetMetaData);
 
     // Flag should be false
-    fmd1.row_groups.forEach(rowGroup -> rowGroup.columns.forEach(column -> {
-      assertFalse(column.meta_data.isSetDictionary_page_offset());
+    fmd1.getRow_groups().forEach(rowGroup -> rowGroup.getColumns().forEach(column -> {
+      assertFalse(column.getMeta_data().isSetDictionary_page_offset());
     }));
 
     ByteArrayOutputStream metaDataOutputStream = new ByteArrayOutputStream();
@@ -547,7 +548,7 @@ public class TestParquetMetadataConverter {
   }
 
   private void verifyMD(FileMetaData md, long... offsets) {
-    assertEquals(offsets.length, md.row_groups.size());
+    assertEquals(offsets.length, md.getRow_groups().size());
     for (int i = 0; i < offsets.length; i++) {
       long offset = offsets[i];
       RowGroup rowGroup = md.getRow_groups().get(i);
@@ -575,7 +576,7 @@ public class TestParquetMetadataConverter {
         }
       }
     }
-    if (offsetsFound.size() != md.row_groups.size()) {
+    if (offsetsFound.size() != md.getRow_groups().size()) {
       fail("missing row groups, " + "found: " + offsetsFound + "\nexpected " + md.getRow_groups());
     }
   }
@@ -583,7 +584,7 @@ public class TestParquetMetadataConverter {
   private long fileSize(FileMetaData md) {
     long size = 0;
     for (RowGroup rg : md.getRow_groups()) {
-      size += rg.total_byte_size;
+      size += rg.getTotal_byte_size();
     }
     return size;
   }
@@ -779,8 +780,8 @@ public class TestParquetMetadataConverter {
     assertFalse("Min should not be set", formatStats.isSetMin());
     assertFalse("Max should not be set", formatStats.isSetMax());
     if (helper == StatsHelper.V2) {
-      Assert.assertArrayEquals("Min_value should match", min, formatStats.getMin_value());
-      Assert.assertArrayEquals("Max_value should match", max, formatStats.getMax_value());
+      assertArrayEquals("Min_value should match", min, formatStats.getMin_value());
+      assertArrayEquals("Max_value should match", max, formatStats.getMax_value());
     }
     Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
 
@@ -1047,7 +1048,7 @@ public class TestParquetMetadataConverter {
         Version.FULL_VERSION, ParquetMetadataConverter.toParquetStatistics(stats), binaryType);
 
     Assert.assertFalse("Stats should not be empty: " + convertedStats, convertedStats.isEmpty());
-    Assert.assertArrayEquals(
+    assertArrayEquals(
         "min == max: " + convertedStats, convertedStats.getMaxBytes(), convertedStats.getMinBytes());
   }
 
@@ -1203,8 +1204,8 @@ public class TestParquetMetadataConverter {
     org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
     assertFalse(statistics.isSetMin());
     assertFalse(statistics.isSetMax());
-    assertEquals(ByteBuffer.wrap(stats.getMinBytes()), statistics.min_value);
-    assertEquals(ByteBuffer.wrap(stats.getMaxBytes()), statistics.max_value);
+    assertArrayEquals(stats.getMinBytes(), statistics.getMin_value());
+    assertArrayEquals(stats.getMaxBytes(), statistics.getMax_value());
   }
 
   @Test
@@ -1243,10 +1244,10 @@ public class TestParquetMetadataConverter {
   private void testV2StatsEqualMinMax(PrimitiveType type, Object min, Object max) {
     Statistics<?> stats = createStats(type, min, max);
     org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
-    assertEquals(ByteBuffer.wrap(stats.getMinBytes()), statistics.min);
-    assertEquals(ByteBuffer.wrap(stats.getMaxBytes()), statistics.max);
-    assertEquals(ByteBuffer.wrap(stats.getMinBytes()), statistics.min_value);
-    assertEquals(ByteBuffer.wrap(stats.getMaxBytes()), statistics.max_value);
+    assertArrayEquals(stats.getMinBytes(), statistics.getMin());
+    assertArrayEquals(stats.getMaxBytes(), statistics.getMax());
+    assertArrayEquals(stats.getMinBytes(), statistics.getMin_value());
+    assertArrayEquals(stats.getMaxBytes(), statistics.getMax_value());
   }
 
   private static <T> Statistics<?> createStats(PrimitiveType type, T min, T max) {

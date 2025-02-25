@@ -629,13 +629,13 @@ public class ParquetRewriter implements Closeable {
       PageHeader pageHeader = reader.readPageHeader();
       int compressedPageSize = pageHeader.getCompressed_page_size();
       byte[] pageLoad;
-      switch (pageHeader.type) {
+      switch (pageHeader.getType()) {
         case DICTIONARY_PAGE:
           if (dictionaryPage != null) {
             throw new IOException("has more than one dictionary page in column chunk: " + chunk);
           }
           // No quickUpdatePageAAD needed for dictionary page
-          DictionaryPageHeader dictPageHeader = pageHeader.dictionary_page_header;
+          DictionaryPageHeader dictPageHeader = pageHeader.getDictionary_page_header();
           pageLoad = processPageLoad(
               reader,
               true,
@@ -658,7 +658,7 @@ public class ParquetRewriter implements Closeable {
             AesCipher.quickUpdatePageAAD(dataPageHeaderAAD, pageOrdinal);
             AesCipher.quickUpdatePageAAD(dataPageAAD, pageOrdinal);
           }
-          DataPageHeader headerV1 = pageHeader.data_page_header;
+          DataPageHeader headerV1 = pageHeader.getData_page_header();
           pageLoad = processPageLoad(
               reader,
               true,
@@ -720,7 +720,7 @@ public class ParquetRewriter implements Closeable {
             AesCipher.quickUpdatePageAAD(dataPageHeaderAAD, pageOrdinal);
             AesCipher.quickUpdatePageAAD(dataPageAAD, pageOrdinal);
           }
-          DataPageHeaderV2 headerV2 = pageHeader.data_page_header_v2;
+          DataPageHeaderV2 headerV2 = pageHeader.getData_page_header_v2();
           int rlLength = headerV2.getRepetition_levels_byte_length();
           BytesInput rlLevels = readBlockAllocate(rlLength, reader);
           int dlLength = headerV2.getDefinition_levels_byte_length();
@@ -729,7 +729,7 @@ public class ParquetRewriter implements Closeable {
           int rawDataLength = pageHeader.getUncompressed_page_size() - rlLength - dlLength;
           pageLoad = processPageLoad(
               reader,
-              headerV2.is_compressed,
+              headerV2.isIs_compressed(),
               compressor,
               decompressor,
               payLoadLength,

@@ -537,7 +537,7 @@ public class ParquetMetadataConverter {
       // There is no ColumnMetaData written after the chunk data, so set the ColumnChunk
       // file_offset to 0
       ColumnChunk columnChunk = new ColumnChunk(0);
-      columnChunk.file_path = block.getPath(); // they are in the same file for now
+      columnChunk.setFile_path(block.getPath()); // they are in the same file for now
       InternalColumnEncryptionSetup columnSetup = null;
       boolean writeCryptoMetadata = false;
       boolean encryptMetaData = false;
@@ -838,8 +838,8 @@ public class ParquetMetadataConverter {
     if (formatStats != null) {
       // Use the new V2 min-max statistics over the former one if it is filled
       if (formatStats.isSetMin_value() && formatStats.isSetMax_value()) {
-        byte[] min = formatStats.min_value.array();
-        byte[] max = formatStats.max_value.array();
+        byte[] min = formatStats.getMin_value();
+        byte[] max = formatStats.getMax_value();
         if (isMinMaxStatsSupported(type) || Arrays.equals(min, max)) {
           statsBuilder.withMin(min);
           statsBuilder.withMax(max);
@@ -856,14 +856,14 @@ public class ParquetMetadataConverter {
         if (!CorruptStatistics.shouldIgnoreStatistics(createdBy, type.getPrimitiveTypeName())
             && (sortOrdersMatch || maxEqualsMin)) {
           if (isSet) {
-            statsBuilder.withMin(formatStats.min.array());
-            statsBuilder.withMax(formatStats.max.array());
+            statsBuilder.withMin(formatStats.getMin());
+            statsBuilder.withMax(formatStats.getMax());
           }
         }
       }
 
       if (formatStats.isSetNull_count()) {
-        statsBuilder.withNumNulls(formatStats.null_count);
+        statsBuilder.withNumNulls(formatStats.getNull_count());
       }
     }
     return statsBuilder.build();
@@ -1100,8 +1100,8 @@ public class ParquetMetadataConverter {
       case ENUM:
         return LogicalTypeAnnotation.enumType();
       case DECIMAL:
-        int scale = (schemaElement == null ? 0 : schemaElement.scale);
-        int precision = (schemaElement == null ? 0 : schemaElement.precision);
+        int scale = (schemaElement == null ? 0 : schemaElement.getScale());
+        int precision = (schemaElement == null ? 0 : schemaElement.getPrecision());
         return LogicalTypeAnnotation.decimalType(scale, precision);
       case DATE:
         return LogicalTypeAnnotation.dateType();
@@ -1157,20 +1157,20 @@ public class ParquetMetadataConverter {
         return LogicalTypeAnnotation.listType();
       case TIME:
         TimeType time = type.getTIME();
-        return LogicalTypeAnnotation.timeType(time.isAdjustedToUTC, convertTimeUnit(time.unit));
+        return LogicalTypeAnnotation.timeType(time.isIsAdjustedToUTC(), convertTimeUnit(time.getUnit()));
       case STRING:
         return LogicalTypeAnnotation.stringType();
       case DECIMAL:
         DecimalType decimal = type.getDECIMAL();
-        return LogicalTypeAnnotation.decimalType(decimal.scale, decimal.precision);
+        return LogicalTypeAnnotation.decimalType(decimal.getScale(), decimal.getPrecision());
       case INTEGER:
         IntType integer = type.getINTEGER();
-        return LogicalTypeAnnotation.intType(integer.bitWidth, integer.isSigned);
+        return LogicalTypeAnnotation.intType(integer.getBitWidth(), integer.isIsSigned());
       case UNKNOWN:
         return null;
       case TIMESTAMP:
         TimestampType timestamp = type.getTIMESTAMP();
-        return LogicalTypeAnnotation.timestampType(timestamp.isAdjustedToUTC, convertTimeUnit(timestamp.unit));
+        return LogicalTypeAnnotation.timestampType(timestamp.isIsAdjustedToUTC(), convertTimeUnit(timestamp.getUnit()));
       case UUID:
         return LogicalTypeAnnotation.uuidType();
       case FLOAT16:
@@ -1195,7 +1195,7 @@ public class ParquetMetadataConverter {
 
   private static void addKeyValue(FileMetaData fileMetaData, String key, String value) {
     KeyValue keyValue = new KeyValue(key);
-    keyValue.value = value;
+    keyValue.setValue(value);
     fileMetaData.addToKey_value_metadata(keyValue);
   }
 
@@ -1602,16 +1602,16 @@ public class ParquetMetadataConverter {
     return ColumnChunkMetaData.get(
         columnPath,
         type,
-        fromFormatCodec(metaData.codec),
+        fromFormatCodec(metaData.getCodec()),
         convertEncodingStats(metaData.getEncoding_stats()),
-        fromFormatEncodings(metaData.encodings),
-        fromParquetStatistics(createdBy, metaData.statistics, type),
-        metaData.data_page_offset,
-        metaData.dictionary_page_offset,
-        metaData.num_values,
-        metaData.total_compressed_size,
-        metaData.total_uncompressed_size,
-        fromParquetSizeStatistics(metaData.size_statistics, type));
+        fromFormatEncodings(metaData.getEncodings()),
+        fromParquetStatistics(createdBy, metaData.getStatistics(), type),
+        metaData.getData_page_offset(),
+        metaData.getDictionary_page_offset(),
+  metaData.getNum_values(),
+  metaData.getTotal_compressed_size(),
+  metaData.getTotal_uncompressed_size(),
+        fromParquetSizeStatistics(metaData.getSize_statistics(), type));
   }
 
   public ParquetMetadata fromParquetMetadata(FileMetaData parquetMetadata) throws IOException {
@@ -1656,7 +1656,7 @@ public class ParquetMetadataConverter {
             throw new ParquetDecodingException(
                 "all column chunks of the same row group must be in the same file for now");
           }
-          ColumnMetaData metaData = columnChunk.meta_data;
+          ColumnMetaData metaData = columnChunk.getMeta_data();
           ColumnCryptoMetaData cryptoMetaData = columnChunk.getCrypto_metadata();
           ColumnChunkMetaData column = null;
           ColumnPath columnPath = null;
@@ -1756,7 +1756,7 @@ public class ParquetMetadataConverter {
     List<KeyValue> key_value_metadata = parquetMetadata.getKey_value_metadata();
     if (key_value_metadata != null) {
       for (KeyValue keyValue : key_value_metadata) {
-        keyValueMetaData.put(keyValue.key, keyValue.value);
+        keyValueMetaData.put(keyValue.getKey(), keyValue.getValue());
       }
     }
     EncryptionType encryptionType;
@@ -1788,7 +1788,7 @@ public class ParquetMetadataConverter {
   }
 
   private static ColumnPath getPath(ColumnMetaData metaData) {
-    String[] path = metaData.path_in_schema.toArray(new String[0]);
+    String[] path = metaData.getPath_in_schema().toArray(new String[0]);
     return ColumnPath.get(path);
   }
 
@@ -1798,10 +1798,10 @@ public class ParquetMetadataConverter {
     SchemaElement root = iterator.next();
     Types.MessageTypeBuilder builder = Types.buildMessage();
     if (root.isSetField_id()) {
-      builder.id(root.field_id);
+      builder.id(root.getField_id());
     }
     buildChildren(builder, iterator, root.getNum_children(), columnOrders, 0);
-    return builder.named(root.name);
+    return builder.named(root.getName());
   }
 
   private void buildChildren(
@@ -1815,17 +1815,17 @@ public class ParquetMetadataConverter {
 
       // Create Parquet Type.
       Types.Builder childBuilder;
-      if (schemaElement.type != null) {
+      if (schemaElement.getType() != null) {
         Types.PrimitiveBuilder primitiveBuilder = builder.primitive(
-            getPrimitive(schemaElement.type), fromParquetRepetition(schemaElement.repetition_type));
+            getPrimitive(schemaElement.getType()), fromParquetRepetition(schemaElement.getRepetition_type()));
         if (schemaElement.isSetType_length()) {
-          primitiveBuilder.length(schemaElement.type_length);
+          primitiveBuilder.length(schemaElement.getType_length());
         }
         if (schemaElement.isSetPrecision()) {
-          primitiveBuilder.precision(schemaElement.precision);
+          primitiveBuilder.precision(schemaElement.getPrecision());
         }
         if (schemaElement.isSetScale()) {
-          primitiveBuilder.scale(schemaElement.scale);
+          primitiveBuilder.scale(schemaElement.getScale());
         }
         if (columnOrders != null) {
           org.apache.parquet.schema.ColumnOrder columnOrder =
@@ -1834,48 +1834,48 @@ public class ParquetMetadataConverter {
           // the types
           // where ordering is not supported.
           if (columnOrder.getColumnOrderName() == ColumnOrderName.TYPE_DEFINED_ORDER
-              && (schemaElement.type == Type.INT96
-                  || schemaElement.converted_type == ConvertedType.INTERVAL)) {
+              && (schemaElement.getType() == Type.INT96
+                  || schemaElement.getConverted_type() == ConvertedType.INTERVAL)) {
             columnOrder = org.apache.parquet.schema.ColumnOrder.undefined();
           }
           primitiveBuilder.columnOrder(columnOrder);
         }
         childBuilder = primitiveBuilder;
       } else {
-        childBuilder = builder.group(fromParquetRepetition(schemaElement.repetition_type));
+        childBuilder = builder.group(fromParquetRepetition(schemaElement.getRepetition_type()));
         buildChildren(
             (Types.GroupBuilder) childBuilder,
             schema,
-            schemaElement.num_children,
+            schemaElement.getNum_children(),
             columnOrders,
             columnCount);
       }
 
       if (schemaElement.isSetLogicalType()) {
-        childBuilder.as(getLogicalTypeAnnotation(schemaElement.logicalType));
+        childBuilder.as(getLogicalTypeAnnotation(schemaElement.getLogicalType()));
       }
       if (schemaElement.isSetConverted_type()) {
-        OriginalType originalType = getLogicalTypeAnnotation(schemaElement.converted_type, schemaElement)
+        OriginalType originalType = getLogicalTypeAnnotation(schemaElement.getConverted_type(), schemaElement)
             .toOriginalType();
         OriginalType newOriginalType = (schemaElement.isSetLogicalType()
-                && getLogicalTypeAnnotation(schemaElement.logicalType) != null)
-            ? getLogicalTypeAnnotation(schemaElement.logicalType).toOriginalType()
+                && getLogicalTypeAnnotation(schemaElement.getLogicalType()) != null)
+            ? getLogicalTypeAnnotation(schemaElement.getLogicalType()).toOriginalType()
             : null;
         if (!originalType.equals(newOriginalType)) {
           if (newOriginalType != null) {
             LOG.warn(
                 "Converted type and logical type metadata mismatch (convertedType: {}, logical type: {}). Using value in converted type.",
-                schemaElement.converted_type,
-                schemaElement.logicalType);
+                schemaElement.getConverted_type(),
+                schemaElement.getLogicalType());
           }
           childBuilder.as(originalType);
         }
       }
       if (schemaElement.isSetField_id()) {
-        childBuilder.id(schemaElement.field_id);
+        childBuilder.id(schemaElement.getField_id());
       }
 
-      childBuilder.named(schemaElement.name);
+      childBuilder.named(schemaElement.getName());
       ++columnCount;
     }
   }
@@ -2316,13 +2316,13 @@ public class ParquetMetadataConverter {
   public static org.apache.parquet.internal.column.columnindex.OffsetIndex fromParquetOffsetIndex(
       OffsetIndex parquetOffsetIndex) {
     boolean hasUnencodedByteArrayDataBytes = parquetOffsetIndex.isSetUnencoded_byte_array_data_bytes()
-        && parquetOffsetIndex.unencoded_byte_array_data_bytes.size()
-            == parquetOffsetIndex.page_locations.size();
+        && parquetOffsetIndex.getUnencoded_byte_array_data_bytes().size()
+            == parquetOffsetIndex.getPage_locations().size();
     OffsetIndexBuilder builder = OffsetIndexBuilder.getBuilder();
-    for (int i = 0; i < parquetOffsetIndex.page_locations.size(); ++i) {
-      PageLocation pageLocation = parquetOffsetIndex.page_locations.get(i);
+    for (int i = 0; i < parquetOffsetIndex.getPage_locations().size(); ++i) {
+      PageLocation pageLocation = parquetOffsetIndex.getPage_locations().get(i);
       Optional<Long> unencodedByteArrayDataBytes = hasUnencodedByteArrayDataBytes
-          ? Optional.of(parquetOffsetIndex.unencoded_byte_array_data_bytes.get(i))
+          ? Optional.of(parquetOffsetIndex.getUnencoded_byte_array_data_bytes().get(i))
           : Optional.empty();
       builder.add(
           pageLocation.getOffset(),
