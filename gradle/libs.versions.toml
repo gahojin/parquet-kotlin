@@ -52,8 +52,6 @@ mockk = "1.13.16"
 
 okio = "3.10.2"
 
-okhttp3 = "4.12.0"
-
 parquet-format = "2.10.0"
 
 semver = "0.9.33"
@@ -107,8 +105,6 @@ mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 okio = { group = "com.squareup.okio", name = "okio-jvm", version.ref = "okio" }
-
-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3" }
 
 parquet-format = { group = "org.apache.parquet", name = "parquet-format", version.ref = "parquet-format" }
 

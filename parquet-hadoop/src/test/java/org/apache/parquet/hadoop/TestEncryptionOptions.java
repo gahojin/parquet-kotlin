@@ -128,7 +128,6 @@ public class TestEncryptionOptions {
 
   private ErrorCollector errorCollector;
   private InterOpTester interop = new InterOpTester();
-  private static final String CHANGESET = "40379b3";
 
   private static final byte[] FOOTER_ENCRYPTION_KEY = "0123456789012345".getBytes();
   private static final byte[][] COLUMN_ENCRYPTION_KEYS = {
@@ -509,7 +508,7 @@ public class TestEncryptionOptions {
         if (EncryptionConfiguration.ENCRYPT_COLUMNS_PLAIN_FOOTER_COMPLETE == encryptionConfiguration) {
           continue;
         }
-        Path file = interop.GetInterOpFile(getFileName(encryptionConfiguration), CHANGESET);
+        Path file = interop.GetInterOpFile(getFileName(encryptionConfiguration));
         LOG.info("==> Decryption configuration {}", decryptionConfiguration);
         FileDecryptionProperties fileDecryptionProperties = decryptionConfiguration.getDecryptionProperties();
 

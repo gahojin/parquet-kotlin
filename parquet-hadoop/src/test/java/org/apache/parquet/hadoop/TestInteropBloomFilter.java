@@ -26,12 +26,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.List;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.ParquetReadOptions;
 import org.apache.parquet.column.values.bloomfilter.BloomFilter;
@@ -48,23 +43,20 @@ import org.slf4j.LoggerFactory;
 
 public class TestInteropBloomFilter {
 
-  // The link includes a reference to a specific commit. To take a newer version - update this link.
-  private static final String PARQUET_TESTING_REPO = "https://github.com/apache/parquet-testing/raw/d69d979/data/";
-  private static String PARQUET_TESTING_PATH = "target/parquet-testing/data";
+  private static final String PARQUET_TESTING_PATH = "../parquet-testing/data";
   // parquet-testing: https://github.com/apache/parquet-testing/pull/22
-  private static String DATA_INDEX_BLOOM_FILE = "data_index_bloom_encoding_stats.parquet";
+  private static final String DATA_INDEX_BLOOM_FILE = "data_index_bloom_encoding_stats.parquet";
   // parquet-testing: https://github.com/apache/parquet-testing/pull/43
-  private static String DATA_INDEX_BLOOM_WITH_LENGTH_FILE = "data_index_bloom_encoding_with_length.parquet";
+  private static final String DATA_INDEX_BLOOM_WITH_LENGTH_FILE = "data_index_bloom_encoding_with_length.parquet";
 
   private static final Logger LOG = LoggerFactory.getLogger(TestInteropBloomFilter.class);
-  private OkHttpClient httpClient = new OkHttpClient();
 
   @Test
   public void testReadDataIndexBloomParquetFiles() throws IOException {
     Path rootPath = new Path(PARQUET_TESTING_PATH);
     LOG.info("======== testReadDataIndexBloomParquetFiles {} ========", rootPath);
 
-    Path filePath = downloadInterOpFiles(rootPath, DATA_INDEX_BLOOM_FILE, httpClient);
+    Path filePath = new Path(rootPath, DATA_INDEX_BLOOM_FILE);
 
     int expectedRowCount = 14;
     String[] expectedValues = new String[] {
@@ -132,7 +124,7 @@ public class TestInteropBloomFilter {
     Path rootPath = new Path(PARQUET_TESTING_PATH);
     LOG.info("======== testReadDataIndexBloomWithLengthParquetFiles {} ========", rootPath);
 
-    Path filePath = downloadInterOpFiles(rootPath, DATA_INDEX_BLOOM_WITH_LENGTH_FILE, httpClient);
+    Path filePath = new Path(rootPath, DATA_INDEX_BLOOM_WITH_LENGTH_FILE);
 
     int expectedRowCount = 14;
     String[] expectedValues = new String[] {
@@ -193,33 +185,5 @@ public class TestInteropBloomFilter {
         fail("Should not throw exception: " + e.getMessage());
       }
     });
-  }
-
-  private Path downloadInterOpFiles(Path rootPath, String fileName, OkHttpClient httpClient) throws IOException {
-    LOG.info("Download interOp files if needed");
-    Configuration conf = new Configuration();
-    FileSystem fs = rootPath.getFileSystem(conf);
-    LOG.info(rootPath + " exists?: " + fs.exists(rootPath));
-    if (!fs.exists(rootPath)) {
-      LOG.info("Create folder for interOp files: " + rootPath);
-      if (!fs.mkdirs(rootPath)) {
-        throw new IOException("Cannot create path " + rootPath);
-      }
-    }
-
-    Path file = new Path(rootPath, fileName);
-    if (!fs.exists(file)) {
-      String downloadUrl = PARQUET_TESTING_REPO + fileName;
-      LOG.info("Download interOp file: " + downloadUrl);
-      Request request = new Request.Builder().url(downloadUrl).build();
-      Response response = httpClient.newCall(request).execute();
-      if (!response.isSuccessful()) {
-        throw new IOException("Failed to download file: " + response);
-      }
-      try (FSDataOutputStream fdos = fs.create(file)) {
-        fdos.write(response.body().bytes());
-      }
-    }
-    return file;
   }
 }

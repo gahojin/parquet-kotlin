@@ -51,7 +51,6 @@ dependencies {
     testImplementation(libs.kotest.property)
     testImplementation(libs.mockk)
     testImplementation(libs.mockito)
-    testImplementation(libs.okhttp3)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.zero.allocation.hashing)
 }

@@ -34,12 +34,11 @@ import org.junit.Test;
 public class TestInterOpReadByteStreamSplit {
   private static final String FLOATS_FILE = "byte_stream_split.zstd.parquet";
   private static final String EXTENDED_FILE = "byte_stream_split_extended.gzip.parquet";
-  private static final String CHANGESET = "74278bc";
   private final InterOpTester interop = new InterOpTester();
 
   @Test
   public void testReadFloats() throws IOException {
-    Path floatsFile = interop.GetInterOpFile(FLOATS_FILE, CHANGESET);
+    Path floatsFile = interop.GetInterOpFile(FLOATS_FILE);
     final int expectRows = 300;
 
     try (ParquetReader<Group> reader =
@@ -91,7 +90,7 @@ public class TestInterOpReadByteStreamSplit {
 
   @Test
   public void testReadAllSupportedTypes() throws IOException {
-    Path extendedFile = interop.GetInterOpFile(EXTENDED_FILE, CHANGESET);
+    Path extendedFile = interop.GetInterOpFile(EXTENDED_FILE);
     final int expectRows = 200;
     compareColumnValues(extendedFile, expectRows, "float_plain", "float_byte_stream_split");
     compareColumnValues(extendedFile, expectRows, "double_plain", "double_byte_stream_split");

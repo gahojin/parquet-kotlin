@@ -36,13 +36,12 @@ import org.junit.Test;
 public class TestInterOpReadFloat16 {
   private static String FLOAT16_NONZEROS_NANS_FILE = "float16_nonzeros_and_nans.parquet";
   private static String FLOAT16_ZEROS_NANS_FILE = "float16_zeros_and_nans.parquet";
-  private static final String CHANGESET = "da467da";
 
   private InterOpTester interop = new InterOpTester();
 
   @Test
   public void testInterOpReadFloat16NonZerosAndNansParquetFiles() throws IOException {
-    Path filePath = interop.GetInterOpFile(FLOAT16_NONZEROS_NANS_FILE, CHANGESET);
+    Path filePath = interop.GetInterOpFile(FLOAT16_NONZEROS_NANS_FILE);
 
     final int expectRows = 8;
     Binary[] c0ExpectValues = {
@@ -87,7 +86,7 @@ public class TestInterOpReadFloat16 {
 
   @Test
   public void testInterOpReadFloat16ZerosAndNansParquetFiles() throws IOException {
-    Path filePath = interop.GetInterOpFile(FLOAT16_ZEROS_NANS_FILE, "da467da");
+    Path filePath = interop.GetInterOpFile(FLOAT16_ZEROS_NANS_FILE);
 
     final int expectRows = 3;
     Binary[] c0ExpectValues = {
