@@ -71,6 +71,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import okio.ByteString;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.FixedBinaryTestUtils;
@@ -185,22 +186,10 @@ public class TestParquetMetadataConverter {
         .named("aFixedDecimal")
         .named("Message"));
     List<SchemaElement> expected = Lists.newArrayList(
-        new SchemaElement("Message").setNum_children(2),
-        new SchemaElement("aBinaryDecimal")
-            .setRepetition_type(FieldRepetitionType.REQUIRED)
-            .setType(Type.BYTE_ARRAY)
-            .setConverted_type(ConvertedType.DECIMAL)
-            .setLogicalType(LogicalType.DECIMAL(new DecimalType(2, 9)))
-            .setPrecision(9)
-            .setScale(2),
-        new SchemaElement("aFixedDecimal")
-            .setRepetition_type(FieldRepetitionType.OPTIONAL)
-            .setType(Type.FIXED_LEN_BYTE_ARRAY)
-            .setType_length(4)
-            .setConverted_type(ConvertedType.DECIMAL)
-            .setLogicalType(LogicalType.DECIMAL(new DecimalType(2, 9)))
-            .setPrecision(9)
-            .setScale(2));
+        new SchemaElement(null, null, null, "Message", 2),
+        new SchemaElement(Type.BYTE_ARRAY, null, FieldRepetitionType.REQUIRED, "aBinaryDecimal", null, ConvertedType.DECIMAL, 2, 9, null, new LogicalType.DECIMAL(new DecimalType(2, 9))),
+        new SchemaElement(Type.FIXED_LEN_BYTE_ARRAY, 4, FieldRepetitionType.OPTIONAL, "aFixedDecimal", null, ConvertedType.DECIMAL, 2, 9, null, new LogicalType.DECIMAL(new DecimalType(2, 9)))
+    );
     Assert.assertEquals(expected, schemaElements);
   }
 
@@ -221,8 +210,8 @@ public class TestParquetMetadataConverter {
     FileMetaData fmd1 = converter.toParquetMetadata(1, parquetMetaData);
 
     // Flag should be true
-    fmd1.getRow_groups().forEach(rowGroup -> rowGroup.getColumns().forEach(column -> {
-      assertTrue(column.getMeta_data().isSetDictionary_page_offset());
+    fmd1.rowGroups.forEach(rowGroup -> rowGroup.columns.forEach(column -> {
+      assertNotNull(column.metaData.dictionaryPageOffset);
     }));
 
     ByteArrayOutputStream metaDataOutputStream = new ByteArrayOutputStream();
@@ -247,8 +236,8 @@ public class TestParquetMetadataConverter {
     FileMetaData fmd1 = converter.toParquetMetadata(1, parquetMetaData);
 
     // Flag should be false
-    fmd1.getRow_groups().forEach(rowGroup -> rowGroup.getColumns().forEach(column -> {
-      assertFalse(column.getMeta_data().isSetDictionary_page_offset());
+    fmd1.rowGroups.forEach(rowGroup -> rowGroup.columns.forEach(column -> {
+      assertNull(column.metaData.dictionaryPageOffset);
     }));
 
     ByteArrayOutputStream metaDataOutputStream = new ByteArrayOutputStream();
@@ -269,19 +258,19 @@ public class TestParquetMetadataConverter {
 
     // Without bloom filter offset
     FileMetaData footer = converter.toParquetMetadata(1, origMetaData);
-    assertFalse(
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().isSetBloom_filter_offset());
+    assertNull(
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterOffset);
     ParquetMetadata convertedMetaData = converter.fromParquetMetadata(footer);
     assertTrue(convertedMetaData.getBlocks().get(0).getColumns().get(0).getBloomFilterOffset() < 0);
 
     // With bloom filter offset
     origMetaData.getBlocks().get(0).getColumns().get(0).setBloomFilterOffset(1234);
     footer = converter.toParquetMetadata(1, origMetaData);
-    assertTrue(
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().isSetBloom_filter_offset());
+    assertNotNull(
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterOffset);
     assertEquals(
         1234,
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().getBloom_filter_offset());
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterOffset.longValue());
     convertedMetaData = converter.fromParquetMetadata(footer);
     assertEquals(
         1234, convertedMetaData.getBlocks().get(0).getColumns().get(0).getBloomFilterOffset());
@@ -294,19 +283,19 @@ public class TestParquetMetadataConverter {
 
     // Without bloom filter length
     FileMetaData footer = converter.toParquetMetadata(1, origMetaData);
-    assertFalse(
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().isSetBloom_filter_length());
+    assertNull(
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterLength);
     ParquetMetadata convertedMetaData = converter.fromParquetMetadata(footer);
     assertTrue(convertedMetaData.getBlocks().get(0).getColumns().get(0).getBloomFilterLength() < 0);
 
     // With bloom filter length
     origMetaData.getBlocks().get(0).getColumns().get(0).setBloomFilterLength(1024);
     footer = converter.toParquetMetadata(1, origMetaData);
-    assertTrue(
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().isSetBloom_filter_length());
+    assertNotNull(
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterLength);
     assertEquals(
         1024,
-        footer.getRow_groups().get(0).getColumns().get(0).getMeta_data().getBloom_filter_length());
+        footer.rowGroups.get(0).columns.get(0).metaData.bloomFilterLength.intValue());
     convertedMetaData = converter.fromParquetMetadata(footer);
     assertEquals(
         1024, convertedMetaData.getBlocks().get(0).getColumns().get(0).getBloomFilterLength());
@@ -325,7 +314,7 @@ public class TestParquetMetadataConverter {
     List<SchemaElement> parquetSchema = parquetMetadataConverter.toParquetSchema(expected);
     // Set logical type field to null to test backward compatibility with files written by older API,
     // where converted_types are written to the metadata, but logicalType is missing
-    parquetSchema.get(1).setLogicalType(null);
+    parquetSchema.get(1).logicalType = null;
     MessageType schema = parquetMetadataConverter.fromParquetSchema(parquetSchema, null);
     assertEquals(expected, schema);
   }
@@ -348,7 +337,7 @@ public class TestParquetMetadataConverter {
 
     List<SchemaElement> parquetSchema = parquetMetadataConverter.toParquetSchema(schema);
     // Set converted type field to a different type to verify that in case of mismatch, it overrides logical type
-    parquetSchema.get(1).setConverted_type(ConvertedType.JSON);
+    parquetSchema.get(1).convertedType = ConvertedType.JSON;
     MessageType actual = parquetMetadataConverter.fromParquetSchema(parquetSchema, null);
     assertEquals(expected, actual);
   }
@@ -515,8 +504,8 @@ public class TestParquetMetadataConverter {
     List<RowGroup> rowGroups = new ArrayList<RowGroup>();
     long offset = 0;
     for (long size : sizes) {
-      ColumnChunk columnChunk = new ColumnChunk(offset);
-      columnChunk.setMeta_data(new ColumnMetaData(
+      ColumnChunk columnChunk = new ColumnChunk(null, offset);
+      columnChunk.metaData = new ColumnMetaData(
           INT32,
           Collections.<org.apache.parquet.format.Encoding>emptyList(),
           Collections.<String>emptyList(),
@@ -524,8 +513,9 @@ public class TestParquetMetadataConverter {
           10l,
           size * 2,
           size,
-          offset));
-      rowGroups.add(new RowGroup(Arrays.asList(columnChunk), size, 1));
+          null,
+          offset);
+      rowGroups.add(new RowGroup(List.of(columnChunk), size, 1));
       offset += size;
     }
     return new FileMetaData(1, schema, sizes.length, rowGroups);
@@ -533,25 +523,27 @@ public class TestParquetMetadataConverter {
 
   private FileMetaData filter(FileMetaData md, long start, long end) {
     return filterFileMetaDataByMidpoint(
-        new FileMetaData(md), new ParquetMetadataConverter.RangeMetadataFilter(start, end));
+        md.deepCopy(),
+        new ParquetMetadataConverter.RangeMetadataFilter(start, end));
   }
 
   private FileMetaData find(FileMetaData md, Long... blockStart) {
     return filterFileMetaDataByStart(
-        new FileMetaData(md),
-        new ParquetMetadataConverter.OffsetMetadataFilter(Sets.newHashSet((Long[]) blockStart)));
+        md.deepCopy(),
+        new ParquetMetadataConverter.OffsetMetadataFilter(Sets.newHashSet(blockStart)));
   }
 
   private FileMetaData find(FileMetaData md, long blockStart) {
     return filterFileMetaDataByStart(
-        new FileMetaData(md), new ParquetMetadataConverter.OffsetMetadataFilter(Sets.newHashSet(blockStart)));
+        md.deepCopy(),
+        new ParquetMetadataConverter.OffsetMetadataFilter(Sets.newHashSet(blockStart)));
   }
 
   private void verifyMD(FileMetaData md, long... offsets) {
-    assertEquals(offsets.length, md.getRow_groups().size());
+    assertEquals(offsets.length, md.rowGroups.size());
     for (int i = 0; i < offsets.length; i++) {
       long offset = offsets[i];
-      RowGroup rowGroup = md.getRow_groups().get(i);
+      RowGroup rowGroup = md.rowGroups.get(i);
       assertEquals(offset, getOffset(rowGroup));
     }
   }
@@ -567,7 +559,7 @@ public class TestParquetMetadataConverter {
     Set<Long> offsetsFound = new TreeSet<Long>();
     for (long start = 0; start < fileSize(md); start += splitWidth) {
       FileMetaData filtered = filter(md, start, start + splitWidth);
-      for (RowGroup rg : filtered.getRow_groups()) {
+      for (RowGroup rg : filtered.rowGroups) {
         long o = getOffset(rg);
         if (offsetsFound.contains(o)) {
           fail("found the offset twice: " + o);
@@ -576,15 +568,15 @@ public class TestParquetMetadataConverter {
         }
       }
     }
-    if (offsetsFound.size() != md.getRow_groups().size()) {
-      fail("missing row groups, " + "found: " + offsetsFound + "\nexpected " + md.getRow_groups());
+    if (offsetsFound.size() != md.rowGroups.size()) {
+      fail("missing row groups, " + "found: " + offsetsFound + "\nexpected " + md.rowGroups);
     }
   }
 
   private long fileSize(FileMetaData md) {
     long size = 0;
-    for (RowGroup rg : md.getRow_groups()) {
-      size += rg.getTotal_byte_size();
+    for (RowGroup rg : md.rowGroups) {
+      size += rg.totalByteSize;
     }
     return size;
   }
@@ -726,7 +718,7 @@ public class TestParquetMetadataConverter {
         org.apache.parquet.format.Encoding.RLE_DICTIONARY,
         org.apache.parquet.format.Encoding.DELTA_LENGTH_BYTE_ARRAY);
 
-    Set<org.apache.parquet.column.Encoding> expected = new HashSet<org.apache.parquet.column.Encoding>();
+    Set<org.apache.parquet.column.Encoding> expected = new HashSet<>();
     expected.add(org.apache.parquet.column.Encoding.BIT_PACKED);
     expected.add(org.apache.parquet.column.Encoding.RLE_DICTIONARY);
     expected.add(org.apache.parquet.column.Encoding.DELTA_LENGTH_BYTE_ARRAY);
@@ -777,24 +769,24 @@ public class TestParquetMetadataConverter {
 
     org.apache.parquet.format.Statistics formatStats = helper.toParquetStatistics(stats);
 
-    assertFalse("Min should not be set", formatStats.isSetMin());
-    assertFalse("Max should not be set", formatStats.isSetMax());
+    assertNull("Min should not be set", formatStats.min);
+    assertNull("Max should not be set", formatStats.max);
     if (helper == StatsHelper.V2) {
-      assertArrayEquals("Min_value should match", min, formatStats.getMin_value());
-      assertArrayEquals("Max_value should match", max, formatStats.getMax_value());
+      assertArrayEquals("Min_value should match", min, formatStats.minValue.toByteArray());
+      assertArrayEquals("Max_value should match", max, formatStats.maxValue.toByteArray());
     }
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
 
     // convert to empty stats because the values are too large
     stats.setMinMaxFromBytes(max, max);
 
     formatStats = helper.toParquetStatistics(stats);
 
-    Assert.assertFalse("Min should not be set", formatStats.isSetMin());
-    Assert.assertFalse("Max should not be set", formatStats.isSetMax());
-    Assert.assertFalse("Min_value should not be set", formatStats.isSetMin_value());
-    Assert.assertFalse("Max_value should not be set", formatStats.isSetMax_value());
-    Assert.assertFalse("Num nulls should not be set", formatStats.isSetNull_count());
+    assertNull("Min should not be set", formatStats.min);
+    assertNull("Max should not be set", formatStats.max);
+    assertNull("Min_value should not be set", formatStats.minValue);
+    assertNull("Max_value should not be set", formatStats.maxValue);
+    assertNull("Num nulls should not be set", formatStats.nullCount);
 
     Statistics roundTripStats = ParquetMetadataConverter.fromParquetStatisticsInternal(
         Version.FULL_VERSION,
@@ -839,14 +831,14 @@ public class TestParquetMetadataConverter {
     org.apache.parquet.format.Statistics formatStats = metadataConverter.toParquetStatistics(stats);
 
     if (minLen + maxLen >= ParquetMetadataConverter.MAX_STATS_SIZE) {
-      assertNull(formatStats.getMin_value());
-      assertNull(formatStats.getMax_value());
+      assertNull(formatStats.minValue);
+      assertNull(formatStats.maxValue);
     } else {
       String minString = new String(min, Charset.forName("UTF-8"));
-      String minStatString = new String(formatStats.getMin_value(), Charset.forName("UTF-8"));
+      String minStatString = formatStats.minValue.string(Charset.forName("UTF-8"));
       assertTrue(minStatString.compareTo(minString) <= 0);
       String maxString = new String(max, Charset.forName("UTF-8"));
-      String maxStatString = new String(formatStats.getMax_value(), Charset.forName("UTF-8"));
+      String maxStatString = formatStats.maxValue.string(Charset.forName("UTF-8"));
       assertTrue(maxStatString.compareTo(maxString) >= 0);
     }
   }
@@ -884,9 +876,9 @@ public class TestParquetMetadataConverter {
 
     org.apache.parquet.format.Statistics formatStats = helper.toParquetStatistics(stats);
 
-    Assert.assertEquals("Min should match", min, BytesUtils.bytesToInt(formatStats.getMin()));
-    Assert.assertEquals("Max should match", max, BytesUtils.bytesToInt(formatStats.getMax()));
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+    Assert.assertEquals("Min should match", min, BytesUtils.bytesToInt(formatStats.min.toByteArray()));
+    Assert.assertEquals("Max should match", max, BytesUtils.bytesToInt(formatStats.max.toByteArray()));
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
   }
 
   @Test
@@ -910,9 +902,9 @@ public class TestParquetMetadataConverter {
 
     org.apache.parquet.format.Statistics formatStats = helper.toParquetStatistics(stats);
 
-    Assert.assertEquals("Min should match", min, BytesUtils.bytesToLong(formatStats.getMin()));
-    Assert.assertEquals("Max should match", max, BytesUtils.bytesToLong(formatStats.getMax()));
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+    Assert.assertEquals("Min should match", min, BytesUtils.bytesToLong(formatStats.min.toByteArray()));
+    Assert.assertEquals("Max should match", max, BytesUtils.bytesToLong(formatStats.max.toByteArray()));
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
   }
 
   @Test
@@ -937,10 +929,10 @@ public class TestParquetMetadataConverter {
     org.apache.parquet.format.Statistics formatStats = helper.toParquetStatistics(stats);
 
     Assert.assertEquals(
-        "Min should match", min, Float.intBitsToFloat(BytesUtils.bytesToInt(formatStats.getMin())), 0.000001);
+        "Min should match", min, Float.intBitsToFloat(BytesUtils.bytesToInt(formatStats.min.toByteArray())), 0.000001);
     Assert.assertEquals(
-        "Max should match", max, Float.intBitsToFloat(BytesUtils.bytesToInt(formatStats.getMax())), 0.000001);
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+        "Max should match", max, Float.intBitsToFloat(BytesUtils.bytesToInt(formatStats.max.toByteArray())), 0.000001);
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
   }
 
   @Test
@@ -967,14 +959,14 @@ public class TestParquetMetadataConverter {
     Assert.assertEquals(
         "Min should match",
         min,
-        Double.longBitsToDouble(BytesUtils.bytesToLong(formatStats.getMin())),
+        Double.longBitsToDouble(BytesUtils.bytesToLong(formatStats.min.toByteArray())),
         0.000001);
     Assert.assertEquals(
         "Max should match",
         max,
-        Double.longBitsToDouble(BytesUtils.bytesToLong(formatStats.getMax())),
+        Double.longBitsToDouble(BytesUtils.bytesToLong(formatStats.max.toByteArray())),
         0.000001);
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
   }
 
   @Test
@@ -998,9 +990,9 @@ public class TestParquetMetadataConverter {
 
     org.apache.parquet.format.Statistics formatStats = helper.toParquetStatistics(stats);
 
-    Assert.assertEquals("Min should match", min, BytesUtils.bytesToBool(formatStats.getMin()));
-    Assert.assertEquals("Max should match", max, BytesUtils.bytesToBool(formatStats.getMax()));
-    Assert.assertEquals("Num nulls should match", 3004, formatStats.getNull_count());
+    Assert.assertEquals("Min should match", min, BytesUtils.bytesToBool(formatStats.min.toByteArray()));
+    Assert.assertEquals("Max should match", max, BytesUtils.bytesToBool(formatStats.max.toByteArray()));
+    Assert.assertEquals("Num nulls should match", 3004L, formatStats.nullCount.longValue());
   }
 
   @Test
@@ -1126,9 +1118,9 @@ public class TestParquetMetadataConverter {
     assertTrue(stats.isEmpty());
     assertEquals(-1, stats.getNumNulls());
 
-    formatStats.clear();
-    formatStats.setMin(BytesUtils.intToBytes(-100));
-    formatStats.setMax(BytesUtils.intToBytes(100));
+// TODO    formatStats.clear();
+    formatStats.min = ByteString.of(BytesUtils.intToBytes(-100));
+    formatStats.max = ByteString.of(BytesUtils.intToBytes(100));
     stats = converter.fromParquetStatistics(Version.FULL_VERSION, formatStats, type);
     assertFalse(stats.isNumNullsSet());
     assertTrue(stats.hasNonNullValue());
@@ -1138,7 +1130,7 @@ public class TestParquetMetadataConverter {
     assertEquals(100, stats.genericGetMax());
 
     formatStats.clear();
-    formatStats.setNull_count(2000);
+    formatStats.nullCount = 2000L;
     stats = converter.fromParquetStatistics(Version.FULL_VERSION, formatStats, type);
     assertTrue(stats.isNumNullsSet());
     assertFalse(stats.hasNonNullValue());
@@ -1164,10 +1156,10 @@ public class TestParquetMetadataConverter {
   private void testSkippedV2Stats(PrimitiveType type, Object min, Object max) {
     Statistics<?> stats = createStats(type, min, max);
     org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
-    assertFalse(statistics.isSetMin());
-    assertFalse(statistics.isSetMax());
-    assertFalse(statistics.isSetMin_value());
-    assertFalse(statistics.isSetMax_value());
+    assertNull(statistics.min);
+    assertNull(statistics.max);
+    assertNull(statistics.minValue);
+    assertNull(statistics.maxValue);
   }
 
   @Test
@@ -1202,10 +1194,10 @@ public class TestParquetMetadataConverter {
   private void testV2OnlyStats(PrimitiveType type, Object min, Object max) {
     Statistics<?> stats = createStats(type, min, max);
     org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
-    assertFalse(statistics.isSetMin());
-    assertFalse(statistics.isSetMax());
-    assertArrayEquals(stats.getMinBytes(), statistics.getMin_value());
-    assertArrayEquals(stats.getMaxBytes(), statistics.getMax_value());
+    assertNull(statistics.min);
+    assertNull(statistics.max);
+    assertArrayEquals(stats.getMinBytes(), statistics.minValue.toByteArray());
+    assertArrayEquals(stats.getMaxBytes(), statistics.maxValue.toByteArray());
   }
 
   @Test
@@ -1244,10 +1236,10 @@ public class TestParquetMetadataConverter {
   private void testV2StatsEqualMinMax(PrimitiveType type, Object min, Object max) {
     Statistics<?> stats = createStats(type, min, max);
     org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
-    assertArrayEquals(stats.getMinBytes(), statistics.getMin());
-    assertArrayEquals(stats.getMaxBytes(), statistics.getMax());
-    assertArrayEquals(stats.getMinBytes(), statistics.getMin_value());
-    assertArrayEquals(stats.getMaxBytes(), statistics.getMax_value());
+    assertArrayEquals(stats.getMinBytes(), statistics.min.toByteArray());
+    assertArrayEquals(stats.getMaxBytes(), statistics.max.toByteArray());
+    assertArrayEquals(stats.getMinBytes(), statistics.minValue.toByteArray());
+    assertArrayEquals(stats.getMaxBytes(), statistics.maxValue.toByteArray());
   }
 
   private static <T> Statistics<?> createStats(PrimitiveType type, T min, T max) {
@@ -1335,8 +1327,8 @@ public class TestParquetMetadataConverter {
       @Override
       public org.apache.parquet.format.Statistics toParquetStatistics(Statistics<?> stats) {
         org.apache.parquet.format.Statistics statistics = ParquetMetadataConverter.toParquetStatistics(stats);
-        statistics.unsetMin_value();
-        statistics.unsetMax_value();
+        statistics.minValue = null;
+        statistics.maxValue = null;
         return statistics;
       }
     },
@@ -1373,15 +1365,15 @@ public class TestParquetMetadataConverter {
     ParquetMetadataConverter converter = new ParquetMetadataConverter();
     FileMetaData formatMetadata = converter.toParquetMetadata(1, metadata);
 
-    List<org.apache.parquet.format.ColumnOrder> columnOrders = formatMetadata.getColumn_orders();
+    List<org.apache.parquet.format.ColumnOrder> columnOrders = (List<org.apache.parquet.format.ColumnOrder>) formatMetadata.columnOrders;
     assertEquals(3, columnOrders.size());
     for (org.apache.parquet.format.ColumnOrder columnOrder : columnOrders) {
-      assertTrue(columnOrder.isSetTYPE_ORDER());
+      assertTrue(columnOrder instanceof org.apache.parquet.format.ColumnOrder.TypeOrder);
     }
 
     // Simulate that thrift got a union type that is not in the generated code
     // (when the file contains a not-yet-supported column order)
-    columnOrders.get(1).clear();
+    columnOrders.set(1, null);
 
     MessageType resultSchema =
         converter.fromParquetMetadata(formatMetadata).getFileMetaData().getSchema();
@@ -1504,36 +1496,20 @@ public class TestParquetMetadataConverter {
 
     List<SchemaElement> parquetSchema = parquetMetadataConverter.toParquetSchema(expected);
     assertEquals(5, parquetSchema.size());
-    assertEquals(new SchemaElement("Message").setNum_children(1), parquetSchema.get(0));
+    assertEquals(new SchemaElement(null, null, null, "Message", 1), parquetSchema.get(0));
     assertEquals(
-        new SchemaElement("testMap")
-            .setRepetition_type(FieldRepetitionType.REQUIRED)
-            .setNum_children(1)
-            .setConverted_type(ConvertedType.MAP)
-            .setLogicalType(LogicalType.MAP(new MapType())),
+        new SchemaElement(null, null, FieldRepetitionType.REQUIRED, "testMap", 1, ConvertedType.MAP, null, null, null, new LogicalType.MAP(new MapType())),
         parquetSchema.get(1));
     // PARQUET-1879 ensure that LogicalType is not written (null) but ConvertedType is MAP_KEY_VALUE for
     // backwards-compatibility
     assertEquals(
-        new SchemaElement("key_value")
-            .setRepetition_type(FieldRepetitionType.REPEATED)
-            .setNum_children(2)
-            .setConverted_type(ConvertedType.MAP_KEY_VALUE)
-            .setLogicalType(null),
+        new SchemaElement(null, null, FieldRepetitionType.REPEATED, "key_value", 2, ConvertedType.MAP_KEY_VALUE),
         parquetSchema.get(2));
     assertEquals(
-        new SchemaElement("key")
-            .setType(Type.BYTE_ARRAY)
-            .setRepetition_type(FieldRepetitionType.REQUIRED)
-            .setConverted_type(ConvertedType.UTF8)
-            .setLogicalType(LogicalType.STRING(new StringType())),
+        new SchemaElement(Type.BYTE_ARRAY, null, FieldRepetitionType.REQUIRED, "key", null, ConvertedType.UTF8, null, null, null, new LogicalType.STRING(new StringType())),
         parquetSchema.get(3));
     assertEquals(
-        new SchemaElement("value")
-            .setType(Type.INT32)
-            .setRepetition_type(FieldRepetitionType.REQUIRED)
-            .setConverted_type(null)
-            .setLogicalType(null),
+        new SchemaElement(Type.INT32, null, FieldRepetitionType.REQUIRED, "value"),
         parquetSchema.get(4));
 
     MessageType schema = parquetMetadataConverter.fromParquetSchema(parquetSchema, null);
@@ -1562,27 +1538,11 @@ public class TestParquetMetadataConverter {
   @Test
   public void testMapConvertedTypeReadWrite() throws Exception {
     List<SchemaElement> oldConvertedTypeSchemaElements = new ArrayList<>();
-    oldConvertedTypeSchemaElements.add(new SchemaElement("example").setNum_children(1));
-    oldConvertedTypeSchemaElements.add(new SchemaElement("testMap")
-        .setRepetition_type(FieldRepetitionType.REQUIRED)
-        .setNum_children(1)
-        .setConverted_type(ConvertedType.MAP)
-        .setLogicalType(null));
-    oldConvertedTypeSchemaElements.add(new SchemaElement("map")
-        .setRepetition_type(FieldRepetitionType.REPEATED)
-        .setNum_children(2)
-        .setConverted_type(ConvertedType.MAP_KEY_VALUE)
-        .setLogicalType(null));
-    oldConvertedTypeSchemaElements.add(new SchemaElement("key")
-        .setType(Type.BYTE_ARRAY)
-        .setRepetition_type(FieldRepetitionType.REQUIRED)
-        .setConverted_type(ConvertedType.UTF8)
-        .setLogicalType(null));
-    oldConvertedTypeSchemaElements.add(new SchemaElement("value")
-        .setType(Type.INT64)
-        .setRepetition_type(FieldRepetitionType.REQUIRED)
-        .setConverted_type(null)
-        .setLogicalType(null));
+    oldConvertedTypeSchemaElements.add(new SchemaElement(null, null, null, "example", 1));
+    oldConvertedTypeSchemaElements.add(new SchemaElement(null, null, FieldRepetitionType.REQUIRED, "testMap", 1, ConvertedType.MAP));
+    oldConvertedTypeSchemaElements.add(new SchemaElement(null, null, FieldRepetitionType.REPEATED, "map", 2, ConvertedType.MAP_KEY_VALUE));
+    oldConvertedTypeSchemaElements.add(new SchemaElement(Type.BYTE_ARRAY, null, FieldRepetitionType.REQUIRED, "key", null, ConvertedType.UTF8));
+    oldConvertedTypeSchemaElements.add(new SchemaElement(Type.INT64, null, FieldRepetitionType.REQUIRED, "value"));
 
     ParquetMetadataConverter parquetMetadataConverter = new ParquetMetadataConverter();
     MessageType messageType = parquetMetadataConverter.fromParquetSchema(oldConvertedTypeSchemaElements, null);

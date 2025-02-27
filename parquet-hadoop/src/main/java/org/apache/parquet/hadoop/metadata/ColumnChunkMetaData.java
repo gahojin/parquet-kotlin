@@ -788,11 +788,11 @@ class EncryptedColumnChunkMetaData extends ColumnChunkMetaData {
         parquetMetadataConverter.buildColumnChunkMetaData(metaData, path, primitiveType, createdBy);
     this.encodingStats = shadowColumnChunkMetaData.encodingStats;
     this.properties = shadowColumnChunkMetaData.properties;
-    if (metaData.isSetBloom_filter_offset()) {
-      setBloomFilterOffset(metaData.getBloom_filter_offset());
+    if (metaData.bloomFilterOffset != null) {
+      setBloomFilterOffset(metaData.bloomFilterOffset);
     }
-    if (metaData.isSetBloom_filter_length()) {
-      setBloomFilterLength(metaData.getBloom_filter_length());
+    if (metaData.bloomFilterLength != null) {
+      setBloomFilterLength(metaData.bloomFilterLength);
     }
   }
 

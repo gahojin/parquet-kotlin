@@ -21,6 +21,8 @@ package org.apache.parquet.crypto;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import org.apache.parquet.format.AesGcmCtrV1;
+import org.apache.parquet.format.AesGcmV1;
 import org.apache.parquet.format.BlockCipher;
 import org.apache.parquet.format.EncryptionAlgorithm;
 import org.apache.parquet.hadoop.metadata.ColumnPath;
@@ -70,7 +72,7 @@ public class InternalFileDecryptor {
   }
 
   private BlockCipher.Decryptor getDataModuleDecryptor(byte[] columnKey) {
-    if (algorithm.isSetAES_GCM_V1()) {
+    if (algorithm instanceof EncryptionAlgorithm.AesGcmV1) {
       return getThriftModuleDecryptor(columnKey);
     }
 
@@ -121,20 +123,22 @@ public class InternalFileDecryptor {
       byte[] aadPrefixInFile = null;
 
       // Process encryption algorithm metadata
-      if (algorithm.isSetAES_GCM_V1()) {
-        if (algorithm.getAES_GCM_V1().isSetAad_prefix()) {
+      if (algorithm instanceof EncryptionAlgorithm.AesGcmV1) {
+        final AesGcmV1 value = ((EncryptionAlgorithm.AesGcmV1) algorithm).getValue();
+        if (value.aadPrefix != null) {
           fileHasAadPrefix = true;
-          aadPrefixInFile = algorithm.getAES_GCM_V1().getAad_prefix();
+          aadPrefixInFile = value.aadPrefix.toByteArray();
         }
-        mustSupplyAadPrefix = algorithm.getAES_GCM_V1().isSupply_aad_prefix();
-        aadFileUnique = algorithm.getAES_GCM_V1().getAad_file_unique();
-      } else if (algorithm.isSetAES_GCM_CTR_V1()) {
-        if (algorithm.getAES_GCM_CTR_V1().isSetAad_prefix()) {
+        mustSupplyAadPrefix = Boolean.TRUE.equals(value.supplyAadPrefix);
+        aadFileUnique = value.aadFileUnique.toByteArray();
+      } else if (algorithm instanceof EncryptionAlgorithm.AesGcmCtrV1) {
+        final AesGcmCtrV1 value = ((EncryptionAlgorithm.AesGcmCtrV1) algorithm).getValue();
+        if (value.aadPrefix != null) {
           fileHasAadPrefix = true;
-          aadPrefixInFile = algorithm.getAES_GCM_CTR_V1().getAad_prefix();
+          aadPrefixInFile = value.aadPrefix.toByteArray();
         }
-        mustSupplyAadPrefix = algorithm.getAES_GCM_CTR_V1().isSupply_aad_prefix();
-        aadFileUnique = algorithm.getAES_GCM_CTR_V1().getAad_file_unique();
+        mustSupplyAadPrefix = Boolean.TRUE.equals(value.supplyAadPrefix);
+        aadFileUnique = value.aadFileUnique.toByteArray();
       } else {
         throw new ParquetCryptoRuntimeException("Unsupported algorithm: " + algorithm);
       }

@@ -25,6 +25,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import okio.ByteString;
+import org.apache.parquet.format.AesGcmCtrV1;
+import org.apache.parquet.format.AesGcmV1;
 import org.apache.parquet.format.EncryptionAlgorithm;
 import org.apache.parquet.hadoop.metadata.ColumnPath;
 
@@ -82,17 +85,19 @@ public class FileEncryptionProperties {
 
     this.algorithm = cipher.getEncryptionAlgorithm();
 
-    if (algorithm.isSetAES_GCM_V1()) {
-      algorithm.getAES_GCM_V1().setAad_file_unique(aadFileUnique);
-      algorithm.getAES_GCM_V1().setSupply_aad_prefix(supplyAadPrefix);
+    if (algorithm instanceof EncryptionAlgorithm.AesGcmV1) {
+      final AesGcmV1 value = ((EncryptionAlgorithm.AesGcmV1) algorithm).getValue();
+      value.aadFileUnique = ByteString.of(aadFileUnique);
+      value.supplyAadPrefix = supplyAadPrefix;
       if (null != aadPrefix && storeAadPrefixInFile) {
-        algorithm.getAES_GCM_V1().setAad_prefix(aadPrefix);
+        value.aadPrefix = ByteString.of(aadPrefix);
       }
     } else {
-      algorithm.getAES_GCM_CTR_V1().setAad_file_unique(aadFileUnique);
-      algorithm.getAES_GCM_CTR_V1().setSupply_aad_prefix(supplyAadPrefix);
+      final AesGcmCtrV1 value = ((EncryptionAlgorithm.AesGcmCtrV1) algorithm).getValue();
+      value.aadFileUnique = ByteString.of(aadFileUnique);
+      value.supplyAadPrefix = supplyAadPrefix;
       if (null != aadPrefix && storeAadPrefixInFile) {
-        algorithm.getAES_GCM_CTR_V1().setAad_prefix(aadPrefix);
+        value.aadPrefix = ByteString.of(aadPrefix);
       }
     }
 

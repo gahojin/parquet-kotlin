@@ -1235,26 +1235,26 @@ public class ParquetRewriterTest {
     while (readValues < totalChunkValues) {
       long curOffset = reader.getPos();
       PageHeader pageHeader = reader.readPageHeader();
-      switch (pageHeader.getType()) {
+      switch (pageHeader.type) {
         case DICTIONARY_PAGE:
-          rewriter.readBlock(pageHeader.getCompressed_page_size(), reader);
+          rewriter.readBlock(pageHeader.compressedPageSize, reader);
           break;
         case DATA_PAGE:
-          DataPageHeader headerV1 = pageHeader.getData_page_header();
+          DataPageHeader headerV1 = pageHeader.dataPageHeader;
           offsets.add(curOffset);
-          rewriter.readBlock(pageHeader.getCompressed_page_size(), reader);
-          readValues += headerV1.getNum_values();
+          rewriter.readBlock(pageHeader.compressedPageSize, reader);
+          readValues += headerV1.numValues;
           break;
         case DATA_PAGE_V2:
-          DataPageHeaderV2 headerV2 = pageHeader.getData_page_header_v2();
+          DataPageHeaderV2 headerV2 = pageHeader.dataPageHeaderV2;
           offsets.add(curOffset);
-          int rlLength = headerV2.getRepetition_levels_byte_length();
+          int rlLength = headerV2.repetitionLevelsByteLength;
           rewriter.readBlock(rlLength, reader);
-          int dlLength = headerV2.getDefinition_levels_byte_length();
+          int dlLength = headerV2.definitionLevelsByteLength;
           rewriter.readBlock(dlLength, reader);
-          int payLoadLength = pageHeader.getCompressed_page_size() - rlLength - dlLength;
+          int payLoadLength = pageHeader.compressedPageSize - rlLength - dlLength;
           rewriter.readBlock(payLoadLength, reader);
-          readValues += headerV2.getNum_values();
+          readValues += headerV2.numValues;
           break;
         default:
           throw new IOException("Not recognized page type");

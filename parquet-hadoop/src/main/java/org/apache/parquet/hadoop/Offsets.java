@@ -76,7 +76,7 @@ class Offsets {
       long headerStart = in.getPos();
       PageHeader header = Util.readPageHeader(in);
       long headerSize = in.getPos() - headerStart;
-      return headerSize + header.getCompressed_page_size();
+      return headerSize + header.compressedPageSize;
     } finally {
       if (origPos != -1) {
         in.seek(origPos);

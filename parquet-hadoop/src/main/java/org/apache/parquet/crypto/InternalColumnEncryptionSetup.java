@@ -19,6 +19,7 @@
 
 package org.apache.parquet.crypto;
 
+import okio.ByteString;
 import org.apache.parquet.format.BlockCipher;
 import org.apache.parquet.format.ColumnCryptoMetaData;
 import org.apache.parquet.format.EncryptionWithColumnKey;
@@ -44,14 +45,14 @@ public class InternalColumnEncryptionSetup {
 
     if (encryptionProperties.isEncrypted()) {
       if (encryptionProperties.isEncryptedWithFooterKey()) {
-        columnCryptoMetaData = ColumnCryptoMetaData.ENCRYPTION_WITH_FOOTER_KEY(new EncryptionWithFooterKey());
+        columnCryptoMetaData = new ColumnCryptoMetaData.EncryptionWithFooterKey(new EncryptionWithFooterKey());
       } else {
         EncryptionWithColumnKey withColumnKeyStruct = new EncryptionWithColumnKey(
             encryptionProperties.getPath().toList());
         if (null != encryptionProperties.getKeyMetaData()) {
-          withColumnKeyStruct.setKey_metadata(encryptionProperties.getKeyMetaData());
+          withColumnKeyStruct.keyMetadata = ByteString.of(encryptionProperties.getKeyMetaData());
         }
-        columnCryptoMetaData = ColumnCryptoMetaData.ENCRYPTION_WITH_COLUMN_KEY(withColumnKeyStruct);
+        columnCryptoMetaData = new ColumnCryptoMetaData.EncryptionWithColumnKey(withColumnKeyStruct);
       }
     } else {
       columnCryptoMetaData = null;

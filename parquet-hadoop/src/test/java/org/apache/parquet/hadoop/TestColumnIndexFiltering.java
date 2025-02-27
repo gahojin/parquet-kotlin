@@ -108,7 +108,7 @@ public class TestColumnIndexFiltering {
   private static final Logger LOGGER = LoggerFactory.getLogger(TestColumnIndexFiltering.class);
   private static final Random RANDOM = new Random(42);
   private static final String[] PHONE_KINDS = {null, "mobile", "home", "work"};
-  private static final List<User> DATA = Collections.unmodifiableList(generateData(10000));
+  private static final List<User> DATA = Collections.unmodifiableList(generateData(15000));
   private static final Path FILE_V1 = createTempFile(false);
   private static final Path FILE_V2 = createTempFile(false);
   private static final Path FILE_V1_E = createTempFile(true);

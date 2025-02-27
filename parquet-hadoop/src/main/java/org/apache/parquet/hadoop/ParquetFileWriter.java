@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.zip.CRC32;
+import okio.ByteString;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -1888,11 +1889,11 @@ public class ParquetFileWriter implements AutoCloseable {
     // Encrypted file with plaintext footer
     if (!fileEncryptor.isFooterEncrypted()) {
       long footerIndex = out.getPos();
-      parquetMetadata.setEncryption_algorithm(fileEncryptor.getEncryptionAlgorithm());
+      parquetMetadata.encryptionAlgorithm = fileEncryptor.getEncryptionAlgorithm();
       // create footer signature (nonce + tag of encrypted footer)
       byte[] footerSigningKeyMetaData = fileEncryptor.getFooterSigningKeyMetaData();
       if (null != footerSigningKeyMetaData) {
-        parquetMetadata.setFooter_signing_key_metadata(footerSigningKeyMetaData);
+        parquetMetadata.footerSigningKeyMetadata = ByteString.of(footerSigningKeyMetaData);
       }
       ByteArrayOutputStream tempOutStream = new ByteArrayOutputStream();
       writeFileMetaData(parquetMetadata, tempOutStream);

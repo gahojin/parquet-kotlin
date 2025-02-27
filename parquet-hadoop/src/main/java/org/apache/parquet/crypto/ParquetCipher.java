@@ -27,13 +27,13 @@ public enum ParquetCipher {
   AES_GCM_V1 {
     @Override
     public EncryptionAlgorithm getEncryptionAlgorithm() {
-      return EncryptionAlgorithm.AES_GCM_V1(new AesGcmV1());
+      return new EncryptionAlgorithm.AesGcmV1(new AesGcmV1());
     }
   },
   AES_GCM_CTR_V1 {
     @Override
     public EncryptionAlgorithm getEncryptionAlgorithm() {
-      return EncryptionAlgorithm.AES_GCM_CTR_V1(new AesGcmCtrV1());
+      return new EncryptionAlgorithm.AesGcmCtrV1(new AesGcmCtrV1());
     }
   };
 

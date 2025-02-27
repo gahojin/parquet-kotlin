@@ -627,30 +627,30 @@ public class ParquetRewriter implements Closeable {
     long totalChunkValues = chunk.getValueCount();
     while (readValues < totalChunkValues) {
       PageHeader pageHeader = reader.readPageHeader();
-      int compressedPageSize = pageHeader.getCompressed_page_size();
+      int compressedPageSize = pageHeader.compressedPageSize;
       byte[] pageLoad;
-      switch (pageHeader.getType()) {
+      switch (pageHeader.type) {
         case DICTIONARY_PAGE:
           if (dictionaryPage != null) {
             throw new IOException("has more than one dictionary page in column chunk: " + chunk);
           }
           // No quickUpdatePageAAD needed for dictionary page
-          DictionaryPageHeader dictPageHeader = pageHeader.getDictionary_page_header();
+          DictionaryPageHeader dictPageHeader = pageHeader.dictionaryPageHeader;
           pageLoad = processPageLoad(
               reader,
               true,
               compressor,
               decompressor,
-              pageHeader.getCompressed_page_size(),
-              pageHeader.getUncompressed_page_size(),
+              pageHeader.compressedPageSize,
+              pageHeader.uncompressedPageSize,
               encryptColumn,
               dataEncryptor,
               dictPageAAD);
           dictionaryPage = new DictionaryPage(
               BytesInput.from(pageLoad),
-              pageHeader.getUncompressed_page_size(),
-              dictPageHeader.getNum_values(),
-              converter.getEncoding(dictPageHeader.getEncoding()));
+              pageHeader.uncompressedPageSize,
+              dictPageHeader.numValues,
+              converter.getEncoding(dictPageHeader.encoding));
           writer.writeDictionaryPage(dictionaryPage, metaEncryptor, dictPageHeaderAAD);
           break;
         case DATA_PAGE:
@@ -658,21 +658,21 @@ public class ParquetRewriter implements Closeable {
             AesCipher.quickUpdatePageAAD(dataPageHeaderAAD, pageOrdinal);
             AesCipher.quickUpdatePageAAD(dataPageAAD, pageOrdinal);
           }
-          DataPageHeader headerV1 = pageHeader.getData_page_header();
+          DataPageHeader headerV1 = pageHeader.dataPageHeader;
           pageLoad = processPageLoad(
               reader,
               true,
               compressor,
               decompressor,
-              pageHeader.getCompressed_page_size(),
-              pageHeader.getUncompressed_page_size(),
+              pageHeader.compressedPageSize,
+              pageHeader.uncompressedPageSize,
               encryptColumn,
               dataEncryptor,
               dataPageAAD);
           statistics = convertStatistics(
               originalCreatedBy,
               normalizeNameInType(chunk.getPrimitiveType()),
-              headerV1.getStatistics(),
+              headerV1.statistics,
               columnIndex,
               pageOrdinal,
               converter);
@@ -684,32 +684,32 @@ public class ParquetRewriter implements Closeable {
                 !isColumnStatisticsMalformed,
                 "Detected mixed null page statistics and non-null page statistics");
           }
-          readValues += headerV1.getNum_values();
+          readValues += headerV1.numValues;
           if (offsetIndex != null) {
             long rowCount = 1
                 + offsetIndex.getLastRowIndex(pageOrdinal, blockRowCount)
                 - offsetIndex.getFirstRowIndex(pageOrdinal);
             readRows += rowCount;
             writer.writeDataPage(
-                toIntWithCheck(headerV1.getNum_values()),
-                pageHeader.getUncompressed_page_size(),
+                toIntWithCheck(headerV1.numValues),
+                pageHeader.uncompressedPageSize,
                 BytesInput.from(pageLoad),
                 statistics,
                 toIntWithCheck(rowCount),
-                converter.getEncoding(headerV1.getRepetition_level_encoding()),
-                converter.getEncoding(headerV1.getDefinition_level_encoding()),
-                converter.getEncoding(headerV1.getEncoding()),
+                converter.getEncoding(headerV1.repetitionLevelEncoding),
+                converter.getEncoding(headerV1.definitionLevelEncoding),
+                converter.getEncoding(headerV1.encoding),
                 metaEncryptor,
                 dataPageHeaderAAD);
           } else {
             writer.writeDataPage(
-                toIntWithCheck(headerV1.getNum_values()),
-                pageHeader.getUncompressed_page_size(),
+                toIntWithCheck(headerV1.numValues),
+                pageHeader.uncompressedPageSize,
                 BytesInput.from(pageLoad),
                 statistics,
-                converter.getEncoding(headerV1.getRepetition_level_encoding()),
-                converter.getEncoding(headerV1.getDefinition_level_encoding()),
-                converter.getEncoding(headerV1.getEncoding()),
+                converter.getEncoding(headerV1.repetitionLevelEncoding),
+                converter.getEncoding(headerV1.definitionLevelEncoding),
+                converter.getEncoding(headerV1.encoding),
                 metaEncryptor,
                 dataPageHeaderAAD);
           }
@@ -720,16 +720,16 @@ public class ParquetRewriter implements Closeable {
             AesCipher.quickUpdatePageAAD(dataPageHeaderAAD, pageOrdinal);
             AesCipher.quickUpdatePageAAD(dataPageAAD, pageOrdinal);
           }
-          DataPageHeaderV2 headerV2 = pageHeader.getData_page_header_v2();
-          int rlLength = headerV2.getRepetition_levels_byte_length();
+          DataPageHeaderV2 headerV2 = pageHeader.dataPageHeaderV2;
+          int rlLength = headerV2.repetitionLevelsByteLength;
           BytesInput rlLevels = readBlockAllocate(rlLength, reader);
-          int dlLength = headerV2.getDefinition_levels_byte_length();
+          int dlLength = headerV2.definitionLevelsByteLength;
           BytesInput dlLevels = readBlockAllocate(dlLength, reader);
-          int payLoadLength = pageHeader.getCompressed_page_size() - rlLength - dlLength;
-          int rawDataLength = pageHeader.getUncompressed_page_size() - rlLength - dlLength;
+          int payLoadLength = pageHeader.compressedPageSize - rlLength - dlLength;
+          int rawDataLength = pageHeader.uncompressedPageSize - rlLength - dlLength;
           pageLoad = processPageLoad(
               reader,
-              headerV2.isIs_compressed(),
+              headerV2.isCompressed,
               compressor,
               decompressor,
               payLoadLength,
@@ -740,7 +740,7 @@ public class ParquetRewriter implements Closeable {
           statistics = convertStatistics(
               originalCreatedBy,
               normalizeNameInType(chunk.getPrimitiveType()),
-              headerV2.getStatistics(),
+              headerV2.statistics,
               columnIndex,
               pageOrdinal,
               converter);
@@ -752,15 +752,15 @@ public class ParquetRewriter implements Closeable {
                 !isColumnStatisticsMalformed,
                 "Detected mixed null page statistics and non-null page statistics");
           }
-          readValues += headerV2.getNum_values();
-          readRows += headerV2.getNum_rows();
+          readValues += headerV2.numValues;
+          readRows += headerV2.numRows;
           writer.writeDataPageV2(
-              headerV2.getNum_rows(),
-              headerV2.getNum_nulls(),
-              headerV2.getNum_values(),
+              headerV2.numRows,
+              headerV2.numNulls,
+              headerV2.numValues,
               rlLevels,
               dlLevels,
-              converter.getEncoding(headerV2.getEncoding()),
+              converter.getEncoding(headerV2.encoding),
               BytesInput.from(pageLoad),
               rawDataLength,
               statistics,
@@ -769,7 +769,7 @@ public class ParquetRewriter implements Closeable {
           pageOrdinal++;
           break;
         default:
-          LOG.debug("skipping page of type {} of size {}", pageHeader.getType(), compressedPageSize);
+          LOG.debug("skipping page of type {} of size {}", pageHeader.type, compressedPageSize);
           break;
       }
     }

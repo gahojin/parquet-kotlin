@@ -21,6 +21,7 @@ package org.apache.parquet.crypto;
 
 import java.util.HashMap;
 import java.util.Map;
+import okio.ByteString;
 import org.apache.parquet.format.BlockCipher;
 import org.apache.parquet.format.EncryptionAlgorithm;
 import org.apache.parquet.format.FileCryptoMetaData;
@@ -69,7 +70,7 @@ public class InternalFileEncryptor {
   }
 
   private BlockCipher.Encryptor getDataModuleEncryptor(byte[] columnKey) {
-    if (algorithm.isSetAES_GCM_V1()) {
+    if (algorithm instanceof EncryptionAlgorithm.AesGcmV1) {
       return getThriftModuleEncryptor(columnKey);
     }
     // AES_GCM_CTR_V1
@@ -135,7 +136,7 @@ public class InternalFileEncryptor {
     }
     FileCryptoMetaData fileCryptoMetaData = new FileCryptoMetaData(algorithm);
     if (null != footerKeyMetadata) {
-      fileCryptoMetaData.setKey_metadata(footerKeyMetadata);
+      fileCryptoMetaData.keyMetadata = ByteString.of(footerKeyMetadata);
     }
     fileCryptoMetaDataCreated = true;
 
