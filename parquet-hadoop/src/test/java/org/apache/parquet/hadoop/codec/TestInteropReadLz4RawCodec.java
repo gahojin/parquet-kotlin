@@ -31,7 +31,6 @@ import org.apache.parquet.hadoop.example.GroupReadSupport;
 import org.junit.Test;
 
 public class TestInteropReadLz4RawCodec {
-  private static final String CHANGESET = "19fcd4d";
   private static String SIMPLE_FILE = "lz4_raw_compressed.parquet";
   private static String LARGER_FILE = "lz4_raw_compressed_larger.parquet";
 
@@ -40,7 +39,7 @@ public class TestInteropReadLz4RawCodec {
   @Test
   public void testInteropReadLz4RawSimpleParquetFiles() throws IOException {
     // Test simple parquet file with lz4 raw compressed
-    Path simpleFile = interop.GetInterOpFile(SIMPLE_FILE, CHANGESET);
+    Path simpleFile = interop.GetInterOpFile(SIMPLE_FILE);
     final int expectRows = 4;
     long[] c0ExpectValues = {1593604800, 1593604800, 1593604801, 1593604801};
     String[] c1ExpectValues = {"abc", "def", "abc", "def"};
@@ -63,7 +62,7 @@ public class TestInteropReadLz4RawCodec {
   public void testInteropReadLz4RawLargerParquetFiles() throws IOException {
     // Test larger parquet file with lz4 raw compressed
     final int expectRows = 10000;
-    Path largerFile = interop.GetInterOpFile(LARGER_FILE, CHANGESET);
+    Path largerFile = interop.GetInterOpFile(LARGER_FILE);
     String[] c0ExpectValues = {
       "c7ce6bef-d5b0-4863-b199-8ea8c7fb117b",
       "e8fb9197-cb9f-4118-b67f-fbfa65f61843",
