@@ -29,9 +29,10 @@ limitations under the License.
 This product includes code from Apache Parquet Java, which includes the following in
 its NOTICE file:
 
+```
 Apache Parquet Java
 Copyright 2014-2024 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
-
+```
