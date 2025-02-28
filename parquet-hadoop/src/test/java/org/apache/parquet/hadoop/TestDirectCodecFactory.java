@@ -216,11 +216,7 @@ public class TestDirectCodecFactory {
     Set<CompressionCodecName> codecsToSkip = new HashSet<>();
     codecsToSkip.add(LZO); // not distributed because it is GPL
     codecsToSkip.add(LZ4); // not distributed in the default version of Hadoop
-    final String arch = System.getProperty("os.arch");
-    if ("aarch64".equals(arch)) {
-      // PARQUET-1975 brotli-codec does not have natives for ARM64 architectures
-      codecsToSkip.add(BROTLI);
-    }
+    codecsToSkip.add(BROTLI); // outdated library, only supports linux/max x86 architectures
 
     for (final int size : sizes) {
       for (final boolean useOnHeapComp : comp) {
