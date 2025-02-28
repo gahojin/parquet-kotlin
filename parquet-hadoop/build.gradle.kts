@@ -32,6 +32,10 @@ dependencies {
     implementation(libs.fastutil)
     implementation(libs.slf4j.api)
 
+    implementation(libs.jackson.annotations)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+
     api(libs.hadoop.client)
     api(libs.hadoop.common) {
         exclude(group = "org.slf4j")
