@@ -30,7 +30,7 @@ dokka = "2.0.0"
 
 hadoop = "3.4.1"
 
-jackson = "2.18.2"
+jackson = "2.18.3"
 
 junit = "5.12.0"
 
