@@ -18,9 +18,6 @@
  */
 package org.apache.parquet.filter2
 
-import org.apache.parquet.encoding.bitpacking.ByteBasedBitPackingGenerator
-import org.apache.parquet.encoding.bitpacking.IntBasedBitPackingGenerator
-
 /**
  * main class for code generation hook in build for filter2 generation
  */
