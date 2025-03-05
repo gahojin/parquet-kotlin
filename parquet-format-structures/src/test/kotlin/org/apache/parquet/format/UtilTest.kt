@@ -54,6 +54,31 @@ class UtilTest : StringSpec({
         md2 shouldBe md
     }
 
+    "readFileMetaData (skipRowGroup=true)" {
+        val md = FileMetaData(
+            version = 1,
+            schema = listOf(SchemaElement(name = "foo")),
+            numRows = 10,
+            rowGroups = listOf(
+                RowGroup(
+                    columns = listOf(ColumnChunk(fileOffset = 1), ColumnChunk(fileOffset = 1)),
+                    totalByteSize = 10,
+                    numRows = 5,
+                ),
+                RowGroup(
+                    columns = listOf(ColumnChunk(fileOffset = 2), ColumnChunk(fileOffset = 3)),
+                    totalByteSize = 11,
+                    numRows = 5,
+                ),
+            )
+        )
+        val buffer = ByteArrayOutputStream()
+        md.write(buffer)
+        val md2 = readFileMetaData(buffer.inputStream(), skipRowGroups = true)
+
+        md2 shouldBe md.copy(rowGroups = emptyList())
+    }
+
     "invalidPageHeader" {
         val ph = PageHeader(
             type = PageType.DATA_PAGE,
