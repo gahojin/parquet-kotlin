@@ -1,5 +1,58 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>ComplexCondition:CapacityByteArrayOutputStream.kt$CapacityByteArrayOutputStream$(off &lt; 0) || (off > b.size) || (len &lt; 0) || ((off + len) - b.size > 0)</ID>
+    <ID>ForbiddenComment:BytesInput.kt$BytesInput.StreamBytesInput$// TODO: more efficient</ID>
+    <ID>ForbiddenComment:BytesUtils.kt$BytesUtils$* uses a trick mentioned in https://developers.google.com/protocol-buffers/docs/encoding to read zigZag encoded data * TODO: the implementation is compatible with readZigZagVarInt. Is there a need for different functions? * * @param in an input stream * @return the value of a zig-zag var-long read from the current position in the stream * @throws IOException if there is an exception while reading</ID>
+    <ID>ForbiddenComment:BytesUtils.kt$BytesUtils$// TODO: this is duplicated code in LittleEndianDataInputStream</ID>
+    <ID>ForbiddenComment:BytesUtils.kt$BytesUtils$// TODO: this is duplicated code in LittleEndianDataOutputStream</ID>
+    <ID>ForbiddenComment:GlobParser.kt$GlobParser$// TODO: maybe turn this check off?</ID>
+    <ID>ForbiddenComment:LittleEndianDataInputStream.kt$LittleEndianDataInputStream$// TODO: has this been benchmarked against two alternate implementations?</ID>
+    <ID>ForbiddenComment:LittleEndianDataInputStream.kt$LittleEndianDataInputStream$// TODO: see perf question above in readInt</ID>
+    <ID>ForbiddenComment:LittleEndianDataOutputStream.kt$LittleEndianDataOutputStream$// TODO: see note in LittleEndianDataInputStream: maybe faster</ID>
+    <ID>ForbiddenComment:MultiBufferInputStream.kt$MultiBufferInputStream$// TODO: use an allocator</ID>
+    <ID>FunctionParameterNaming:BytesInput.kt$BytesInput.Companion$`in`: ByteArray</ID>
+    <ID>FunctionParameterNaming:BytesInput.kt$BytesInput.Companion$`in`: InputStream</ID>
+    <ID>FunctionParameterNaming:BytesUtils.kt$BytesUtils$`in`: ByteArray</ID>
+    <ID>FunctionParameterNaming:BytesUtils.kt$BytesUtils$`in`: ByteBuffer</ID>
+    <ID>FunctionParameterNaming:BytesUtils.kt$BytesUtils$`in`: InputStream</ID>
+    <ID>NestedBlockDepth:GlobParser.kt$GlobParser$fun parse(pattern: String): GlobNodeSequence</ID>
+    <ID>ReturnCount:GlobExpander.kt$GlobExpander.GlobExpanderImpl.Companion$fun crossOrTakeNonEmpty(list1: List&lt;String>, list2: List&lt;String>): List&lt;String></ID>
+    <ID>ReturnCount:MultiBufferInputStream.kt$MultiBufferInputStream$override fun read(bytes: ByteArray, off: Int, len: Int): Int</ID>
+    <ID>ReturnCount:MultiBufferInputStream.kt$MultiBufferInputStream$override fun read(out: ByteBuffer): Int</ID>
+    <ID>ReturnCount:MultiBufferInputStream.kt$MultiBufferInputStream$override fun skip(n: Long): Long</ID>
+    <ID>ReturnCount:MultiBufferInputStream.kt$MultiBufferInputStream.ConcatIterator$override fun hasNext(): Boolean</ID>
+    <ID>ReturnCount:SemanticVersion.kt$SemanticVersion$override fun compareTo(other: SemanticVersion): Int</ID>
+    <ID>ReturnCount:SemanticVersion.kt$SemanticVersion.NumberOrString$override fun compareTo(other: NumberOrString): Int</ID>
+    <ID>ReturnCount:SingleBufferInputStream.kt$SingleBufferInputStream$@Throws(IOException::class) override fun read(bytes: ByteArray, offset: Int, length: Int): Int</ID>
+    <ID>ReturnCount:SingleBufferInputStream.kt$SingleBufferInputStream$override fun skip(n: Long): Long</ID>
+    <ID>SpreadOperator:ColumnPath.kt$ColumnPath.Companion$(*path.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())</ID>
+    <ID>SpreadOperator:DynMethods.kt$DynMethods.UnboundMethodImpl$(target, *args.copyOf(argLength))</ID>
+    <ID>SpreadOperator:LocalOutputFile.kt$LocalOutputFile.LocalPositionOutputStream$(_path, *openOption)</ID>
+    <ID>SpreadOperator:Preconditions.kt$Preconditions$(*strings(args))</ID>
+    <ID>SwallowedException:CapacityByteArrayOutputStream.kt$CapacityByteArrayOutputStream$e: ArithmeticException</ID>
+    <ID>SwallowedException:DynConstructors.kt$DynConstructors.Ctor$e: InvocationTargetException</ID>
+    <ID>SwallowedException:DynMethods.kt$DynMethods.UnboundMethodImpl$e: InvocationTargetException</ID>
+    <ID>ThrowingExceptionsWithoutMessageOrCause:LittleEndianDataInputStream.kt$LittleEndianDataInputStream$IndexOutOfBoundsException()</ID>
+    <ID>ThrowsCount:DynConstructors.kt$DynConstructors.Ctor$@Throws(Exception::class) fun newInstanceChecked(vararg args: Any?): C</ID>
+    <ID>ThrowsCount:GlobParser.kt$GlobParser$fun parse(pattern: String): GlobNodeSequence</ID>
+    <ID>ThrowsCount:SemanticVersion.kt$SemanticVersion.Companion$@JvmStatic @Throws(SemanticVersionParseException::class) fun parse(version: String?): SemanticVersion</ID>
+    <ID>TooGenericExceptionCaught:AutoCloseables.kt$AutoCloseables$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:DelegatingPositionOutputStream.kt$DelegatingPositionOutputStream$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DynConstructors.kt$DynConstructors.Ctor$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DynMethods.kt$DynMethods.UnboundMethodImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LittleEndianDataOutputStream.kt$LittleEndianDataOutputStream$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:BytesInput.kt$BytesInput.StreamBytesInput$throw RuntimeException("Exception occurred during reading input stream", e)</ID>
+    <ID>TooGenericExceptionThrown:BytesInput.kt$BytesInput.UnsignedVarIntBytesInput$throw RuntimeException(e)</ID>
+    <ID>TooGenericExceptionThrown:DynConstructors.kt$DynConstructors.Builder$throw RuntimeException("Cannot find constructor for $baseClass\n${formatProblems(problems)}")</ID>
+    <ID>TooGenericExceptionThrown:DynConstructors.kt$DynConstructors.Ctor$throw RuntimeException(e)</ID>
+    <ID>TooGenericExceptionThrown:DynConstructors.kt$DynConstructors.Ctor$throw RuntimeException(e.cause)</ID>
+    <ID>TooGenericExceptionThrown:DynMethods.kt$DynMethods.Builder$throw RuntimeException("Cannot find method: $name")</ID>
+    <ID>TooGenericExceptionThrown:DynMethods.kt$DynMethods.UnboundMethodImpl$throw RuntimeException(e)</ID>
+    <ID>TooGenericExceptionThrown:DynMethods.kt$DynMethods.UnboundMethodImpl$throw RuntimeException(e.cause)</ID>
+    <ID>TooGenericExceptionThrown:MultiBufferInputStream.kt$MultiBufferInputStream$throw RuntimeException("[Parquet bug] Stream is bad: incorrect bytes remaining ${length - position}")</ID>
+    <ID>TooGenericExceptionThrown:PlainParquetConfiguration.kt$PlainParquetConfiguration$throw RuntimeException( xface.canonicalName + " is not assignable from " + value.canonicalName )</ID>
+    <ID>TooGenericExceptionThrown:PlainParquetConfiguration.kt$PlainParquetConfiguration$throw RuntimeException(e)</ID>
+  </CurrentIssues>
 </SmellBaseline>

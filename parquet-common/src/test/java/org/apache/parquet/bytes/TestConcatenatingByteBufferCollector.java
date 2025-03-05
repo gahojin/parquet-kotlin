@@ -39,7 +39,7 @@ public class TestConcatenatingByteBufferCollector {
 
   @Before
   public void initAllocator() {
-    allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
   }
 
   @After
@@ -103,7 +103,7 @@ public class TestConcatenatingByteBufferCollector {
 
   private static CapacityByteArrayOutputStream capacityByteArrayOutputStream(String str) {
     CapacityByteArrayOutputStream cbaos =
-        new CapacityByteArrayOutputStream(2, Integer.MAX_VALUE, new HeapByteBufferAllocator());
+        new CapacityByteArrayOutputStream(2, Integer.MAX_VALUE, HeapByteBufferAllocator.INSTANCE);
     for (byte b : bytes(str)) {
       cbaos.write(b);
     }

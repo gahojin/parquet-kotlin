@@ -150,7 +150,7 @@ public class TestColumnIndexFiltering {
 
   @Before
   public void initAllocator() {
-    allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
   }
 
   @After
@@ -352,7 +352,7 @@ public class TestColumnIndexFiltering {
     int pageSize = DATA.size() / 10; // Ensure that several pages will be created
     int rowGroupSize = pageSize * 6 * 5; // Ensure that there are more row-groups created
 
-    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator())) {
+    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE)) {
       PhoneBookWriter.write(
           ExampleParquetWriter.builder(file)
               .withAllocator(allocator)

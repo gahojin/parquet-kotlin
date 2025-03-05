@@ -390,7 +390,7 @@ public class PhoneBookWriter {
   }
 
   public static List<Group> readFile(File f, Filter filter) throws IOException {
-    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
         ParquetReader<Group> reader = createReader(new Path(f.getAbsolutePath()), filter, allocator)) {
 
       Group current;

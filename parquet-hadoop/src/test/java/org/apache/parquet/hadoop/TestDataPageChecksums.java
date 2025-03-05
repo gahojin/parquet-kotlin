@@ -86,7 +86,7 @@ public class TestDataPageChecksums {
 
   @Before
   public void initAllocator() {
-    allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
   }
 
   @After
@@ -148,7 +148,7 @@ public class TestDataPageChecksums {
     ColumnChunkPageWriteStore writeStore = new ColumnChunkPageWriteStore(
         compressor,
         schemaSimple,
-        new HeapByteBufferAllocator(),
+        HeapByteBufferAllocator.INSTANCE,
         Integer.MAX_VALUE,
         ParquetOutputFormat.getPageWriteChecksumEnabled(conf));
 

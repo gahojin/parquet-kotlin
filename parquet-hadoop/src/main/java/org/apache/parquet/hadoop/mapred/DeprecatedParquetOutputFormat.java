@@ -88,7 +88,7 @@ public class DeprecatedParquetOutputFormat<V> extends org.apache.hadoop.mapred.F
         throws IOException {
 
       CompressionCodecName codec = getCodec(conf);
-      String extension = codec.getExtension() + ".parquet";
+      String extension = codec.extension + ".parquet";
       Path file = getDefaultWorkFile(conf, name, extension);
 
       try {

@@ -194,7 +194,7 @@ public class TestParquetFileWriter {
 
   @Before
   public void initAllocator() {
-    allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
   }
 
   @After

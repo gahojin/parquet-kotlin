@@ -20,7 +20,7 @@ package org.apache.parquet.column.values.bitpacking
 
 import okio.IOException
 import org.apache.parquet.bytes.BytesInput
-import org.apache.parquet.bytes.BytesInput.concat
+import org.apache.parquet.bytes.BytesInput.Companion.concat
 import org.apache.parquet.bytes.BytesUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -479,7 +479,7 @@ public class ParquetFileWriter implements AutoCloseable {
     this.pageWriteChecksumEnabled = pageWriteChecksumEnabled;
     this.crc = pageWriteChecksumEnabled ? new CRC32() : null;
     this.crcAllocator = pageWriteChecksumEnabled
-        ? ReusingByteBufferAllocator.strict(allocator == null ? new HeapByteBufferAllocator() : allocator)
+        ? ReusingByteBufferAllocator.strict(allocator == null ? HeapByteBufferAllocator.INSTANCE : allocator)
         : null;
 
     this.metadataConverter = new ParquetMetadataConverter(statisticsTruncateLength);
@@ -552,7 +552,7 @@ public class ParquetFileWriter implements AutoCloseable {
     this.pageWriteChecksumEnabled = ParquetOutputFormat.getPageWriteChecksumEnabled(configuration);
     this.crc = pageWriteChecksumEnabled ? new CRC32() : null;
     this.crcAllocator = pageWriteChecksumEnabled
-        ? ReusingByteBufferAllocator.strict(allocator == null ? new HeapByteBufferAllocator() : allocator)
+        ? ReusingByteBufferAllocator.strict(allocator == null ? HeapByteBufferAllocator.INSTANCE : allocator)
         : null;
     this.metadataConverter = new ParquetMetadataConverter(ParquetProperties.DEFAULT_STATISTICS_TRUNCATE_LENGTH);
     this.fileEncryptor = null;
