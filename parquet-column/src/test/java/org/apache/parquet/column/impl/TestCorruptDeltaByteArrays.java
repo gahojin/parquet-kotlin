@@ -87,7 +87,7 @@ public class TestCorruptDeltaByteArrays {
   }
 
   private DeltaByteArrayWriter getDeltaByteArrayWriter() {
-    return new DeltaByteArrayWriter(10, 100, new HeapByteBufferAllocator());
+    return new DeltaByteArrayWriter(10, 100, HeapByteBufferAllocator.INSTANCE);
   }
 
   @Test

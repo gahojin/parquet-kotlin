@@ -141,7 +141,7 @@ public class TestColumnChunkPageWriteStore {
 
   @Test
   public void test() throws Exception {
-    test(conf, allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator()));
+    test(conf, allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE));
   }
 
   @Test
@@ -282,7 +282,7 @@ public class TestColumnChunkPageWriteStore {
     try (ColumnChunkPageWriteStore store = new ColumnChunkPageWriteStore(
         compressor(UNCOMPRESSED),
         schema,
-        allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator()),
+        allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE),
         Integer.MAX_VALUE)) {
 
       for (ColumnDescriptor col : schema.getColumns()) {

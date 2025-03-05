@@ -677,8 +677,8 @@ public class TestPropertiesDrivenEncryption {
     int rowNum = 0;
     try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(
             this.isDecryptionDirectMemory
-                ? new DirectByteBufferAllocator()
-                : new HeapByteBufferAllocator());
+                ? DirectByteBufferAllocator.INSTANCE
+                : HeapByteBufferAllocator.INSTANCE);
         ParquetReader<Group> reader = ParquetReader.builder(new GroupReadSupport(), file)
             .withConf(hadoopConfig)
             .withAllocator(allocator)

@@ -79,7 +79,7 @@ public class TestStoreBloomFilter {
 
   @Test
   public void testStoreBloomFilter() throws IOException {
-    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator());
+    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE);
         ParquetFileReader reader = new ParquetFileReader(
             HadoopInputFile.fromPath(file, new Configuration()),
             ParquetReadOptions.builder().withAllocator(allocator).build())) {
@@ -122,7 +122,7 @@ public class TestStoreBloomFilter {
       throws IOException {
     int pageSize = DATA.size() / 100; // Ensure that several pages will be created
     int rowGroupSize = pageSize * 4; // Ensure that there are more row-groups created
-    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(new HeapByteBufferAllocator())) {
+    try (TrackingByteBufferAllocator allocator = TrackingByteBufferAllocator.wrap(HeapByteBufferAllocator.INSTANCE)) {
       PhoneBookWriter.write(
           ExampleParquetWriter.builder(file)
               .withAllocator(allocator)

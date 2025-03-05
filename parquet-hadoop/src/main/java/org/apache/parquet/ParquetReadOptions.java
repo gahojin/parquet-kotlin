@@ -262,7 +262,7 @@ public class ParquetReadOptions {
     protected ParquetMetadataConverter.MetadataFilter metadataFilter = NO_FILTER;
     // the page size parameter isn't used when only using the codec factory to get decompressors
     protected CompressionCodecFactory codecFactory = null;
-    protected ByteBufferAllocator allocator = new HeapByteBufferAllocator();
+    protected ByteBufferAllocator allocator = HeapByteBufferAllocator.INSTANCE;
     protected int maxAllocationSize = ALLOCATION_SIZE_DEFAULT;
     protected Map<String, String> properties = new HashMap<>();
     protected FileDecryptionProperties fileDecryptionProperties = null;

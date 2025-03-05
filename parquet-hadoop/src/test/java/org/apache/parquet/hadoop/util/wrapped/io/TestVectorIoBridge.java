@@ -412,7 +412,7 @@ public class TestVectorIoBridge {
   public void testDirectBufferReadRejected() throws Exception {
     verifyExceptionalVectoredRead(
         getSampleNonOverlappingRanges(),
-        DirectByteBufferAllocator.getInstance(),
+        DirectByteBufferAllocator.INSTANCE,
         UnsupportedOperationException.class);
   }
 
@@ -424,7 +424,7 @@ public class TestVectorIoBridge {
     try (FSDataInputStream in = openTestFile()) {
       assertFalse(
           "Direct buffer read should not be available",
-          VectorIoBridge.instance().readVectoredAvailable(in, DirectByteBufferAllocator.getInstance()));
+          VectorIoBridge.instance().readVectoredAvailable(in, DirectByteBufferAllocator.INSTANCE));
     }
   }
 

@@ -462,7 +462,7 @@ public class ParquetOutputFormat<T> extends FileOutputFormat<Void, T> {
     final Configuration conf = getConfiguration(taskAttemptContext);
 
     CompressionCodecName codec = getCodec(taskAttemptContext);
-    String extension = codec.getExtension() + ".parquet";
+    String extension = codec.extension + ".parquet";
     Path file = getDefaultWorkFile(taskAttemptContext, extension);
     return getRecordWriter(conf, file, codec, mode);
   }

@@ -197,7 +197,7 @@ public class TestDirectCodecFactory {
     String errorMsg =
         "Test failed, creation of a direct codec factory should have failed when passed a non-direct allocator.";
     try {
-      CodecFactory.createDirectCodecFactory(new Configuration(), new HeapByteBufferAllocator(), 0);
+      CodecFactory.createDirectCodecFactory(new Configuration(), HeapByteBufferAllocator.INSTANCE, 0);
       throw new RuntimeException(errorMsg);
     } catch (IllegalStateException ex) {
       // indicates successful completion of the test

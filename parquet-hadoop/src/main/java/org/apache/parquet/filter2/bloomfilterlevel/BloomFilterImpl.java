@@ -19,11 +19,10 @@
 
 package org.apache.parquet.filter2.bloomfilterlevel;
 
-import static org.apache.parquet.Preconditions.checkNotNull;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.parquet.column.values.bloomfilter.BloomFilter;
 import org.apache.parquet.filter2.predicate.FilterPredicate;
@@ -44,8 +43,8 @@ public class BloomFilterImpl implements FilterPredicate.Visitor<Boolean> {
 
   public static boolean canDrop(
       FilterPredicate pred, List<ColumnChunkMetaData> columns, BloomFilterReader bloomFilterReader) {
-    checkNotNull(pred, "pred");
-    checkNotNull(columns, "columns");
+    Objects.requireNonNull(pred, "pred");
+    Objects.requireNonNull(columns, "columns");
     return pred.accept(new BloomFilterImpl(columns, bloomFilterReader));
   }
 

@@ -195,7 +195,7 @@ public class ParquetReader<T> implements Closeable {
     private final InputFile file;
     private final Path path;
     private Filter filter = null;
-    private ByteBufferAllocator allocator = new HeapByteBufferAllocator();
+    private ByteBufferAllocator allocator = HeapByteBufferAllocator.INSTANCE;
     protected ParquetConfiguration configuration;
     private ParquetReadOptions.Builder optionsBuilder;
 
