@@ -39,6 +39,11 @@ class SemanticVersion private constructor(
     @JvmField val pre: Prerelease?,
     @JvmField val buildInfo: String?,
 ) : Comparable<SemanticVersion> {
+    init {
+        require(major >= 0) { "major must be >= 0" }
+        require(minor >= 0) { "minor must be >= 0" }
+        require(patch >= 0) { "patch must be >= 0" }
+    }
 
     constructor(major: Int, minor: Int, patch: Int) : this(
         major = major,
@@ -69,12 +74,6 @@ class SemanticVersion private constructor(
         pre = pre?.let { Prerelease(it) },
         buildInfo = buildInfo,
     )
-
-    init {
-        require(major >= 0) { "major must be >= 0" }
-        require(minor >= 0) { "minor must be >= 0" }
-        require(patch >= 0) { "patch must be >= 0" }
-    }
 
     override fun compareTo(other: SemanticVersion): Int {
         var cmp = compareIntegers(major, other.major)

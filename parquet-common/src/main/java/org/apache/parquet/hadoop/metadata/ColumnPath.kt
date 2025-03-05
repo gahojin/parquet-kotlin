@@ -56,6 +56,8 @@ class ColumnPath private constructor(
     }
 
     companion object {
+        private const val serialVersionUID = 1L
+
         private val paths = object : Canonicalizer<ColumnPath>() {
             override fun toCanonical(value: ColumnPath): ColumnPath {
                 val path = value.p.map { it.intern() }.toTypedArray()

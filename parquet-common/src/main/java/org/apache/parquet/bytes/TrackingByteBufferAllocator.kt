@@ -77,16 +77,21 @@ class TrackingByteBufferAllocator private constructor(
         }
     }
 
-    class ReleasingUnallocatedByteBufferException :
-        LeakDetectorHeapByteBufferAllocatorException("Releasing a ByteBuffer instance that is not allocated by this allocator or already been released")
+    class ReleasingUnallocatedByteBufferException : LeakDetectorHeapByteBufferAllocatorException(
+        "Releasing a ByteBuffer instance that is not allocated by this allocator or already been released"
+    )
 
-    class LeakedByteBufferException(count: Int, e: ByteBufferAllocationStacktraceException?) :
-        LeakDetectorHeapByteBufferAllocatorException(
-            "$count ByteBuffer object(s) is/are remained unreleased after closing this allocator.",
-            e
-        )
+    class LeakedByteBufferException(
+        count: Int,
+        e: ByteBufferAllocationStacktraceException?,
+    ) : LeakDetectorHeapByteBufferAllocatorException(
+        "$count ByteBuffer object(s) is/are remained unreleased after closing this allocator.",
+        e,
+    )
 
     private val allocated: MutableMap<Key, ByteBufferAllocationStacktraceException?> = HashMap()
+
+    override val isDirect = allocator.isDirect
 
     override fun allocate(size: Int): ByteBuffer {
         val buffer = allocator.allocate(size)
@@ -104,9 +109,6 @@ class TrackingByteBufferAllocator private constructor(
         // Clearing the buffer so subsequent access would probably generate errors
         b.clear()
     }
-
-    override val isDirect: Boolean
-        get() = allocator.isDirect
 
     @Throws(LeakedByteBufferException::class)
     override fun close() {

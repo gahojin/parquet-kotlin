@@ -21,6 +21,8 @@ package org.apache.parquet.bytes
 import java.nio.ByteBuffer
 
 open class HeapByteBufferAllocator : ByteBufferAllocator {
+    override val isDirect: Boolean = false
+
     override fun allocate(size: Int): ByteBuffer {
         return ByteBuffer.allocate(size)
     }
@@ -28,8 +30,6 @@ open class HeapByteBufferAllocator : ByteBufferAllocator {
     override fun release(b: ByteBuffer) {
         return
     }
-
-    override val isDirect: Boolean = false
 
     companion object {
         @JvmField

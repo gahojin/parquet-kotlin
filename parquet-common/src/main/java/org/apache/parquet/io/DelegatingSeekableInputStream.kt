@@ -32,13 +32,13 @@ import java.nio.ByteBuffer
 abstract class DelegatingSeekableInputStream(val stream: InputStream) : SeekableInputStream() {
     private val temp = ByteArray(COPY_BUFFER_SIZE)
 
+    @get:Throws(IOException::class)
+    abstract override val pos: Long
+
     @Throws(IOException::class)
     override fun close() {
         stream.close()
     }
-
-    @get:Throws(IOException::class)
-    abstract override val pos: Long
 
     @Throws(IOException::class)
     abstract override fun seek(newPos: Long)

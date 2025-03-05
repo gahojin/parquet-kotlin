@@ -72,10 +72,10 @@ object VersionParser {
             try {
                 sv = SemanticVersion.parse(version)
                 hasSemver = true
-            } catch (e: RuntimeException) {
+            } catch (_: RuntimeException) {
                 sv = null
                 hasSemver = false
-            } catch (e: SemanticVersionParseException) {
+            } catch (_: SemanticVersionParseException) {
                 sv = null
                 hasSemver = false
             }

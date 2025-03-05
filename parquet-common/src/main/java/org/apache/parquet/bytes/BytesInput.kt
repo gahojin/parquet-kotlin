@@ -45,6 +45,18 @@ import java.util.function.Consumer
  */
 abstract class BytesInput {
     /**
+     * For internal use only.
+     *
+     * Returns a [ByteBuffer] object referencing to the internal data of this [BytesInput] without copying if
+     * applicable. If it is not possible (because there are multiple [ByteBuffer]s internally or cannot be
+     * referenced as a [ByteBuffer]), `null` value will be returned.
+     *
+     * @return the internal data of this [BytesInput] or `null`
+     */
+    protected open val internalByteBuffer: ByteBuffer?
+        get() = null
+
+    /**
      * writes the bytes into a stream
      *
      * @param out an output stream
@@ -157,18 +169,6 @@ abstract class BytesInput {
     }
 
     /**
-     * For internal use only.
-     *
-     * Returns a [ByteBuffer] object referencing to the internal data of this [BytesInput] without copying if
-     * applicable. If it is not possible (because there are multiple [ByteBuffer]s internally or cannot be
-     * referenced as a [ByteBuffer]), `null` value will be returned.
-     *
-     * @return the internal data of this [BytesInput] or `null`
-     */
-    protected open val internalByteBuffer: ByteBuffer?
-        get() = null
-
-    /**
      * @return a new InputStream materializing the contents of this input
      * @throws IOException if there is an exception reading
      */
@@ -239,6 +239,9 @@ abstract class BytesInput {
     ) : BytesInput() {
         private val size: Long = inputs.sumOf { it.size() }
 
+        override val internalByteBuffer: ByteBuffer?
+            get() = if (inputs.size == 1) inputs[0].internalByteBuffer else null
+
         @Suppress("unused")
         @Throws(IOException::class)
         override fun writeAllTo(out: OutputStream) {
@@ -255,9 +258,6 @@ abstract class BytesInput {
                 input.writeInto(buffer)
             }
         }
-
-        override val internalByteBuffer: ByteBuffer?
-            get() = if (inputs.size == 1) inputs[0].internalByteBuffer else null
 
         override fun size() = size
 
@@ -349,6 +349,9 @@ abstract class BytesInput {
     private class CapacityBAOSBytesInput(
         private val arrayOut: CapacityByteArrayOutputStream,
     ) : BytesInput() {
+        override val internalByteBuffer: ByteBuffer?
+            get() = arrayOut.internalByteBuffer
+
         @Throws(IOException::class)
         override fun writeAllTo(out: OutputStream) {
             arrayOut.writeTo(out)
@@ -357,9 +360,6 @@ abstract class BytesInput {
         override fun writeInto(buffer: ByteBuffer) {
             arrayOut.writeInto(buffer)
         }
-
-        override val internalByteBuffer: ByteBuffer?
-            get() = arrayOut.internalByteBuffer
 
         override fun size() = arrayOut.size()
     }
@@ -427,6 +427,9 @@ abstract class BytesInput {
     }
 
     private class ByteBufferBytesInput(private val buffer: ByteBuffer) : BytesInput() {
+        override val internalByteBuffer: ByteBuffer?
+            get() = buffer.slice()
+
         @Throws(IOException::class)
         override fun writeAllTo(out: OutputStream) {
             Channels.newChannel(out).write(buffer.duplicate())
@@ -435,9 +438,6 @@ abstract class BytesInput {
         override fun writeInto(target: ByteBuffer) {
             target.put(buffer.duplicate())
         }
-
-        override val internalByteBuffer: ByteBuffer?
-            get() = buffer.slice()
 
         override fun toInputStream(): ByteBufferInputStream {
             return wrap(buffer)

@@ -75,6 +75,9 @@ interface CompressionCodecFactory {
      * @see .release
      */
     interface BytesInputCompressor {
+        /** the codec name of this compressor. */
+        val codecName: CompressionCodecName
+
         /**
          * Compresses the specified [BytesInput] data and returns it as [BytesInput].
          *
@@ -89,13 +92,6 @@ interface CompressionCodecFactory {
          */
         @Throws(IOException::class)
         fun compress(bytes: BytesInput): BytesInput
-
-        /**
-         * Returns the codec name of this compressor.
-         *
-         * @return the codec name
-         */
-        val codecName: CompressionCodecName
 
         /**
          * Releases this compressor instance.

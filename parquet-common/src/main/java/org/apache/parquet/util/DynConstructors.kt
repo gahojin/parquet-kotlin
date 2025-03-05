@@ -63,6 +63,9 @@ object DynConstructors {
         private val ctor: Constructor<C>,
         val constructedClass: Class<out C>,
     ) : DynMethods.UnboundMethod {
+        override val isStatic: Boolean = true
+        override val isNoop: Boolean = false
+
         @Throws(Exception::class)
         fun newInstanceChecked(vararg args: Any?): C {
             try {
@@ -101,18 +104,13 @@ object DynConstructors {
         }
 
         override fun bind(receiver: Any?): DynMethods.BoundMethod {
-            throw IllegalStateException("Cannot bind constructors")
+            error("Cannot bind constructors")
         }
 
-        override val isStatic: Boolean = true
-        override val isNoop: Boolean = false
-
-        override fun asStatic(): StaticMethod {
-            return StaticMethod(this)
-        }
+        override fun asStatic() = StaticMethod(this)
 
         override fun toString(): String {
-            return javaClass.getSimpleName() + "(constructor=$ctor, class=$constructedClass)"
+            return "${javaClass.getSimpleName()}(constructor=$ctor, class=$constructedClass)"
         }
     }
 

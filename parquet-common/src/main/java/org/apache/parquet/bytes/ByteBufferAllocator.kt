@@ -21,6 +21,9 @@ package org.apache.parquet.bytes
 import java.nio.ByteBuffer
 
 interface ByteBufferAllocator {
+    /** Indicates if this allocator will produce ByteBuffers backed by direct memory. */
+    val isDirect: Boolean
+
     fun allocate(size: Int): ByteBuffer
 
     /**
@@ -30,11 +33,4 @@ interface ByteBufferAllocator {
      * @param b a ByteBuffer
      */
     fun release(b: ByteBuffer)
-
-    /**
-     * Indicates if this allocator will produce ByteBuffers backed by direct memory.
-     *
-     * @return true if direct memory backed buffers will be created by this allocator, else false
-     */
-    val isDirect: Boolean
 }

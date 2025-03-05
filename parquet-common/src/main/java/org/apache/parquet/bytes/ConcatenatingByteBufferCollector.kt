@@ -35,6 +35,9 @@ class ConcatenatingByteBufferCollector(
     private val slabs = arrayListOf<ByteBuffer>()
     private var size: Long = 0L
 
+    override val internalByteBuffer: ByteBuffer?
+        get() = if (slabs.size == 1) slabs[0].duplicate() else null
+
     /**
      * Collects the content of the specified input. It allocates a new [ByteBuffer] instance that can contain all
      * the content.
@@ -71,9 +74,6 @@ class ConcatenatingByteBufferCollector(
         }
     }
 
-    override val internalByteBuffer: ByteBuffer?
-        get() = if (slabs.size == 1) slabs[0].duplicate() else null
-
     override fun size(): Long {
         return size
     }
@@ -83,6 +83,6 @@ class ConcatenatingByteBufferCollector(
      * @return a text representation of the memory usage of this structure
      */
     fun memUsageString(prefix: String?): String {
-        return String.format("%s %s %d slabs, %,d bytes", prefix, javaClass.simpleName, slabs.size, size)
+        return "%s %s %d slabs, %,d bytes".format(prefix, javaClass.simpleName, slabs.size, size)
     }
 }

@@ -37,6 +37,12 @@ object DynMethods {
      * RuntimeException, or with a single Exception catch block.
      */
     interface UnboundMethod {
+        /** whether the method is a static method */
+        val isStatic: Boolean
+
+        /** whether the method is a noop */
+        val isNoop: Boolean
+
         @Throws(Exception::class)
         fun <R> invokeChecked(target: Any?, vararg args: Any?): R?
         fun <R> invoke(target: Any?, vararg args: Any?): R?
@@ -59,36 +65,24 @@ object DynMethods {
          */
         fun asStatic(): StaticMethod
 
-        /** whether the method is a static method */
-        val isStatic: Boolean
-
-        /** whether the method is a noop */
-        val isNoop: Boolean
-
         companion object {
             /**
              * Singleton [UnboundMethod], performs no operation and returns null.
              */
             internal val NOOP: UnboundMethod = object : UnboundMethod {
+                override val isStatic: Boolean = true
+                override val isNoop: Boolean = true
+
                 @Throws(Exception::class)
                 override fun <R> invokeChecked(target: Any?, vararg args: Any?): R? = null
 
                 override fun <R> invoke(target: Any?, vararg args: Any?): R? = null
 
-                override fun bind(receiver: Any?): BoundMethod {
-                    return BoundMethod(this, receiver)
-                }
+                override fun bind(receiver: Any?) = BoundMethod(this, receiver)
 
-                override fun asStatic(): StaticMethod {
-                    return StaticMethod(this)
-                }
+                override fun asStatic() = StaticMethod(this)
 
-                override val isStatic: Boolean = true
-                override val isNoop: Boolean = true
-
-                override fun toString(): String {
-                    return "DynMethods.UnboundMethod(NOOP)"
-                }
+                override fun toString() = "DynMethods.UnboundMethod(NOOP)"
             }
         }
     }
@@ -98,6 +92,11 @@ object DynMethods {
         private val name: String,
     ): UnboundMethod {
         private val argLength: Int = if (method.isVarArgs == false) method.parameterTypes.size else -1
+
+        override val isStatic: Boolean
+            get() = Modifier.isStatic(method.modifiers)
+
+        override val isNoop = this === UnboundMethod.NOOP
 
         @Suppress("UNCHECKED_CAST")
         @Throws(Exception::class)
@@ -133,13 +132,6 @@ object DynMethods {
 
             return BoundMethod(this, receiver)
         }
-
-        /** whether the method is a static method */
-        override val isStatic: Boolean
-            get() = Modifier.isStatic(method.modifiers)
-
-        /** whether the method is a noop */
-        override val isNoop = this === UnboundMethod.NOOP
 
         /**
          * Returns this method as a StaticMethod.

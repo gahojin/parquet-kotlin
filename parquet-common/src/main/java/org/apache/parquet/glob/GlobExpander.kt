@@ -85,6 +85,8 @@ object GlobExpander {
         }
 
         companion object {
+            private const val serialVersionUID = 1L
+
             private val INSTANCE = GlobExpanderImpl()
 
             fun expand(node: GlobNode): List<String> {

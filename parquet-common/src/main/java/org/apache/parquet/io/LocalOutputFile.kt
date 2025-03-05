@@ -32,6 +32,12 @@ class LocalOutputFile(
     path: Path,
 ) : OutputFile {
     private val _path: Path = path
+    override val path: String? = _path.toString()
+
+    override fun supportsBlockSize(): Boolean = false
+
+    override fun defaultBlockSize(): Long = -1L
+
 
     private inner class LocalPositionOutputStream(
         buffer: Int,
@@ -86,12 +92,6 @@ class LocalOutputFile(
             StandardOpenOption.TRUNCATE_EXISTING,
         )
     }
-
-    override fun supportsBlockSize(): Boolean = false
-
-    override fun defaultBlockSize(): Long = -1L
-
-    override val path: String? = _path.toString()
 
     companion object {
         private const val BUFFER_SIZE_DEFAULT = 4096

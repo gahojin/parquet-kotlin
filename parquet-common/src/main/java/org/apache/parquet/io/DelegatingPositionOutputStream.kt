@@ -24,6 +24,9 @@ import java.io.OutputStream
 abstract class DelegatingPositionOutputStream(
     val stream: OutputStream,
 ) : PositionOutputStream() {
+    @get:Throws(IOException::class)
+    abstract override val pos: Long
+
     @Throws(IOException::class)
     override fun close() {
         try {
@@ -37,9 +40,6 @@ abstract class DelegatingPositionOutputStream(
     override fun flush() {
         stream.flush()
     }
-
-    @get:Throws(IOException::class)
-    abstract override val pos: Long
 
     @Throws(IOException::class)
     override fun write(b: Int) {

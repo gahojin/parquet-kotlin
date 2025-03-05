@@ -45,14 +45,14 @@ class LocalInputFile(
         return object : SeekableInputStream() {
             private val randomAccessFile = RandomAccessFile(path.toFile(), "r")
 
+            @get:Throws(IOException::class)
+            override val pos: Long
+                get() = randomAccessFile.filePointer
+
             @Throws(IOException::class)
             override fun read(): Int {
                 return randomAccessFile.read()
             }
-
-            @get:Throws(IOException::class)
-            override val pos: Long
-                get() = randomAccessFile.filePointer
 
             @Throws(IOException::class)
             override fun seek(newPos: Long) {

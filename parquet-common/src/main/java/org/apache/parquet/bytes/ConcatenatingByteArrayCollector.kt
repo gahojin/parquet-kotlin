@@ -64,6 +64,6 @@ class ConcatenatingByteArrayCollector : BytesInput() {
      * @return a text representation of the memory usage of this structure
      */
     fun memUsageString(prefix: String?): String {
-        return String.format("%s %s %d slabs, %,d bytes", prefix, javaClass.simpleName, slabs.size, size)
+        return "%s %s %d slabs, %,d bytes".format(prefix, javaClass.simpleName, slabs.size, size)
     }
 }

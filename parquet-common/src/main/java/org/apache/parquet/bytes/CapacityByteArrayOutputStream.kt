@@ -60,6 +60,36 @@ class CapacityByteArrayOutputStream(
         private set
     private var bytesUsed = 0
 
+    /** the index of the last value written to this stream, which can be passed to [.setByte] in order to change it */
+    val currentIndex: Long
+        get() {
+            require(bytesUsed > 0) { "This is an empty stream" }
+            return (bytesUsed - 1).toLong()
+        }
+
+    /** the total number of allocated slabs */
+    val slabCount: Int
+        get() = slabs.size
+
+    val internalByteBuffer: ByteBuffer?
+        get() {
+            if (slabs.size == 1) {
+                val buf = slabs[0].duplicate()
+                buf.flip()
+                return buf.slice()
+            }
+            return null
+        }
+
+    init {
+        require(initialSlabSize > 0) { "initialSlabSize must be > 0" }
+        require(maxCapacityHint > 0) { "maxCapacityHint must be > 0" }
+        require(maxCapacityHint >= initialSlabSize) {
+            "maxCapacityHint can't be less than initialSlabSize $initialSlabSize $maxCapacityHint"
+        }
+        reset()
+    }
+
     /**
      * Defaults maxCapacityHint to 1MB
      *
@@ -83,15 +113,6 @@ class CapacityByteArrayOutputStream(
      */
     @Deprecated("use {@link CapacityByteArrayOutputStream#CapacityByteArrayOutputStream(int, int, ByteBufferAllocator)}")
     constructor(initialSlabSize: Int, maxCapacityHint: Int) : this(initialSlabSize, maxCapacityHint, HeapByteBufferAllocator())
-
-    init {
-        require(initialSlabSize > 0) { "initialSlabSize must be > 0" }
-        require(maxCapacityHint > 0) { "maxCapacityHint must be > 0" }
-        require(maxCapacityHint >= initialSlabSize) {
-            "maxCapacityHint can't be less than initialSlabSize $initialSlabSize $maxCapacityHint"
-        }
-        reset()
-    }
 
     /**
      * the new slab is guaranteed to be at least minimumSize
@@ -143,11 +164,7 @@ class CapacityByteArrayOutputStream(
 
     override fun write(b: ByteArray, off: Int, len: Int) {
         if ((off < 0) || (off > b.size) || (len < 0) || ((off + len) - b.size > 0)) {
-            throw IndexOutOfBoundsException(
-                String.format(
-                    "Given byte array of size %d, with requested length(%d) and offset(%d)", b.size, len, off
-                )
-            )
+            throw IndexOutOfBoundsException("Given byte array of size ${b.size}, with requested length($len) and offset($off)")
         }
         if (len > currentSlab.remaining()) {
             val length1 = currentSlab.remaining()
@@ -225,13 +242,6 @@ class CapacityByteArrayOutputStream(
         currentSlab = EMPTY_SLAB
     }
 
-    /** the index of the last value written to this stream, which can be passed to [.setByte] in order to change it */
-    val currentIndex: Long
-        get() {
-            require(bytesUsed > 0) { "This is an empty stream" }
-            return (bytesUsed - 1).toLong()
-        }
-
     /**
      * Replace the byte stored at position index in this stream with value
      *
@@ -260,20 +270,6 @@ class CapacityByteArrayOutputStream(
     fun memUsageString(prefix: String): String {
         return "%s %s %d slabs, %,d bytes".format(prefix, javaClass.simpleName, slabs.size, capacity)
     }
-
-    /** the total number of allocated slabs */
-    val slabCount: Int
-        get() = slabs.size
-
-    val internalByteBuffer: ByteBuffer?
-        get() {
-            if (slabs.size == 1) {
-                val buf = slabs[0].duplicate()
-                buf.flip()
-                return buf.slice()
-            }
-            return null
-        }
 
     override fun close() {
         for (slab in slabs) {

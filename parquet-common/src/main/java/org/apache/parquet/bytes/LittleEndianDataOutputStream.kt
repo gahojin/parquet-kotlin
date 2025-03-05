@@ -36,6 +36,8 @@ import java.io.OutputStream
 class LittleEndianDataOutputStream(
     private val out: OutputStream,
 ) : OutputStream() {
+    private val writeBuffer = ByteArray(8)
+
     /**
      * Writes the specified byte (the low eight bits of the argument
      * `b`) to the underlying output stream. If no exception
@@ -150,8 +152,6 @@ class LittleEndianDataOutputStream(
         out.write((v ushr 16) and 0xFF)
         out.write((v ushr 24) and 0xFF)
     }
-
-    private val writeBuffer = ByteArray(8)
 
     /**
      * Writes a `long` to the underlying output stream as eight

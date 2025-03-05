@@ -38,6 +38,8 @@ abstract class ReusingByteBufferAllocator private constructor(
     private var buffer: ByteBuffer? = null
     private var bufferOut: ByteBuffer? = null
 
+    override val isDirect = allocator.isDirect
+
     /**
      * {@inheritDoc}
      *
@@ -75,9 +77,6 @@ abstract class ReusingByteBufferAllocator private constructor(
         require(b === bufferOut) { "The buffer to be released is not the one allocated by this allocator" }
         bufferOut = null
     }
-
-    override val isDirect: Boolean
-        get() = allocator.isDirect
 
     override fun close() {
         buffer?.also {

@@ -25,6 +25,10 @@ import java.io.IOException
  * data files using [PositionOutputStream] instances.
  */
 interface OutputFile {
+    /**  the path of the file, as a [String]. */
+    val path: String?
+        get() = null
+
     /**
      * Opens a new [PositionOutputStream] for the data file to create.
      *
@@ -52,8 +56,4 @@ interface OutputFile {
      * @return the default block size.
      */
     fun defaultBlockSize(): Long
-
-    /**  the path of the file, as a [String]. */
-    val path: String?
-        get() = null
 }

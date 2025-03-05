@@ -47,7 +47,7 @@ class WildcardPath(
     fun matches(path: String) = pattern.matcher(path).matches()
 
     override fun toString(): String {
-        return String.format("WildcardPath(parentGlobPath: '%s', pattern: '%s')", parentGlobPath, wildcardPath)
+        return "WildcardPath(parentGlobPath: '$parentGlobPath', pattern: '$wildcardPath')"
     }
 
     override fun equals(other: Any?): Boolean {

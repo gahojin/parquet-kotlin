@@ -135,9 +135,7 @@ object BytesUtils {
             2 -> readIntLittleEndianOnTwoBytes(`in`)
             3 -> readIntLittleEndianOnThreeBytes(`in`)
             4 -> readIntLittleEndian(`in`)
-            else -> throw IOException(
-                String.format("Encountered bitWidth (%d) that requires more than 4 bytes", bitWidth)
-            )
+            else -> throw IOException("Encountered bitWidth ($bitWidth) that requires more than 4 bytes")
         }
     }
 
@@ -193,7 +191,7 @@ object BytesUtils {
             2 -> writeIntLittleEndianOnTwoBytes(out, v)
             3 -> writeIntLittleEndianOnThreeBytes(out, v)
             4 -> writeIntLittleEndian(out, v)
-            else -> throw IOException(String.format("Encountered value (%d) that requires more than 4 bytes", v))
+            else -> throw IOException("Encountered value ($v) that requires more than 4 bytes")
         }
     }
 

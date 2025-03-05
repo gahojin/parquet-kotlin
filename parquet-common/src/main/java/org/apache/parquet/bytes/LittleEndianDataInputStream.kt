@@ -30,6 +30,8 @@ import java.io.InputStream
 class LittleEndianDataInputStream(
     private val delegated: InputStream,
 ) : InputStream() {
+    private val readBuffer = ByteArray(8)
+
     /**
      * See the general contract of the `readFully`
      * method of `DataInput`.
@@ -307,8 +309,6 @@ class LittleEndianDataInputStream(
         if ((ch1 or ch2 or ch3 or ch4) < 0) throw EOFException()
         return ((ch1 shl 24) + (ch2 shl 16) + (ch3 shl 8) + (ch4 shl 0))
     }
-
-    private val readBuffer = ByteArray(8)
 
     /**
      * Bytes for this operation are read from the contained input stream.

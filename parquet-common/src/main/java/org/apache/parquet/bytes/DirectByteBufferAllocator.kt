@@ -20,7 +20,9 @@ package org.apache.parquet.bytes
 
 import java.nio.ByteBuffer
 
-open class DirectByteBufferAllocator : ByteBufferAllocator {
+open class DirectByteBufferAllocator internal constructor() : ByteBufferAllocator {
+    override val isDirect: Boolean = true
+
     override fun allocate(size: Int): ByteBuffer {
         return ByteBuffer.allocateDirect(size)
     }
@@ -29,8 +31,6 @@ open class DirectByteBufferAllocator : ByteBufferAllocator {
         // The ByteBuffer.allocateDirect
         return
     }
-
-    override val isDirect: Boolean = true
 
     companion object {
         @JvmField
