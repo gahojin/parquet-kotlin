@@ -72,7 +72,7 @@ object AutoCloseables {
      */
     @JvmStatic
     fun uncheckedClose(vararg autoCloseables: AutoCloseable?) {
-        uncheckedClose(listOf(*autoCloseables))
+        uncheckedClose(autoCloseables.toList())
     }
 
     class ParquetCloseResourceException internal constructor(e: Throwable) :

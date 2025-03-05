@@ -138,7 +138,7 @@ open class ByteBufferInputStream(
             return if (buffers.size == 1) {
                 SingleBufferInputStream(buffers[0])
             } else {
-                MultiBufferInputStream(listOf(*buffers))
+                MultiBufferInputStream(buffers.toList())
             }
         }
 
