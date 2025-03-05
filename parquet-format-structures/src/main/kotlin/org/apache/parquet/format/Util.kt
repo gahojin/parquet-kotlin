@@ -316,15 +316,7 @@ private object SkipFileMetaDataAdapter : Adapter<FileMetaData> {
                 } else {
                     protocol.skip(fieldMeta.typeId)
                 }
-                4 -> if (fieldMeta.typeId == TType.LIST) {
-                    val list0 = protocol.readListBegin()
-                    for (i0 in 0..<list0.size) {
-                        RowGroup.ADAPTER.read(protocol)
-                    }
-                    protocol.readListEnd()
-                } else {
-                    protocol.skip(fieldMeta.typeId)
-                }
+                4 -> protocol.skip(fieldMeta.typeId)
                 5 -> if (fieldMeta.typeId == TType.LIST) {
                     val list0 = protocol.readListBegin()
                     val keyValueMetadata = ArrayList<KeyValue>(list0.size)
