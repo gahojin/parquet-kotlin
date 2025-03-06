@@ -28,7 +28,6 @@ dependencies {
     implementation(platform(libs.kotlin.bom))
     implementation(libs.kotlin.stdlib)
     implementation(libs.slf4j.api)
-    implementation(libs.semver)
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
@@ -38,6 +37,7 @@ dependencies {
     testImplementation(libs.kotest.property)
     testImplementation(libs.mockito)
     testImplementation(libs.mockk)
+    testImplementation(libs.semver)
     testImplementation(libs.slf4j.simple)
 }
 
