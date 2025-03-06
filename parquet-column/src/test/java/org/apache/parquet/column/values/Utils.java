@@ -20,7 +20,6 @@ package org.apache.parquet.column.values;
 
 import java.io.IOException;
 import java.util.Random;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.parquet.bytes.ByteBufferInputStream;
 import org.apache.parquet.io.api.Binary;
 
