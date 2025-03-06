@@ -59,6 +59,7 @@ import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.schema.PrimitiveComparator;
 import org.apache.parquet.schema.PrimitiveStringifier;
 import org.apache.parquet.schema.PrimitiveType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation to create {@link ColumnIndex} objects.
@@ -120,6 +121,7 @@ public abstract class ColumnIndexBuilder {
       stringifier = type.stringifier();
     }
 
+    @NotNull
     @Override
     public BoundaryOrder getBoundaryOrder() {
       return boundaryOrder;
@@ -133,11 +135,13 @@ public abstract class ColumnIndexBuilder {
       return LongLists.unmodifiable(LongArrayList.wrap(nullCounts));
     }
 
+    @NotNull
     @Override
     public List<Boolean> getNullPages() {
       return BooleanLists.unmodifiable(BooleanArrayList.wrap(nullPages));
     }
 
+    @NotNull
     @Override
     public List<ByteBuffer> getMinValues() {
       List<ByteBuffer> list = new ArrayList<>(getPageCount());
@@ -152,6 +156,7 @@ public abstract class ColumnIndexBuilder {
       return list;
     }
 
+    @NotNull
     @Override
     public List<ByteBuffer> getMaxValues() {
       List<ByteBuffer> list = new ArrayList<>(getPageCount());
@@ -166,6 +171,7 @@ public abstract class ColumnIndexBuilder {
       return list;
     }
 
+    @NotNull
     @Override
     public List<Long> getRepetitionLevelHistogram() {
       if (repLevelHistogram == null) {
@@ -174,6 +180,7 @@ public abstract class ColumnIndexBuilder {
       return LongLists.unmodifiable(LongArrayList.wrap(repLevelHistogram));
     }
 
+    @NotNull
     @Override
     public List<Long> getDefinitionLevelHistogram() {
       if (defLevelHistogram == null) {
@@ -274,17 +281,17 @@ public abstract class ColumnIndexBuilder {
     abstract ValueComparator createValueComparator(Object value);
 
     @Override
-    public PrimitiveIterator.OfInt visit(And and) {
+    public PrimitiveIterator.OfInt visit(@NotNull And and) {
       throw new UnsupportedOperationException("AND shall not be used on column index directly");
     }
 
     @Override
-    public PrimitiveIterator.OfInt visit(Not not) {
+    public PrimitiveIterator.OfInt visit(@NotNull Not not) {
       throw new UnsupportedOperationException("NOT shall not be used on column index directly");
     }
 
     @Override
-    public PrimitiveIterator.OfInt visit(Or or) {
+    public PrimitiveIterator.OfInt visit(@NotNull Or or) {
       throw new UnsupportedOperationException("OR shall not be used on column index directly");
     }
 
@@ -386,9 +393,8 @@ public abstract class ColumnIndexBuilder {
           .gtEq(createValueComparator(min))
           .forEachRemaining((int index) -> matchingIndexesGreaterThanMin.add(index));
       matchingIndexesLessThanMax.retainAll(matchingIndexesGreaterThanMin);
-      IntSet matchingIndex = matchingIndexesLessThanMax;
-      matchingIndex.addAll(matchingIndexesForNull); // add the matching null pages
-      return IndexIterator.filter(getPageCount(), matchingIndex::contains);
+      matchingIndexesLessThanMax.addAll(matchingIndexesForNull); // add the matching null pages
+      return IndexIterator.filter(getPageCount(), matchingIndexesLessThanMax::contains);
     }
 
     @Override

@@ -1,5 +1,52 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>EqualsWithHashCodeExist:Binary.kt$Binary : ComparableSerializable</ID>
+    <ID>EqualsWithHashCodeExist:Binary.kt$Binary$ByteArrayBackedBinary : Binary</ID>
+    <ID>EqualsWithHashCodeExist:Binary.kt$Binary$ByteArraySliceBackedBinary : Binary</ID>
+    <ID>EqualsWithHashCodeExist:Binary.kt$Binary$ByteBufferBackedBinary : Binary</ID>
+    <ID>EqualsWithHashCodeExist:BloomFilter.kt$BloomFilter</ID>
+    <ID>ForbiddenComment:Binary.kt$Binary.ByteBufferBackedBinary$// TODO: should not have to materialize those bytes</ID>
+    <ID>ForbiddenComment:DictionaryPage.kt$DictionaryPage$// TODO: fix sizes long or int</ID>
+    <ID>ForbiddenComment:Encoding.kt$Encoding.RLE$* Actually a combination of bit packing and run length encoding. * TODO: Should we rename this to be more clear?</ID>
+    <ID>ForbiddenComment:MessageType.kt$MessageType$// TODO: optimize this</ID>
+    <ID>ForbiddenComment:PageReadStore.kt$PageReadStore$* contains all the readers for all the columns of the corresponding row group * * TODO: rename to RowGroup?</ID>
+    <ID>ForbiddenComment:RecordConsumer.kt$RecordConsumer$// TODO: make this abstract in 2.0</ID>
+    <ID>ForbiddenComment:RunLengthBitPackingHybridDecoder.kt$RunLengthBitPackingHybridDecoder$// TODO: reuse a buffer</ID>
+    <ID>ForbiddenComment:RunLengthBitPackingHybridEncoder.kt$RunLengthBitPackingHybridEncoder$* Encodes values using a combination of run length encoding and bit packing, * according to the following grammar: * * ``` * rle-bit-packed-hybrid: &lt;length> &lt;encoded-data> * length := length of the &lt;encoded-data> in bytes stored as 4 bytes little endian * encoded-data := &lt;run>* * run := &lt;bit-packed-run> | &lt;rle-run> * bit-packed-run := &lt;bit-packed-header> &lt;bit-packed-values> * bit-packed-header := varint-encode(&lt;bit-pack-count> &lt;&lt; 1 | 1) * // we always bit-pack a multiple of 8 values at a time, so we only store the number of values / 8 * bit-pack-count := (number of values in this run) / 8 * bit-packed-values := bit packed back to back, from LSB to MSB * rle-run := &lt;rle-header> &lt;repeated-value> * rle-header := varint-encode( (number of times repeated) &lt;&lt; 1) * repeated-value := value that is repeated, using a fixed-width of round-up-to-next-byte(bit-width) * ``` * * NOTE: this class is only responsible for creating and returning the `&lt;encoded-data>` * portion of the above grammar. The `&lt;length>` portion is done by * [RunLengthBitPackingHybridValuesWriter] * * Only supports positive values (including 0) // TODO: is that ok? Should we make a signed version? * * </ID>
+    <ID>ForbiddenComment:ValuesWriter.kt$ValuesWriter$// TODO: maybe consolidate into a getPage</ID>
+    <ID>FunctionParameterNaming:Binary.kt$Binary.ByteBufferBackedBinary$`in`: ObjectInputStream</ID>
+    <ID>FunctionParameterNaming:FilterPredicate.kt$FilterPredicate.Visitor$`in`: In&lt;T></ID>
+    <ID>FunctionParameterNaming:ValuesReader.kt$ValuesReader$`in`: ByteBufferInputStream</ID>
+    <ID>MaxLineLength:Binary.kt$Binary.ByteArrayBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
+    <ID>MaxLineLength:Binary.kt$Binary.ByteArraySliceBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
+    <ID>MaxLineLength:Binary.kt$Binary.ByteBufferBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
+    <ID>NestedBlockDepth:GroupWriter.kt$GroupWriter$private fun writeGroup(group: Group, type: GroupType)</ID>
+    <ID>NestedBlockDepth:MessageColumnIO.kt$MessageColumnIO.MessageColumnIORecordConsumer$fun writeNullForMissingFieldsAtCurrentLevel()</ID>
+    <ID>NestedBlockDepth:OffsetIndexBuilder.kt$OffsetIndexBuilder.OffsetIndexImpl$override fun toString(): String</ID>
+    <ID>NestedBlockDepth:SimpleGroup.kt$SimpleGroup$private fun appendToString(builder: StringBuilder, indent: String): StringBuilder</ID>
+    <ID>ReturnCount:CorruptDeltaByteArrays.kt$CorruptDeltaByteArrays$@JvmStatic fun requiresSequentialReads(createdBy: String?, encoding: Encoding?): Boolean</ID>
+    <ID>ReturnCount:CorruptDeltaByteArrays.kt$CorruptDeltaByteArrays$@JvmStatic fun requiresSequentialReads(semver: SemanticVersion?, encoding: Encoding?): Boolean</ID>
+    <ID>ReturnCount:CorruptDeltaByteArrays.kt$CorruptDeltaByteArrays$@JvmStatic fun requiresSequentialReads(version: ParsedVersion?, encoding: Encoding?): Boolean</ID>
+    <ID>ReturnCount:CorruptStatistics.kt$CorruptStatistics$@JvmStatic fun shouldIgnoreStatistics(createdBy: String?, columnType: PrimitiveTypeName): Boolean</ID>
+    <ID>ReturnCount:Type.kt$Type.Repetition.Companion$@JvmStatic fun leastRestrictive(vararg repetitions: Repetition?): Repetition</ID>
+    <ID>SpreadOperator:MessageType.kt$MessageType$(*it)</ID>
+    <ID>SpreadOperator:MessageType.kt$MessageType$(*path)</ID>
+    <ID>TooGenericExceptionCaught:CorruptDeltaByteArrays.kt$CorruptDeltaByteArrays$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:CorruptStatistics.kt$CorruptStatistics$e: RuntimeException</ID>
+    <ID>TooGenericExceptionCaught:GroupColumnIO.kt$GroupColumnIO$e: IndexOutOfBoundsException</ID>
+    <ID>TooGenericExceptionCaught:MessageColumnIO.kt$MessageColumnIO.MessageColumnIORecordConsumer$e: RuntimeException</ID>
+    <ID>TooGenericExceptionThrown:SimpleGroup.kt$SimpleGroup$throw RuntimeException( "not found $fieldIndex(${schema.getFieldName(fieldIndex)}) element number $index in group:\n$this")</ID>
+    <ID>TooGenericExceptionThrown:SimpleGroup.kt$SimpleGroup$throw RuntimeException( "not found $fieldIndex(${schema.getFieldName(fieldIndex)}) in group:\n$this")</ID>
+    <ID>UnusedPrivateMember:Binary.kt$Binary.ByteBufferBackedBinary$@Throws(IOException::class) private fun writeObject(out: ObjectOutputStream)</ID>
+    <ID>UnusedPrivateMember:Binary.kt$Binary.ByteBufferBackedBinary$@Throws(IOException::class, ClassNotFoundException::class) private fun readObject(`in`: ObjectInputStream)</ID>
+    <ID>UnusedPrivateMember:Binary.kt$Binary.ByteBufferBackedBinary$@Throws(ObjectStreamException::class) private fun readObjectNoData()</ID>
+    <ID>UnusedPrivateProperty:ValuesReader.kt$ValuesReader$i</ID>
+    <ID>WrongEqualsTypeParameter:Binary.kt$Binary$abstract fun equals(other: Binary): Boolean</ID>
+    <ID>WrongEqualsTypeParameter:Binary.kt$Binary.ByteArrayBackedBinary$override fun equals(other: Binary): Boolean</ID>
+    <ID>WrongEqualsTypeParameter:Binary.kt$Binary.ByteArraySliceBackedBinary$override fun equals(other: Binary): Boolean</ID>
+    <ID>WrongEqualsTypeParameter:Binary.kt$Binary.ByteBufferBackedBinary$override fun equals(other: Binary): Boolean</ID>
+    <ID>WrongEqualsTypeParameter:Type.kt$Type$protected open fun equals(other: Type): Boolean</ID>
+  </CurrentIssues>
 </SmellBaseline>

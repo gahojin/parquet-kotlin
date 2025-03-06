@@ -338,7 +338,7 @@ public class GroupType extends Type {
   }
 
   @Override
-  void checkContains(Type subType) {
+  public void checkContains(Type subType) {
     super.checkContains(subType);
     checkGroupContains(subType);
   }
@@ -355,7 +355,7 @@ public class GroupType extends Type {
   }
 
   @Override
-  <T> T convert(List<GroupType> path, TypeConverter<T> converter) {
+  protected <T> T convert(List<GroupType> path, TypeConverter<T> converter) {
     List<GroupType> childrenPath = new ArrayList<>(path);
     childrenPath.add(this);
     final List<T> children = convertChildren(childrenPath, converter);

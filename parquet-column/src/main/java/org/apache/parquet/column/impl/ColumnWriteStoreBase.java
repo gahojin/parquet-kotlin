@@ -36,6 +36,7 @@ import org.apache.parquet.column.page.PageWriter;
 import org.apache.parquet.column.values.bloomfilter.BloomFilterWriteStore;
 import org.apache.parquet.column.values.bloomfilter.BloomFilterWriter;
 import org.apache.parquet.schema.MessageType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Base implementation for {@link ColumnWriteStore} to be extended to specialize for V1 and V2 pages.
@@ -44,7 +45,7 @@ abstract class ColumnWriteStoreBase implements ColumnWriteStore {
 
   // Used to support the deprecated workflow of ColumnWriteStoreV1 (lazy init of ColumnWriters)
   private interface ColumnWriterProvider {
-    ColumnWriter getColumnWriter(ColumnDescriptor path);
+    ColumnWriter getColumnWriter(@NotNull ColumnDescriptor path);
   }
 
   private final ColumnWriterProvider columnWriterProvider;
@@ -69,16 +70,13 @@ abstract class ColumnWriteStoreBase implements ColumnWriteStore {
 
     this.rowCountForNextSizeCheck = min(props.getMinRowCountForPageSizeCheck(), props.getPageRowCountLimit());
 
-    columnWriterProvider = new ColumnWriterProvider() {
-      @Override
-      public ColumnWriter getColumnWriter(ColumnDescriptor path) {
-        ColumnWriterBase column = columns.get(path);
-        if (column == null) {
-          column = createColumnWriterBase(path, pageWriteStore.getPageWriter(path), null, props);
-          columns.put(path, column);
-        }
-        return column;
+    columnWriterProvider = path -> {
+      ColumnWriterBase column = columns.get(path);
+      if (column == null) {
+        column = createColumnWriterBase(path, pageWriteStore.getPageWriter(path), null, props);
+        columns.put(path, column);
       }
+      return column;
     };
   }
 
@@ -94,12 +92,7 @@ abstract class ColumnWriteStoreBase implements ColumnWriteStore {
 
     this.rowCountForNextSizeCheck = min(props.getMinRowCountForPageSizeCheck(), props.getPageRowCountLimit());
 
-    columnWriterProvider = new ColumnWriterProvider() {
-      @Override
-      public ColumnWriter getColumnWriter(ColumnDescriptor path) {
-        return columns.get(path);
-      }
-    };
+    columnWriterProvider = columns::get;
   }
 
   // The Bloom filter is written to a specified bitset instead of pages, so it needs a separate write store abstract.
@@ -124,12 +117,7 @@ abstract class ColumnWriteStoreBase implements ColumnWriteStore {
 
     this.rowCountForNextSizeCheck = props.getMinRowCountForPageSizeCheck();
 
-    columnWriterProvider = new ColumnWriterProvider() {
-      @Override
-      public ColumnWriter getColumnWriter(ColumnDescriptor path) {
-        return columns.get(path);
-      }
-    };
+    columnWriterProvider = columns::get;
   }
 
   private ColumnWriterBase createColumnWriterBase(
@@ -145,8 +133,9 @@ abstract class ColumnWriteStoreBase implements ColumnWriteStore {
   abstract ColumnWriterBase createColumnWriter(
       ColumnDescriptor path, PageWriter pageWriter, BloomFilterWriter bloomFilterWriter, ParquetProperties props);
 
+  @NotNull
   @Override
-  public ColumnWriter getColumnWriter(ColumnDescriptor path) {
+  public ColumnWriter getColumnWriter(@NotNull ColumnDescriptor path) {
     return columnWriterProvider.getColumnWriter(path);
   }
 
