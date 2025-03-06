@@ -1616,7 +1616,7 @@ public class ParquetMetadataConverter {
         type,
         fromFormatCodec(metaData.codec),
         convertEncodingStats(metaData.encodingStats),
-        fromFormatEncodings((List<Encoding>) metaData.encodings),
+        fromFormatEncodings(metaData.encodings),
         fromParquetStatistics(createdBy, metaData.statistics, type),
         metaData.dataPageOffset,
         metaData.dictionaryPageOffset == null ? 0 : metaData.dictionaryPageOffset,
@@ -1642,7 +1642,7 @@ public class ParquetMetadataConverter {
       boolean encryptedFooter,
       Map<RowGroup, Long> rowGroupToRowIndexOffsetMap)
       throws IOException {
-    MessageType messageType = fromParquetSchema(parquetMetadata.schema, (List<ColumnOrder>) parquetMetadata.columnOrders);
+    MessageType messageType = fromParquetSchema(parquetMetadata.schema, parquetMetadata.columnOrders);
     List<BlockMetaData> blocks = new ArrayList<>();
     List<RowGroup> row_groups = parquetMetadata.rowGroups;
 
