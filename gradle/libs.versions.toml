@@ -62,7 +62,7 @@ slf4j = "2.0.17"
 
 snappy = "1.1.10.7"
 
-thrifty = "4.4.0"
+thrifty = "4.5.0"
 
 zero-allocation-hashing = "0.27ea0"
 

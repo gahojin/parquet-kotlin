@@ -1292,8 +1292,8 @@ public class TestParquetMetadataConverter {
       Encoding dicEncoding, Encoding dataEncoding, boolean includeEncodingStats) {
     MessageType schema = parseMessageType("message schema { optional int32 col (INT_32); }");
     org.apache.parquet.hadoop.metadata.FileMetaData fileMetaData =
-        new org.apache.parquet.hadoop.metadata.FileMetaData(schema, new HashMap<String, String>(), null);
-    List<BlockMetaData> blockMetaDataList = new ArrayList<BlockMetaData>();
+        new org.apache.parquet.hadoop.metadata.FileMetaData(schema, new HashMap<>(), null);
+    List<BlockMetaData> blockMetaDataList = new ArrayList<>();
     BlockMetaData blockMetaData = new BlockMetaData();
     EncodingStats es = null;
     if (includeEncodingStats) {
@@ -1360,12 +1360,12 @@ public class TestParquetMetadataConverter {
         + "  }"
         + "}");
     org.apache.parquet.hadoop.metadata.FileMetaData fileMetaData =
-        new org.apache.parquet.hadoop.metadata.FileMetaData(schema, new HashMap<String, String>(), null);
-    ParquetMetadata metadata = new ParquetMetadata(fileMetaData, new ArrayList<BlockMetaData>());
+        new org.apache.parquet.hadoop.metadata.FileMetaData(schema, new HashMap<>(), null);
+    ParquetMetadata metadata = new ParquetMetadata(fileMetaData, new ArrayList<>());
     ParquetMetadataConverter converter = new ParquetMetadataConverter();
     FileMetaData formatMetadata = converter.toParquetMetadata(1, metadata);
 
-    List<org.apache.parquet.format.ColumnOrder> columnOrders = (List<org.apache.parquet.format.ColumnOrder>) formatMetadata.columnOrders;
+    List<org.apache.parquet.format.ColumnOrder> columnOrders = formatMetadata.columnOrders;
     assertEquals(3, columnOrders.size());
     for (org.apache.parquet.format.ColumnOrder columnOrder : columnOrders) {
       assertTrue(columnOrder instanceof org.apache.parquet.format.ColumnOrder.TypeOrder);

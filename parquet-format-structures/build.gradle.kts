@@ -84,6 +84,7 @@ thrifty {
         jvmOverloads = true
         deepCopyFunc = true
         nameStyle = FieldNameStyle.JAVA
+        jvmSuppressWildcards = true
     }
     sourceDir(project.layout.buildDirectory.dir("thrift").get().toString()) {
         include("**/*.thrift")
