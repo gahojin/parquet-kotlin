@@ -19,7 +19,6 @@
 package org.apache.parquet
 
 import org.apache.parquet.SemanticVersion.SemanticVersionParseException
-import org.apache.parquet.Strings.isNullOrEmpty
 import java.util.regex.Pattern
 
 /**
@@ -45,7 +44,7 @@ object VersionParser {
         val semver = matcher.group(2)
         val appBuildHash = matcher.group(3)
 
-        if (isNullOrEmpty(application)) {
+        if (application.isNullOrEmpty()) {
             throw VersionParseException("application cannot be null or empty")
         }
 
@@ -58,10 +57,10 @@ object VersionParser {
         appBuildHash: String?,
     ) {
         @JvmField
-        val version: String? = if (isNullOrEmpty(version)) null else version
+        val version: String? = if (version.isNullOrEmpty()) null else version
 
         @JvmField
-        val appBuildHash: String? = if (isNullOrEmpty(appBuildHash)) null else appBuildHash
+        val appBuildHash: String? = if (appBuildHash.isNullOrEmpty()) null else appBuildHash
 
         private val hasSemver: Boolean
         val semanticVersion: SemanticVersion?

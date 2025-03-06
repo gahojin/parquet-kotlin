@@ -25,6 +25,7 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 import org.apache.parquet.schema.TypeVisitor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Factory constructing the ColumnIO structure from the schema
@@ -52,7 +53,7 @@ public class ColumnIOFactory {
     }
 
     @Override
-    public void visit(MessageType messageType) {
+    public void visit(@NotNull MessageType messageType) {
       columnIO = new MessageColumnIO(requestedSchema, validating, createdBy);
       visitChildren(columnIO, messageType, requestedSchema);
       columnIO.setLevels();
@@ -60,7 +61,7 @@ public class ColumnIOFactory {
     }
 
     @Override
-    public void visit(GroupType groupType) {
+    public void visit(@NotNull GroupType groupType) {
       if (currentRequestedType.isPrimitive()) {
         incompatibleSchema(groupType, currentRequestedType);
       }
@@ -87,7 +88,7 @@ public class ColumnIOFactory {
     }
 
     @Override
-    public void visit(PrimitiveType primitiveType) {
+    public void visit(@NotNull PrimitiveType primitiveType) {
       if (!currentRequestedType.isPrimitive()
           || (this.strictTypeChecking
               && currentRequestedType.asPrimitiveType().getPrimitiveTypeName()

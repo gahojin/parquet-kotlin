@@ -60,6 +60,7 @@ import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName;
 import org.apache.parquet.schema.Type;
 import org.apache.parquet.schema.Type.Repetition;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -644,7 +645,7 @@ final class ValidatingColumnWriteStore implements ColumnWriteStore {
   public void close() {}
 
   @Override
-  public ColumnWriter getColumnWriter(final ColumnDescriptor path) {
+  public ColumnWriter getColumnWriter(@NotNull final ColumnDescriptor path) {
     return new ColumnWriter() {
       private void validate(Object value, int repetitionLevel, int definitionLevel) {
         String actual = Arrays.toString(path.getPath()) + ": " + value + ", r:" + repetitionLevel + ", d:"

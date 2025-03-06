@@ -33,7 +33,6 @@ dependencies {
     implementation(libs.slf4j.api)
     implementation(libs.zero.allocation.hashing)
 
-    testImplementation(libs.commons.lang3)
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
     testImplementation(libs.junit.benchmarks)

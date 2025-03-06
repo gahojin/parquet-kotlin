@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import net.openhft.hashing.LongHashFunction;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.parquet.column.values.RandomStringUtils;
 import org.apache.parquet.io.api.Binary;
 import org.junit.Assert;
 import org.junit.Rule;

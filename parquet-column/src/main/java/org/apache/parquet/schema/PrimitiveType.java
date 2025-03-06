@@ -753,7 +753,7 @@ public final class PrimitiveType extends Type {
   }
 
   @Override
-  void checkContains(Type subType) {
+  public void checkContains(Type subType) {
     super.checkContains(subType);
     if (!subType.isPrimitive()) {
       throw new InvalidRecordException(subType + " found: expected " + this);

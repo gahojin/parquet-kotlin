@@ -20,8 +20,6 @@ thrifty = { id = "jp.co.gahojin.thrifty", version.ref = "thrifty" }
 
 aircompressor = "2.0.2"
 
-commons-lang3 = "3.17.0"
-
 commons-pool = "1.6"
 
 detekt = "1.23.8"
@@ -71,8 +69,6 @@ zstd = "1.5.7-1"
 [libraries]
 
 aircompressor = { group = "io.airlift", name = "aircompressor", version.ref = "aircompressor" }
-
-commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
 
 commons-pool = { group = "commons-pool", name = "commons-pool", version.ref = "commons-pool" }
 

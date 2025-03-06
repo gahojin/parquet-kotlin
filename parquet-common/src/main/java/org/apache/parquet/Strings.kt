@@ -19,20 +19,8 @@
 package org.apache.parquet
 
 import org.apache.parquet.glob.GlobExpander.expand
-import org.apache.parquet.glob.WildcardPath
 
 object Strings {
-    /**
-     * Returns true if s.isEmpty() or s == null
-     *
-     * @param s a string that may be null or empty
-     * @return true if the string s is null or is empty
-     */
-    @JvmStatic
-    fun isNullOrEmpty(s: String?): Boolean {
-        return s.isNullOrEmpty()
-    }
-
     /**
      * Expands a string with braces ("{}") into all of its possible permutations.
      * We call anything inside of {} braces a "one-of" group.
@@ -40,10 +28,8 @@ object Strings {
      *
      * The only special characters in this glob syntax are '}', '{' and ','
      *
-     *
      * The top-level pattern must not contain any commas, but a "one-of" group separates
      * its elements with commas, and a one-of group may contain sub one-of groups.
-     *
      *
      * For example:
      * start{a,b,c}end -&gt; startaend, startbend, startcend
@@ -57,20 +43,5 @@ object Strings {
     @JvmStatic
     fun expandGlob(globPattern: String): List<String> {
         return expand(globPattern)
-    }
-
-    /**
-     * Expands a string according to [.expandGlob], and then constructs a [WildcardPath]
-     * for each expanded result which can be used to match strings as described in [WildcardPath].
-     *
-     * @param globPattern a String to be passed to [.expandGlob]
-     * @param delim       the delimeter used by [WildcardPath]
-     * @return a list of wildcard paths, one for each expanded result
-     */
-    @JvmStatic
-    fun expandGlobToWildCardPaths(globPattern: String, delim: Char): List<WildcardPath> {
-        return expandGlob(globPattern).map {
-            WildcardPath(globPattern, it, delim)
-        }
     }
 }
