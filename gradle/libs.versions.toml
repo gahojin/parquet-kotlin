@@ -44,9 +44,9 @@ kotlin-poet = "2.1.0"
 
 kotest = "5.9.1"
 
-maven-publish = "0.30.0"
+maven-publish = "0.31.0"
 
-mockito = "5.15.2"
+mockito = "5.16.0"
 
 mockk = "1.13.17"
 
