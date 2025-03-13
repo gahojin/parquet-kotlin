@@ -25,7 +25,7 @@ import org.apache.parquet.column.ColumnReader
  * which returns an unbound filter. This only becomes a filter when it is bound to the actual
  * columns.
  */
-interface UnboundRecordFilter {
+fun interface UnboundRecordFilter {
     /**
      * Call to bind to actual columns and create filter.
      *

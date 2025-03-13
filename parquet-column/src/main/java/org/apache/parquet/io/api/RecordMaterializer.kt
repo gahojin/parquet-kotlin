@@ -39,7 +39,7 @@ abstract class RecordMaterializer<T> {
     /**
      * @return the root converter for this tree
      */
-    abstract val rootConverter: GroupConverter?
+    abstract val rootConverter: GroupConverter
 
     /**
      * Called if [.getCurrentRecord] isn't going to be called.

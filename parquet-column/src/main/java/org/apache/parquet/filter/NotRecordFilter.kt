@@ -16,20 +16,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.parquet.io.api
+package org.apache.parquet.filter
 
 /**
- * Represent a tree of converters
- * that materializes tuples
+ * Provides ability to negate the result of a filter.
  */
-abstract class Converter {
-    abstract val isPrimitive: Boolean
+class NotRecordFilter private constructor(
+    private val boundFilter: RecordFilter,
+) : RecordFilter {
+    override val isMatch: Boolean
+        get() = !boundFilter.isMatch
 
-    open fun asPrimitiveConverter(): PrimitiveConverter {
-        throw ClassCastException("Expected instance of primitive converter but got \"${javaClass.name}\"")
-    }
-
-    open fun asGroupConverter(): GroupConverter {
-        throw ClassCastException("Expected instance of group converter but got \"${javaClass.getName()}\"")
+    companion object {
+        /**
+         * Returns builder for creating an and filter.
+         *
+         * @param filter The filter to invert.
+         * @return a not record filter
+         */
+        @JvmStatic
+        fun not(filter: UnboundRecordFilter): UnboundRecordFilter {
+            return UnboundRecordFilter {
+                NotRecordFilter(filter.bind(it))
+            }
+        }
     }
 }

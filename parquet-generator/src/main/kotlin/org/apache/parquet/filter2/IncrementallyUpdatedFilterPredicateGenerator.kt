@@ -618,7 +618,7 @@ object IncrementallyUpdatedFilterPredicateGenerator {
     }
 
     private fun compareOp(info: TypeInfo, target: String, op: String): String {
-        return "comparator.compare(value as ${info.className}, $target) $op 0"
+        return "comparator!!.compare(value as ${info.className}, $target) $op 0"
     }
 
     private fun compareEquality(info: TypeInfo, target: String, eq: Boolean): String {

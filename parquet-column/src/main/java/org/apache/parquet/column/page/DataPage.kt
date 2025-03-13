@@ -18,7 +18,8 @@
  */
 package org.apache.parquet.column.page
 
-import java.util.Optional
+import java.util.OptionalInt
+import java.util.OptionalLong
 
 /**
  * one data page in a chunk
@@ -29,21 +30,21 @@ abstract class DataPage @JvmOverloads internal constructor(
     compressedSize: Int,
     uncompressedSize: Int,
     val valueCount: Int,
-    private val firstRowIndex: Long = -1,
+    private val firstRowIndex: Long = -1L,
 ) : Page(compressedSize, uncompressedSize) {
     /**
      * @return the index of the first row in this page if the related data is available (the optional column-index
      * contains this value)
      */
-    fun getFirstRowIndex(): Optional<Long> {
-        return if (firstRowIndex < 0) Optional.empty<Long>() else Optional.of<Long>(firstRowIndex)
+    fun getFirstRowIndex(): OptionalLong {
+        return if (firstRowIndex < 0) OptionalLong.empty() else OptionalLong.of(firstRowIndex)
     }
 
     /**
      * @return the number of rows in this page if the related data is available (in case of pageV1 the optional
      * column-index contains this value)
      */
-    abstract fun getIndexRowCount(): Optional<Int>
+    abstract fun getIndexRowCount(): OptionalInt
 
     abstract fun <T> accept(visitor: Visitor<T>): T
 
