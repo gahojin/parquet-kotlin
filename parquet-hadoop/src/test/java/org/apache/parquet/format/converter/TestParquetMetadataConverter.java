@@ -68,6 +68,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1389,8 +1390,8 @@ public class TestParquetMetadataConverter {
   public void testOffsetIndexConversion() {
     for (boolean withSizeStats : new boolean[] {false, true}) {
       OffsetIndexBuilder builder = OffsetIndexBuilder.getBuilder();
-      builder.add(1000, 10000, 0, withSizeStats ? Optional.of(11L) : Optional.empty());
-      builder.add(22000, 12000, 100, withSizeStats ? Optional.of(22L) : Optional.empty());
+      builder.add(1000, 10000, 0, withSizeStats ? OptionalLong.of(11L) : OptionalLong.empty());
+      builder.add(22000, 12000, 100, withSizeStats ? OptionalLong.of(22L) : OptionalLong.empty());
       OffsetIndex offsetIndex = ParquetMetadataConverter.fromParquetOffsetIndex(
           ParquetMetadataConverter.toParquetOffsetIndex(builder.build(100000)));
       assertEquals(2, offsetIndex.getPageCount());
@@ -1595,7 +1596,7 @@ public class TestParquetMetadataConverter {
             new SizeStatistics(type, 1024, repLevelHistogram, defLevelHistogram)),
         type);
     assertEquals(type, sizeStatistics.getType());
-    assertEquals(Optional.of(1024L), sizeStatistics.getUnencodedByteArrayDataBytes());
+    assertEquals(OptionalLong.of(1024L), sizeStatistics.getUnencodedByteArrayDataBytes());
     assertEquals(repLevelHistogram, sizeStatistics.getRepetitionLevelHistogram());
     assertEquals(defLevelHistogram, sizeStatistics.getDefinitionLevelHistogram());
   }

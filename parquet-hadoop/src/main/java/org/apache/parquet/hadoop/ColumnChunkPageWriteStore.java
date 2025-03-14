@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.zip.CRC32;
 import org.apache.parquet.bytes.ByteBufferAllocator;
@@ -245,7 +246,7 @@ public class ColumnChunkPageWriteStore implements PageWriteStore, BloomFilterWri
       offsetIndexBuilder.add(
           toIntWithCheck(tempOutputStream.size() + compressedSize),
           rowCount,
-          sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : Optional.empty());
+          sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : OptionalLong.empty());
 
       // by concatenating before collecting instead of collecting twice,
       // we only allocate one buffer to copy into instead of multiple.
@@ -361,7 +362,7 @@ public class ColumnChunkPageWriteStore implements PageWriteStore, BloomFilterWri
       offsetIndexBuilder.add(
           toIntWithCheck((long) tempOutputStream.size() + compressedSize),
           rowCount,
-          sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : Optional.empty());
+          sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : OptionalLong.empty());
 
       // by concatenating before collecting instead of collecting twice,
       // we only allocate one buffer to copy into instead of multiple.

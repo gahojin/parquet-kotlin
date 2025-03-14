@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> the type of the materialized record
  */
-class RecordReaderImplementation<T> extends RecordReader<T> {
+public class RecordReaderImplementation<T> extends RecordReader<T> {
   private static final Logger LOG = LoggerFactory.getLogger(RecordReaderImplementation.class);
 
   public static class Case {

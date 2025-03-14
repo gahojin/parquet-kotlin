@@ -60,7 +60,7 @@ data class ParquetProperties private constructor(
 
     // The expected NDV (number of distinct values) for each columns
     private val bloomFilterNDVs: ColumnProperty<Long?>,
-    private val bloomFilterFPPs: ColumnProperty<Double?>,
+    private val bloomFilterFPPs: ColumnProperty<Double>,
     val maxBloomFilterBytes: Int,
     private val bloomFilterEnabled: ColumnProperty<Boolean>,
     private val adaptiveBloomFilterEnabled: ColumnProperty<Boolean>,
@@ -99,7 +99,7 @@ data class ParquetProperties private constructor(
 
     @get:Deprecated("")
     val isEnableDictionary: Boolean
-        get() = dictionaryEnabled.getDefaultValue()!!
+        get() = dictionaryEnabled.defaultValue
 
     private constructor(builder: Builder) : this(
         pageValueCountThreshold = builder.pageValueCountThreshold,
@@ -168,12 +168,12 @@ data class ParquetProperties private constructor(
     }
 
     fun isDictionaryEnabled(column: ColumnDescriptor): Boolean {
-        return dictionaryEnabled.getValue(column)!!
+        return dictionaryEnabled.getValue(column)
     }
 
     @Deprecated("")
     fun isByteStreamSplitEnabled(): Boolean {
-        return byteStreamSplitEnabled.getDefaultValue() != ByteStreamSplitMode.NONE
+        return byteStreamSplitEnabled.defaultValue != ByteStreamSplitMode.NONE
     }
 
     fun isByteStreamSplitEnabled(column: ColumnDescriptor): Boolean {
@@ -216,56 +216,46 @@ data class ParquetProperties private constructor(
     }
 
     fun getBloomFilterFPP(column: ColumnDescriptor): OptionalDouble {
-        val fpp = bloomFilterFPPs.getValue(column)
-        return fpp?.let { OptionalDouble.of(it) } ?: OptionalDouble.empty()
+        return OptionalDouble.of(bloomFilterFPPs.getValue(column))
     }
 
     fun isBloomFilterEnabled(column: ColumnDescriptor): Boolean {
-        return bloomFilterEnabled.getValue(column)!!
+        return bloomFilterEnabled.getValue(column)
     }
 
     fun getAdaptiveBloomFilterEnabled(column: ColumnDescriptor): Boolean {
-        return adaptiveBloomFilterEnabled.getValue(column)!!
+        return adaptiveBloomFilterEnabled.getValue(column)
     }
 
     fun getBloomFilterCandidatesCount(column: ColumnDescriptor): Int {
-        return numBloomFilterCandidates.getValue(column)!!
+        return numBloomFilterCandidates.getValue(column)
     }
 
     fun getStatisticsEnabled(column: ColumnDescriptor): Boolean {
         // First check column-specific setting
-        val columnSetting = statistics.getValue(column)
-        if (columnSetting != null) {
-            return columnSetting
-        }
-        // Fall back to global setting
-        return statisticsEnabled
+        return statistics.getValue(column)
     }
 
     fun getSizeStatisticsEnabled(column: ColumnDescriptor): Boolean {
-        val columnSetting = sizeStatistics.getValue(column)
-        if (columnSetting != null) {
-            return columnSetting
-        }
-        return sizeStatisticsEnabled
+        return sizeStatistics.getValue(column)
     }
 
     override fun toString(): String {
-        return ("Parquet page size to " + this.pageSizeThreshold + '\n'
-                + "Parquet dictionary page size to " + this.dictionaryPageSizeThreshold + '\n'
+        return ("Parquet page size to " + pageSizeThreshold + '\n'
+                + "Parquet dictionary page size to " + dictionaryPageSizeThreshold + '\n'
                 + "Dictionary is " + dictionaryEnabled + '\n'
-                + "Writer version is: " + this.writerVersion + '\n'
+                + "Writer version is: " + writerVersion + '\n'
                 + "Page size checking is: " + (if (estimateNextSizeCheck()) "estimated" else "constant") + '\n'
-                + "Min row count for page size check is: " + this.minRowCountForPageSizeCheck + '\n'
-                + "Max row count for page size check is: " + this.maxRowCountForPageSizeCheck + '\n'
-                + "Truncate length for column indexes is: " + this.columnIndexTruncateLength + '\n'
-                + "Truncate length for statistics min/max  is: " + this.statisticsTruncateLength + '\n'
+                + "Min row count for page size check is: " + minRowCountForPageSizeCheck + '\n'
+                + "Max row count for page size check is: " + maxRowCountForPageSizeCheck + '\n'
+                + "Truncate length for column indexes is: " + columnIndexTruncateLength + '\n'
+                + "Truncate length for statistics min/max  is: " + statisticsTruncateLength + '\n'
                 + "Bloom filter enabled: " + bloomFilterEnabled + '\n'
-                + "Max Bloom filter size for a column is " + this.maxBloomFilterBytes + '\n'
+                + "Max Bloom filter size for a column is " + maxBloomFilterBytes + '\n'
                 + "Bloom filter expected number of distinct values are: " + bloomFilterNDVs + '\n'
                 + "Bloom filter false positive probabilities are: " + bloomFilterFPPs + '\n'
-                + "Page row count limit to " + this.pageRowCountLimit + '\n'
-                + "Writing page checksums is: " + (if (this.pageWriteChecksumEnabled) "on" else "off") + '\n'
+                + "Page row count limit to " + pageRowCountLimit + '\n'
+                + "Writing page checksums is: " + (if (pageWriteChecksumEnabled) "on" else "off") + '\n'
                 + "Statistics enabled: " + statisticsEnabled + '\n'
                 + "Size statistics enabled: " + sizeStatisticsEnabled)
     }
@@ -286,7 +276,7 @@ data class ParquetProperties private constructor(
         internal var statisticsEnabled: Boolean = DEFAULT_STATISTICS_ENABLED
         internal val sizeStatisticsEnabled: Boolean = DEFAULT_SIZE_STATISTICS_ENABLED
         internal val bloomFilterNDVs: ColumnProperty.Builder<Long?>
-        internal val bloomFilterFPPs: ColumnProperty.Builder<Double?>
+        internal val bloomFilterFPPs: ColumnProperty.Builder<Double>
         internal var maxBloomFilterBytes: Int = DEFAULT_MAX_BLOOM_FILTER_BYTES
         internal val adaptiveBloomFilterEnabled: ColumnProperty.Builder<Boolean>
         internal val numBloomFilterCandidates: ColumnProperty.Builder<Int>
@@ -299,28 +289,25 @@ data class ParquetProperties private constructor(
         internal val sizeStatistics: ColumnProperty.Builder<Boolean>
 
         internal constructor() {
-            enableDict = ColumnProperty.builder<Boolean>().withDefaultValue(DEFAULT_IS_DICTIONARY_ENABLED)
-            byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode>()
-                .withDefaultValue(
-                    if (DEFAULT_IS_BYTE_STREAM_SPLIT_ENABLED)
-                        ByteStreamSplitMode.FLOATING_POINT
-                    else
-                        ByteStreamSplitMode.NONE
-                )
-            bloomFilterEnabled = ColumnProperty.builder<Boolean>().withDefaultValue(DEFAULT_BLOOM_FILTER_ENABLED)
-            bloomFilterNDVs = ColumnProperty.builder<Long?>().withDefaultValue(null)
-            bloomFilterFPPs = ColumnProperty.builder<Double?>().withDefaultValue(DEFAULT_BLOOM_FILTER_FPP)
-            adaptiveBloomFilterEnabled =
-                ColumnProperty.builder<Boolean>().withDefaultValue(DEFAULT_ADAPTIVE_BLOOM_FILTER_ENABLED)
-            numBloomFilterCandidates =
-                ColumnProperty.builder<Int>().withDefaultValue(DEFAULT_BLOOM_FILTER_CANDIDATES_NUMBER)
-            statistics = ColumnProperty.builder<Boolean>().withDefaultValue(DEFAULT_STATISTICS_ENABLED)
-            sizeStatistics = ColumnProperty.builder<Boolean>().withDefaultValue(DEFAULT_SIZE_STATISTICS_ENABLED)
+            enableDict = ColumnProperty.builder<Boolean>(DEFAULT_IS_DICTIONARY_ENABLED)
+            byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode> {
+                if (DEFAULT_IS_BYTE_STREAM_SPLIT_ENABLED)
+                    ByteStreamSplitMode.FLOATING_POINT
+                else
+                    ByteStreamSplitMode.NONE
+            }
+            bloomFilterEnabled = ColumnProperty.builder<Boolean>(DEFAULT_BLOOM_FILTER_ENABLED)
+            bloomFilterNDVs = ColumnProperty.builder<Long?>(null)
+            bloomFilterFPPs = ColumnProperty.builder<Double>(DEFAULT_BLOOM_FILTER_FPP)
+            adaptiveBloomFilterEnabled = ColumnProperty.builder<Boolean>(DEFAULT_ADAPTIVE_BLOOM_FILTER_ENABLED)
+            numBloomFilterCandidates = ColumnProperty.builder<Int>(DEFAULT_BLOOM_FILTER_CANDIDATES_NUMBER)
+            statistics = ColumnProperty.builder<Boolean>(DEFAULT_STATISTICS_ENABLED)
+            sizeStatistics = ColumnProperty.builder<Boolean>(DEFAULT_SIZE_STATISTICS_ENABLED)
         }
 
         internal constructor(toCopy: ParquetProperties) {
             this.pageSize = toCopy.pageSizeThreshold
-            this.enableDict = ColumnProperty.builder<Boolean?>(toCopy.dictionaryEnabled)
+            this.enableDict = ColumnProperty.builder<Boolean>(toCopy.dictionaryEnabled)
             this.dictPageSize = toCopy.dictionaryPageSizeThreshold
             this.writerVersion = toCopy.writerVersion
             this.minRowCountForPageSizeCheck = toCopy.minRowCountForPageSizeCheck
@@ -331,15 +318,15 @@ data class ParquetProperties private constructor(
             this.pageRowCountLimit = toCopy.pageRowCountLimit
             this.pageWriteChecksumEnabled = toCopy.pageWriteChecksumEnabled
             this.bloomFilterNDVs = ColumnProperty.builder<Long?>(toCopy.bloomFilterNDVs)
-            this.bloomFilterFPPs = ColumnProperty.builder<Double?>(toCopy.bloomFilterFPPs)
-            this.bloomFilterEnabled = ColumnProperty.builder<Boolean?>(toCopy.bloomFilterEnabled)
-            this.adaptiveBloomFilterEnabled = ColumnProperty.builder<Boolean?>(toCopy.adaptiveBloomFilterEnabled)
-            this.numBloomFilterCandidates = ColumnProperty.builder<Int?>(toCopy.numBloomFilterCandidates)
+            this.bloomFilterFPPs = ColumnProperty.builder<Double>(toCopy.bloomFilterFPPs)
+            this.bloomFilterEnabled = ColumnProperty.builder<Boolean>(toCopy.bloomFilterEnabled)
+            this.adaptiveBloomFilterEnabled = ColumnProperty.builder<Boolean>(toCopy.adaptiveBloomFilterEnabled)
+            this.numBloomFilterCandidates = ColumnProperty.builder<Int>(toCopy.numBloomFilterCandidates)
             this.maxBloomFilterBytes = toCopy.maxBloomFilterBytes
-            this.byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode?>(toCopy.byteStreamSplitEnabled)
+            this.byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode>(toCopy.byteStreamSplitEnabled)
             this.extraMetaData = toCopy.extraMetaData
-            this.statistics = ColumnProperty.builder<Boolean?>(toCopy.statistics)
-            this.sizeStatistics = ColumnProperty.builder<Boolean?>(toCopy.sizeStatistics)
+            this.statistics = ColumnProperty.builder<Boolean>(toCopy.statistics)
+            this.sizeStatistics = ColumnProperty.builder<Boolean>(toCopy.sizeStatistics)
         }
 
         /**
@@ -416,7 +403,7 @@ data class ParquetProperties private constructor(
          */
         fun withDictionaryPageSize(dictionaryPageSize: Int): Builder = apply {
             require(dictionaryPageSize > 0) { "Invalid dictionary page size (negative): $dictionaryPageSize" }
-            this.dictPageSize = dictionaryPageSize
+            dictPageSize = dictionaryPageSize
         }
 
         /**

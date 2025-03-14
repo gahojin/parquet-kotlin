@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList
 import it.unimi.dsi.fastutil.longs.LongList
 import java.util.Formatter
 import java.util.Optional
+import java.util.OptionalLong
 
 /**
  * Builder implementation to create [OffsetIndex] objects during writing a parquet file.
@@ -101,7 +102,7 @@ open class OffsetIndexBuilder private constructor() {
      * @param rowCount           the number of rows in the page
      */
     open fun add(compressedPageSize: Int, rowCount: Long) {
-        add(compressedPageSize, rowCount, Optional.empty<Long?>())
+        add(compressedPageSize, rowCount, OptionalLong.empty())
     }
 
     /**
@@ -112,7 +113,7 @@ open class OffsetIndexBuilder private constructor() {
      * @param rowCount the number of rows in the page
      * @param unencodedDataBytes the number of bytes of unencoded data of BYTE_ARRAY type
      */
-    fun add(compressedPageSize: Int, rowCount: Long, unencodedDataBytes: Optional<Long>) {
+    fun add(compressedPageSize: Int, rowCount: Long, unencodedDataBytes: OptionalLong) {
         add(previousOffset + previousPageSize, compressedPageSize, previousRowIndex + previousRowCount, unencodedDataBytes)
         previousRowCount = rowCount
     }
@@ -126,7 +127,7 @@ open class OffsetIndexBuilder private constructor() {
      * @param firstRowIndex      the index of the first row in the page (within the row group)
      */
     open fun add(offset: Long, compressedPageSize: Int, firstRowIndex: Long) {
-        add(offset, compressedPageSize, firstRowIndex, Optional.empty<Long>())
+        add(offset, compressedPageSize, firstRowIndex, OptionalLong.empty())
     }
 
     /**
@@ -142,7 +143,7 @@ open class OffsetIndexBuilder private constructor() {
      * @param unencodedDataBytes
      * the number of bytes of unencoded data of BYTE_ARRAY type
      */
-    fun add(offset: Long, compressedPageSize: Int, firstRowIndex: Long, unencodedDataBytes: Optional<Long>) {
+    fun add(offset: Long, compressedPageSize: Int, firstRowIndex: Long, unencodedDataBytes: OptionalLong) {
         previousOffset = offset
         offsets.add(offset)
         previousPageSize = compressedPageSize
@@ -150,7 +151,7 @@ open class OffsetIndexBuilder private constructor() {
         previousRowIndex = firstRowIndex
         firstRowIndexes.add(firstRowIndex)
         if (unencodedDataBytes.isPresent) {
-            this.unencodedDataBytes.add(unencodedDataBytes.get())
+            this.unencodedDataBytes.add(unencodedDataBytes.asLong)
         }
     }
 

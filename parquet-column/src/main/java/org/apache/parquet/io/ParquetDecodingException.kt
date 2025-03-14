@@ -26,11 +26,11 @@ import org.apache.parquet.ParquetRuntimeException
 open class ParquetDecodingException : ParquetRuntimeException {
     constructor()
 
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    constructor(message: String, cause: Throwable) : super(message, cause)
 
-    constructor(message: String?) : super(message)
+    constructor(message: String) : super(message)
 
-    constructor(cause: Throwable?) : super(cause)
+    constructor(cause: Throwable) : super(cause)
 
     companion object {
         private const val serialVersionUID = 1L

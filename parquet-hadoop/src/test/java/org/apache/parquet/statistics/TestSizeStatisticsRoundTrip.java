@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.OptionalLong;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.Preconditions;
@@ -82,7 +84,7 @@ public class TestSizeStatisticsRoundTrip {
       ColumnChunkMetaData column = footer.getBlocks().get(0).getColumns().get(0);
 
       SizeStatistics sizeStatistics = column.getSizeStatistics();
-      Assert.assertEquals(Optional.of(4L), sizeStatistics.getUnencodedByteArrayDataBytes());
+      Assert.assertEquals(OptionalLong.of(4L), sizeStatistics.getUnencodedByteArrayDataBytes());
       Assert.assertEquals(Collections.emptyList(), sizeStatistics.getRepetitionLevelHistogram());
       Assert.assertEquals(Collections.emptyList(), sizeStatistics.getDefinitionLevelHistogram());
 
@@ -140,7 +142,7 @@ public class TestSizeStatisticsRoundTrip {
       ColumnChunkMetaData column = footer.getBlocks().get(0).getColumns().get(0);
 
       SizeStatistics sizeStatistics = column.getSizeStatistics();
-      Assert.assertEquals(Optional.of(3L), sizeStatistics.getUnencodedByteArrayDataBytes());
+      Assert.assertEquals(OptionalLong.of(3L), sizeStatistics.getUnencodedByteArrayDataBytes());
       Assert.assertEquals(Arrays.asList(2L, 1L), sizeStatistics.getRepetitionLevelHistogram());
       Assert.assertEquals(Arrays.asList(0L, 0L, 0L, 3L), sizeStatistics.getDefinitionLevelHistogram());
 

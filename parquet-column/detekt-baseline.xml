@@ -35,15 +35,18 @@
     <ID>FunctionParameterNaming:FilterPredicate.kt$FilterPredicate.Visitor$`in`: In&lt;T></ID>
     <ID>FunctionParameterNaming:ValuesReader.kt$ValuesReader$`in`: ByteBufferInputStream</ID>
     <ID>InstanceOfCheckForException:ColumnReaderBase.kt$ColumnReaderBase$e is ArrayIndexOutOfBoundsException</ID>
+    <ID>LongMethod:MessageTypeParser.kt$MessageTypeParser$private fun addPrimitiveType(st: Tokenizer, type: PrimitiveTypeName, r: Repetition, builder: GroupBuilder&lt;*>)</ID>
     <ID>MaxLineLength:Binary.kt$Binary.ByteArrayBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
     <ID>MaxLineLength:Binary.kt$Binary.ByteArraySliceBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
     <ID>MaxLineLength:Binary.kt$Binary.ByteBufferBackedBinary$@Deprecated("will be removed in 2.0.0. The comparison logic depends on the related logical type therefore this one\n might not be correct. The {@link java.util.Comparator} implementation for the related type available at\n {@link org.apache.parquet.schema.PrimitiveType#comparator} should be used instead.")</ID>
     <ID>MaxLineLength:ColumnReaderBase.kt$ColumnReaderBase$"Can't read value in column %s at value %d out of %d, %d out of %d in currentPage. repetition level: %d, definition level: %d"</ID>
     <ID>MaxLineLength:DataPageV2.kt$DataPageV2$return "Page V2 [dl size=${definitionLevels.size()}, rl size=${repetitionLevels.size()}, data size=${data.size()}, data enc=${dataEncoding}, valueCount=${valueCount}, rowCount=${rowCount}, is compressed=${isCompressed}, uncompressedSize=${uncompressedSize}]"</ID>
     <ID>MaxLineLength:ParquetProperties.kt$ParquetProperties$PrimitiveTypeName.INT32, PrimitiveTypeName.INT64, PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> byteStreamSplitEnabled.getValue(column) == ByteStreamSplitMode.EXTENDED</ID>
+    <ID>MaxLineLength:Statistics.kt$Statistics$*</ID>
     <ID>NestedBlockDepth:Float16.kt$Float16$@JvmStatic fun toFloat16(f: kotlin.Float): Short</ID>
     <ID>NestedBlockDepth:GroupWriter.kt$GroupWriter$private fun writeGroup(group: Group, type: GroupType)</ID>
     <ID>NestedBlockDepth:MessageColumnIO.kt$MessageColumnIO.MessageColumnIORecordConsumer$fun writeNullForMissingFieldsAtCurrentLevel()</ID>
+    <ID>NestedBlockDepth:MessageTypeParser.kt$MessageTypeParser$private fun addPrimitiveType(st: Tokenizer, type: PrimitiveTypeName, r: Repetition, builder: GroupBuilder&lt;*>)</ID>
     <ID>NestedBlockDepth:OffsetIndexBuilder.kt$OffsetIndexBuilder.OffsetIndexImpl$override fun toString(): String</ID>
     <ID>NestedBlockDepth:SimpleGroup.kt$SimpleGroup$private fun appendToString(builder: StringBuilder, indent: String): StringBuilder</ID>
     <ID>ReturnCount:CorruptDeltaByteArrays.kt$CorruptDeltaByteArrays$@JvmStatic fun requiresSequentialReads(createdBy: String?, encoding: Encoding?): Boolean</ID>
@@ -53,11 +56,15 @@
     <ID>ReturnCount:EncodingStats.kt$EncodingStats$fun hasNonDictionaryEncodedPages(): Boolean</ID>
     <ID>ReturnCount:Float16.kt$Float16$@JvmStatic fun compare(x: Short, y: Short): Int</ID>
     <ID>ReturnCount:Type.kt$Type.Repetition.Companion$@JvmStatic fun leastRestrictive(vararg repetitions: Repetition?): Repetition</ID>
+    <ID>SpreadOperator:ByteStreamSplitValuesWriter.kt$ByteStreamSplitValuesWriter$(*allInputs)</ID>
+    <ID>SpreadOperator:ColumnProperty.kt$ColumnProperty$(*columnDescriptor.path)</ID>
+    <ID>SpreadOperator:ColumnProperty.kt$ColumnProperty.Builder$(*columnDescriptor.path)</ID>
     <ID>SpreadOperator:FilteringGroupConverter.kt$FilteringGroupConverter$(*columnIO.columnDescriptor.path)</ID>
     <ID>SpreadOperator:IncrementallyUpdatedFilterPredicateBuilderBase.kt$IncrementallyUpdatedFilterPredicateBuilderBase$(*descriptor.path)</ID>
     <ID>SpreadOperator:MessageType.kt$MessageType$(*it)</ID>
     <ID>SpreadOperator:MessageType.kt$MessageType$(*path)</ID>
     <ID>ThrowsCount:ColumnWriterBase.kt$ColumnWriterBase$fun writePage()</ID>
+    <ID>ThrowsCount:ValidatingRecordConsumer.kt$ValidatingRecordConsumer$private fun validate(vararg ptypes: PrimitiveTypeName)</ID>
     <ID>TooGenericExceptionCaught:BinaryPlainValuesReader.kt$BinaryPlainValuesReader$e: RuntimeException</ID>
     <ID>TooGenericExceptionCaught:ColumnReaderBase.kt$ColumnReaderBase$e: RuntimeException</ID>
     <ID>TooGenericExceptionCaught:ColumnWriterBase.kt$ColumnWriterBase$e: Throwable</ID>

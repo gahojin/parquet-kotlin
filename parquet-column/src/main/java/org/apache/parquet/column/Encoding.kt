@@ -65,7 +65,6 @@ enum class Encoding {
                 PrimitiveTypeName.INT64 -> LongPlainValuesReader()
                 PrimitiveTypeName.INT96 -> FixedLenByteArrayPlainValuesReader(12)
                 PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> FixedLenByteArrayPlainValuesReader(descriptor.typeLength)
-                else -> throw ParquetDecodingException("no plain reader for type ${descriptor.getType()}")
             }
         }
 
