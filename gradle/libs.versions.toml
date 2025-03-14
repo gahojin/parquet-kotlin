@@ -13,12 +13,8 @@ dokka = "2.0.0"
 hadoop = "3.4.1"
 
 jackson = "2.19.0"
-##      ^ "3.0-rc1"
-##      ^ "3.0-rc2"
 
 junit = "5.12.2"
-##    ^ "5.13.0-M1"
-##    ^ "5.13.0-M2"
 
 junit-benchmarks = "0.7.2"
 
@@ -31,9 +27,6 @@ kotlin-kover = "0.9.1"
 kotlin-poet = "2.1.0"
 
 kotest = "5.9.1"
-##     ^ "6.0.0.M1"
-##     ^ "6.0.0.M2"
-##     ^ "6.0.0.M3"
 
 maven-publish = "0.31.0"
 
@@ -48,8 +41,6 @@ parquet-format = "2.11.0"
 semver = "0.9.33"
 
 slf4j = "2.0.17"
-##    ^ "2.1.0-alpha0"
-##    ^ "2.1.0-alpha1"
 
 snappy = "1.1.10.7"
 
