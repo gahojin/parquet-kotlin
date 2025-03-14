@@ -21,6 +21,8 @@ package org.apache.parquet.column.statistics;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.OptionalLong;
+
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.schema.LogicalTypeAnnotation;
 import org.apache.parquet.schema.PrimitiveType;
@@ -46,7 +48,7 @@ public class TestSizeStatistics {
     builder.add(1, 0);
     builder.add(1, 1);
     SizeStatistics statistics = builder.build();
-    Assert.assertEquals(Optional.of(3L), statistics.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.of(3L), statistics.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Arrays.asList(3L, 3L, 1L), statistics.getRepetitionLevelHistogram());
     Assert.assertEquals(Arrays.asList(2L, 2L, 3L), statistics.getDefinitionLevelHistogram());
   }
@@ -66,7 +68,7 @@ public class TestSizeStatistics {
     builder.add(1, 0);
     builder.add(1, 0);
     SizeStatistics statistics = builder.build();
-    Assert.assertEquals(Optional.empty(), statistics.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.empty(), statistics.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Arrays.asList(2L, 4L), statistics.getRepetitionLevelHistogram());
     Assert.assertEquals(Collections.emptyList(), statistics.getDefinitionLevelHistogram());
   }
@@ -88,7 +90,7 @@ public class TestSizeStatistics {
     builder2.add(0, 1, Binary.fromString("e"));
     SizeStatistics statistics2 = builder2.build();
     statistics1.mergeStatistics(statistics2);
-    Assert.assertEquals(Optional.of(5L), statistics1.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.of(5L), statistics1.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Arrays.asList(3L, 1L, 1L), statistics1.getRepetitionLevelHistogram());
     Assert.assertEquals(Arrays.asList(1L, 3L, 1L), statistics1.getDefinitionLevelHistogram());
   }
@@ -121,7 +123,7 @@ public class TestSizeStatistics {
     builder.add(2, 2, Binary.fromString("c"));
     SizeStatistics statistics = builder.build();
     SizeStatistics copy = statistics.copy();
-    Assert.assertEquals(Optional.of(3L), copy.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.of(3L), copy.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Arrays.asList(1L, 1L, 1L), copy.getRepetitionLevelHistogram());
     Assert.assertEquals(Arrays.asList(1L, 1L, 1L), copy.getDefinitionLevelHistogram());
   }
@@ -132,12 +134,12 @@ public class TestSizeStatistics {
         .as(LogicalTypeAnnotation.stringType())
         .named("a");
     SizeStatistics statistics = new SizeStatistics(type, 1024L, null, null);
-    Assert.assertEquals(Optional.of(1024L), statistics.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.of(1024L), statistics.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Collections.emptyList(), statistics.getRepetitionLevelHistogram());
     Assert.assertEquals(Collections.emptyList(), statistics.getDefinitionLevelHistogram());
 
     SizeStatistics copy = statistics.copy();
-    Assert.assertEquals(Optional.of(1024L), copy.getUnencodedByteArrayDataBytes());
+    Assert.assertEquals(OptionalLong.of(1024L), copy.getUnencodedByteArrayDataBytes());
     Assert.assertEquals(Collections.emptyList(), copy.getRepetitionLevelHistogram());
     Assert.assertEquals(Collections.emptyList(), copy.getDefinitionLevelHistogram());
   }
