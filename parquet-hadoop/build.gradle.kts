@@ -64,7 +64,7 @@ detekt {
     buildUponDefaultConfig = true
     allRules = false
     autoCorrect = true
-    config.setFrom(rootDir.resolve("config/detekt.yml"))
+    config.from(rootDir.resolve("config/detekt.yml"))
 }
 
 java {
