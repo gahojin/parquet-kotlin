@@ -27,6 +27,18 @@ import org.apache.parquet.schema.PrimitiveType
 internal class NoopStatistics<T : Comparable<T>>(
     type: PrimitiveType,
 ) : Statistics<T>(type) {
+    override val maxBytes: ByteArray?
+        get() = throw UnsupportedOperationException("getMaxBytes is not supported by ${javaClass.name}")
+
+    override val minBytes: ByteArray?
+        get() = throw UnsupportedOperationException("getMinBytes is not supported by ${javaClass.name}")
+
+    override fun getNumNulls(): Long = -1L
+
+    override fun isEmpty(): Boolean = true
+
+    override fun isNumNullsSet(): Boolean = false
+
     override fun updateStats(value: Int) = Unit
 
     override fun updateStats(value: Long) = Unit
@@ -37,19 +49,19 @@ internal class NoopStatistics<T : Comparable<T>>(
 
     override fun updateStats(value: Boolean) = Unit
 
-    override fun updateStats(value: Binary?) = Unit
+    override fun updateStats(value: Binary) = Unit
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is Statistics<*>) return false
-        return type().equals(other.type())
+        return type() == other.type()
     }
 
     override fun hashCode(): Int {
         return 31 * type().hashCode()
     }
 
-    override fun mergeStatisticsMinMax(stats: Statistics<*>?) = Unit
+    override fun mergeStatisticsMinMax(stats: Statistics<*>) = Unit
 
     @Deprecated("will be removed in 2.0.0. Use {@link #getBuilderForReading(PrimitiveType)} instead.")
     override fun setMinMaxFromBytes(minBytes: ByteArray, maxBytes: ByteArray) = Unit
@@ -62,14 +74,6 @@ internal class NoopStatistics<T : Comparable<T>>(
         throw UnsupportedOperationException("genericGetMax is not supported by ${javaClass.name}")
     }
 
-    override fun getMaxBytes(): ByteArray? {
-        throw UnsupportedOperationException("getMaxBytes is not supported by ${javaClass.name}")
-    }
-
-    override fun getMinBytes(): ByteArray? {
-        throw UnsupportedOperationException("getMinBytes is not supported by ${javaClass.name}")
-    }
-
     override fun stringify(value: T?): String? {
         throw UnsupportedOperationException("stringify is not supported by ${javaClass.name}")
     }
@@ -78,13 +82,7 @@ internal class NoopStatistics<T : Comparable<T>>(
         throw UnsupportedOperationException("isSmallerThan is not supported by ${javaClass.name}")
     }
 
-    override fun getNumNulls(): Long = -1L
-
-    override fun isEmpty(): Boolean = true
-
     override fun hasNonNullValue(): Boolean = false
-
-    override fun isNumNullsSet(): Boolean = false
 
     override fun copy(): Statistics<T> {
         return NoopStatistics<T>(type())
