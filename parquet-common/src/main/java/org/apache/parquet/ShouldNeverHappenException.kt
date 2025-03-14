@@ -23,7 +23,7 @@ package org.apache.parquet
  * not know this, for example the default clause of an exhaustive switch statement.
  */
 class ShouldNeverHappenException : ParquetRuntimeException {
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    constructor(message: String, cause: Throwable) : super(message, cause)
 
     constructor(message: String) : super(message)
 

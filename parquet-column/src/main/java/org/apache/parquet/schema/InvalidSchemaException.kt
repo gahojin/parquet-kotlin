@@ -21,7 +21,7 @@ package org.apache.parquet.schema
 import org.apache.parquet.ParquetRuntimeException
 
 class InvalidSchemaException : ParquetRuntimeException {
-    constructor(message: String?, cause: Throwable?) : super(message, cause)
+    constructor(message: String, cause: Throwable) : super(message, cause)
 
-    constructor(message: String?) : super(message)
+    constructor(message: String) : super(message)
 }

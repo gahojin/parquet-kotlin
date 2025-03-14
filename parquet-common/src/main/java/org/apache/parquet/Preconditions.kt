@@ -80,13 +80,7 @@ object Preconditions {
         check(isValid) { message.format(*strings(args)) }
     }
 
-    private fun strings(objects: Array<out Any?>): Array<String?> {
-        val strings = arrayOfNulls<String>(objects.size)
-        var i = 0
-        while (i < objects.size) {
-            strings[i] = objects[i].toString()
-            i += 1
-        }
-        return strings
+    private fun strings(objects: Array<out Any?>): Array<String> {
+        return objects.map { it.toString() }.toTypedArray()
     }
 }
