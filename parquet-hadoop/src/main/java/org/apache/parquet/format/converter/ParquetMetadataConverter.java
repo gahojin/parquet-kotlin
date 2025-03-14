@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -2420,9 +2421,9 @@ public class ParquetMetadataConverter {
     OffsetIndexBuilder builder = OffsetIndexBuilder.getBuilder();
     for (int i = 0; i < parquetOffsetIndex.pageLocations.size(); ++i) {
       PageLocation pageLocation = parquetOffsetIndex.pageLocations.get(i);
-      Optional<Long> unencodedByteArrayDataBytes = hasUnencodedByteArrayDataBytes
-          ? Optional.of(parquetOffsetIndex.unencodedByteArrayDataBytes.get(i))
-          : Optional.empty();
+      OptionalLong unencodedByteArrayDataBytes = hasUnencodedByteArrayDataBytes
+          ? OptionalLong.of(parquetOffsetIndex.unencodedByteArrayDataBytes.get(i))
+          : OptionalLong.empty();
       builder.add(
           pageLocation.offset,
           pageLocation.compressedPageSize,
@@ -2479,14 +2480,14 @@ public class ParquetMetadataConverter {
     SizeStatistics formatStats = new SizeStatistics();
     if (stats.getUnencodedByteArrayDataBytes().isPresent()) {
       formatStats.unencodedByteArrayDataBytes =
-          stats.getUnencodedByteArrayDataBytes().get();
+          stats.getUnencodedByteArrayDataBytes().getAsLong();
     }
     List<Long> repLevelHistogram = stats.getRepetitionLevelHistogram();
-    if (repLevelHistogram != null && !repLevelHistogram.isEmpty()) {
+    if (!repLevelHistogram.isEmpty()) {
       formatStats.repetitionLevelHistogram = repLevelHistogram;
     }
     List<Long> defLevelHistogram = stats.getDefinitionLevelHistogram();
-    if (defLevelHistogram != null && !defLevelHistogram.isEmpty()) {
+    if (!defLevelHistogram.isEmpty()) {
       formatStats.definitionLevelHistogram = defLevelHistogram;
     }
     return formatStats;

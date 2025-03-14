@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.zip.CRC32;
 import okio.ByteString;
@@ -883,7 +884,7 @@ public class ParquetFileWriter implements AutoCloseable {
     offsetIndexBuilder.add(
         toIntWithCheck(out.getPos() - beforeHeader, "page"),
         rowCount,
-        sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : Optional.empty());
+        sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : OptionalLong.empty());
   }
 
   private void innerWriteDataPage(
@@ -1363,7 +1364,7 @@ public class ParquetFileWriter implements AutoCloseable {
     offsetIndexBuilder.add(
         toIntWithCheck(out.getPos() - beforeHeader, "page"),
         rowCount,
-        sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : Optional.empty());
+        sizeStatistics != null ? sizeStatistics.getUnencodedByteArrayDataBytes() : OptionalLong.empty());
   }
 
   private void crcUpdate(BytesInput bytes) {

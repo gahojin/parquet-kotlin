@@ -108,6 +108,9 @@ tasks.withType<Test>().configureEach {
         events("passed", "skipped", "failed")
     }
     maxHeapSize = "2G"
+
+//    systemProperty("enableResourceIntensiveTests", System.getProperty("enableResourceIntensiveTests"))
+//    maxHeapSize = "8G"
 }
 
 signing {

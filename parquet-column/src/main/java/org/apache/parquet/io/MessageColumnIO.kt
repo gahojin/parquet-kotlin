@@ -47,7 +47,7 @@ class MessageColumnIO internal constructor(
     private val validating: Boolean,
     private val createdBy: String?,
 ) : GroupColumnIO(messageType, null, 0) {
-    private var leaves: List<PrimitiveColumnIO> = emptyList()
+    var leaves: List<PrimitiveColumnIO> = emptyList()
 
     override val type: MessageType
         get() = super.type as MessageType
@@ -197,7 +197,7 @@ class MessageColumnIO internal constructor(
 
         init {
             var maxDepth = 0
-            columnWriters = getLeaves().associateBy({ it.id }) {
+            columnWriters = leaves.associateBy({ it.id }) {
                 columns.getColumnWriter(it.columnDescriptor).also { w ->
                     maxDepth = maxOf(maxDepth, it.fieldPath.size)
                     buildGroupToLeafWriterMap(it, w)
@@ -453,21 +453,13 @@ class MessageColumnIO internal constructor(
 
     fun setLevels() {
         setLevels(
-            0,
-            0,
-            emptyArray(),
-            IntArray(0),
-            listOf(this),
-            listOf(this)
+            r = 0,
+            d = 0,
+            fieldPath = emptyArray(),
+            indexFieldPath = IntArray(0),
+            repetition = listOf(this),
+            path = listOf(this),
         )
-    }
-
-    fun setLeaves(leaves: MutableList<PrimitiveColumnIO>) {
-        this.leaves = leaves
-    }
-
-    fun getLeaves(): List<PrimitiveColumnIO> {
-        return leaves
     }
 
     companion object {
