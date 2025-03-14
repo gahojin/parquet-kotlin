@@ -256,7 +256,7 @@ public class TestMemColumn {
             "binary_col page-{}: {} bytes, {} rows",
             pageCnt,
             page.getCompressedSize(),
-            page.getIndexRowCount().get());
+            page.getIndexRowCount().getAsInt());
         assertTrue("Compressed size should be less than 1024", page.getCompressedSize() <= 1024);
       }
     }
@@ -275,10 +275,10 @@ public class TestMemColumn {
             "int32_col page-{}: {} bytes, {} rows",
             pageCnt,
             page.getCompressedSize(),
-            page.getIndexRowCount().get());
+            page.getIndexRowCount().getAsInt());
         assertTrue(
             "Row count should be less than 10",
-            page.getIndexRowCount().get() <= 10);
+            page.getIndexRowCount().getAsInt() <= 10);
       }
     }
   }

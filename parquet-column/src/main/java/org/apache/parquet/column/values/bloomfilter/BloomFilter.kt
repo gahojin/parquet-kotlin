@@ -18,8 +18,8 @@
  */
 package org.apache.parquet.column.values.bloomfilter
 
+import okio.IOException
 import org.apache.parquet.io.api.Binary
-import java.io.IOException
 import java.io.OutputStream
 
 /**
@@ -73,21 +73,21 @@ interface BloomFilter {
      *
      * @return hash strategy that the bloom filter apply
      */
-    val hashStrategy: HashStrategy
+    val hashStrategy: HashStrategy?
 
     /**
      * Return the algorithm that the bloom filter apply.
      *
      * @return algorithm that the bloom filter apply
      */
-    val algorithm: Algorithm
+    val algorithm: Algorithm?
 
     /**
      * Return the compress algorithm that the bloom filter apply.
      *
      * @return compress algorithm that the bloom filter apply
      */
-    val compression: Compression
+    val compression: Compression?
 
     /**
      * Write the Bloom filter to an output stream. It writes the Bloom filter header including the
@@ -96,7 +96,7 @@ interface BloomFilter {
      * @param out the output stream to write
      */
     @Throws(IOException::class)
-    fun writeTo(out: OutputStream?)
+    fun writeTo(out: OutputStream)
 
     /**
      * Insert an element to the Bloom filter, the element content is represented by

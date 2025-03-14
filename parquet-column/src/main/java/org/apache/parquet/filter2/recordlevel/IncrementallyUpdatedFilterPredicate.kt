@@ -25,10 +25,8 @@ import org.apache.parquet.io.api.Binary
  * the values for a record's columns one by one and internally tracks whether the predicate is
  * satisfied, unsatisfied, or unknown.
  *
- *
  * This is used to apply a predicate during record assembly, without assembling a second copy of
  * a record, and without building a stack of update events.
- *
  *
  * IncrementallyUpdatedFilterPredicate is implemented via the visitor pattern, as is
  * [org.apache.parquet.filter2.predicate.FilterPredicate]
@@ -56,7 +54,6 @@ interface IncrementallyUpdatedFilterPredicate {
     /**
      * This is the leaf node of a filter predicate. It receives the value for the primitive column it represents,
      * and decides whether or not the predicate represented by this node is satisfied.
-     *
      *
      * It is stateful, and needs to be rest after use.
      */
@@ -115,8 +112,7 @@ interface IncrementallyUpdatedFilterPredicate {
          */
         protected fun setResult(result: Boolean) {
             check(!isKnown) {
-                ("setResult() called on a ValueInspector whose result is already known!"
-                        + " Did you forget to call reset()?")
+                "setResult() called on a ValueInspector whose result is already known! Did you forget to call reset()?"
             }
             this.result = result
             isKnown = true

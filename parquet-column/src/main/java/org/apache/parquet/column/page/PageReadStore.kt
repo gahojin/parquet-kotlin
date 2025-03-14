@@ -55,7 +55,7 @@ interface PageReadStore : AutoCloseable {
      * @param descriptor the descriptor of the column
      * @return the page reader for that column
      */
-    fun getPageReader(descriptor: ColumnDescriptor?): PageReader?
+    fun getPageReader(descriptor: ColumnDescriptor): PageReader
 
     // No-op default implementation for compatibility
     override fun close() = Unit

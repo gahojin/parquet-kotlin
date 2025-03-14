@@ -16,20 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.parquet.io.api
+package org.apache.parquet.io
+
+import org.apache.parquet.io.api.RecordMaterializer
 
 /**
- * Represent a tree of converters
- * that materializes tuples
+ * used to read empty schema
+ *
+ * @param <T> the type of the materialized record
  */
-abstract class Converter {
-    abstract val isPrimitive: Boolean
+internal class EmptyRecordReader<T>(
+    private val recordMaterializer: RecordMaterializer<T>,
+) : RecordReader<T>() {
+    // TODO: validator(wrap(recordMaterializer), validating, root.getType());
+    private val recordConsumer = recordMaterializer.rootConverter
 
-    open fun asPrimitiveConverter(): PrimitiveConverter {
-        throw ClassCastException("Expected instance of primitive converter but got \"${javaClass.name}\"")
-    }
-
-    open fun asGroupConverter(): GroupConverter {
-        throw ClassCastException("Expected instance of group converter but got \"${javaClass.getName()}\"")
+    override fun read(): T? {
+        recordConsumer.start()
+        recordConsumer.end()
+        return recordMaterializer.currentRecord
     }
 }

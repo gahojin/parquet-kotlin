@@ -18,6 +18,6 @@
  */
 package org.apache.parquet.column.values
 
-interface RequiresPreviousReader {
-    fun setPreviousReader(reader: ValuesReader)
+fun interface RequiresPreviousReader {
+    fun setPreviousReader(reader: ValuesReader?)
 }

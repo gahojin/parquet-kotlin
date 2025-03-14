@@ -64,7 +64,7 @@ enum class Encoding {
                 PrimitiveTypeName.INT32 -> IntegerPlainValuesReader()
                 PrimitiveTypeName.INT64 -> LongPlainValuesReader()
                 PrimitiveTypeName.INT96 -> FixedLenByteArrayPlainValuesReader(12)
-                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> FixedLenByteArrayPlainValuesReader(descriptor.getTypeLength())
+                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> FixedLenByteArrayPlainValuesReader(descriptor.typeLength)
                 else -> throw ParquetDecodingException("no plain reader for type ${descriptor.getType()}")
             }
         }
@@ -73,7 +73,7 @@ enum class Encoding {
         override fun initDictionary(descriptor: ColumnDescriptor, dictionaryPage: DictionaryPage): Dictionary {
             return when (descriptor.getType()) {
                 PrimitiveTypeName.BINARY -> PlainBinaryDictionary(dictionaryPage)
-                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> PlainBinaryDictionary(dictionaryPage, descriptor.getTypeLength())
+                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> PlainBinaryDictionary(dictionaryPage, descriptor.typeLength)
                 PrimitiveTypeName.INT96 -> PlainBinaryDictionary(dictionaryPage, 12)
                 PrimitiveTypeName.INT64 -> PlainLongDictionary(dictionaryPage)
                 PrimitiveTypeName.DOUBLE -> PlainDoubleDictionary(dictionaryPage)
@@ -105,7 +105,7 @@ enum class Encoding {
                 PrimitiveTypeName.DOUBLE -> ByteStreamSplitValuesReaderForDouble()
                 PrimitiveTypeName.INT32 -> ByteStreamSplitValuesReaderForInteger()
                 PrimitiveTypeName.INT64 -> ByteStreamSplitValuesReaderForLong()
-                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> ByteStreamSplitValuesReaderForFLBA(descriptor.getTypeLength())
+                PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY -> ByteStreamSplitValuesReaderForFLBA(descriptor.typeLength)
                 else -> throw ParquetDecodingException("no byte stream split reader for type ${descriptor.getType()}")
             }
         }

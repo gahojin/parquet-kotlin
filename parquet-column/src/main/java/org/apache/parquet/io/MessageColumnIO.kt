@@ -81,20 +81,17 @@ class MessageColumnIO internal constructor(
         return filter.accept<RecordReader<T>>(object : FilterCompat.Visitor<RecordReader<T>> {
             override fun visit(filterPredicateCompat: FilterPredicateCompat): RecordReader<T> {
                 val predicate = filterPredicateCompat.filterPredicate
-                val builder =
-                    IncrementallyUpdatedFilterPredicateBuilder(leaves)
+                val builder = IncrementallyUpdatedFilterPredicateBuilder(leaves)
                 val streamingPredicate = builder.build(predicate)
-                val filteringRecordMaterializer: RecordMaterializer<T?> = FilteringRecordMaterializer<T?>(
-                    recordMaterializer, leaves, builder.valueInspectorsByColumn, streamingPredicate
+                val filteringRecordMaterializer = FilteringRecordMaterializer<T>(
+                    recordMaterializer, leaves, builder.valueInspectorsByColumn, streamingPredicate,
                 )
 
                 return RecordReaderImplementation<T>(
                     this@MessageColumnIO,
                     filteringRecordMaterializer,
                     validating,
-                    ColumnReadStoreImpl(
-                        columns, filteringRecordMaterializer.rootConverter, type, createdBy
-                    )
+                    ColumnReadStoreImpl(columns, filteringRecordMaterializer.rootConverter, type, createdBy),
                 )
             }
 

@@ -35,5 +35,5 @@ interface PageReader {
     /**
      * @return the next page in that chunk or null if after the last page
      */
-    fun readPage(): DataPage?
+    fun readPage(): DataPage
 }

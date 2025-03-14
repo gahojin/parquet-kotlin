@@ -33,7 +33,7 @@ abstract class GroupConverter : Converter() {
      * @param fieldIndex index of the field in this group
      * @return the corresponding converter
      */
-    abstract fun getConverter(fieldIndex: Int): Converter?
+    abstract fun getConverter(fieldIndex: Int): Converter
 
     /* runtime calls  **/
     /**

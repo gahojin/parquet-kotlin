@@ -29,7 +29,7 @@ import org.apache.parquet.io.api.Binary
  * some columns will always be the same value, and this will capture that. An
  * example is the set of repetition levels for a schema with no repeated fields.
  */
-class DevNullValuesWriter : ValuesWriter() {
+object DevNullValuesWriter : ValuesWriter() {
     override val bufferedSize: Long = 0L
 
     override val bytes: BytesInput = empty()
