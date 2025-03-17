@@ -108,6 +108,7 @@ public class DictionaryFilterTest {
       + "required binary binary_field; "
       + "required binary single_value_field; "
       + "optional binary optional_single_value_field; "
+      + "optional int32 optional_single_value_int32_field;"
       + "required fixed_len_byte_array(17) fixed_field (DECIMAL(40,4)); "
       + "required int32 int32_field; "
       + "required int64 int64_field; "
@@ -196,6 +197,7 @@ public class DictionaryFilterTest {
       // 10% of the time, leave the field null
       if (index % 10 > 0) {
         group.append("optional_single_value_field", "sharp");
+        group.append("optional_single_value_int32_field", 42);
       }
 
       writer.write(group);
@@ -292,6 +294,7 @@ public class DictionaryFilterTest {
         "binary_field",
         "single_value_field",
         "optional_single_value_field",
+        "optional_single_value_int32_field",
         "int32_field",
         "int64_field",
         "double_field",
@@ -329,6 +332,7 @@ public class DictionaryFilterTest {
         "binary_field",
         "single_value_field",
         "optional_single_value_field",
+        "optional_single_value_int32_field",
         "fixed_field",
         "int32_field",
         "int64_field",
@@ -670,6 +674,20 @@ public class DictionaryFilterTest {
     assertFalse(
         "Should not drop block for matching UDP",
         canDrop(userDefined(intColumn("int32_field"), undroppable), ccmd, dictionaries));
+  }
+
+  @Test
+  public void testNullAcceptingUdp() throws Exception {
+    InInt32UDP drop42DenyNulls = new InInt32UDP(Sets.newHashSet(205));
+    InInt32UDP drop42AcceptNulls = new InInt32UDP(Sets.newHashSet(null, 205));
+
+    // A column with value 42 and 10% nulls
+    IntColumn intColumnWithNulls = intColumn("optional_single_value_int32_field");
+
+    assertTrue("Should drop block", canDrop(userDefined(intColumnWithNulls, drop42DenyNulls), ccmd, dictionaries));
+    assertFalse(
+        "Should not drop block for null accepting udp",
+        canDrop(userDefined(intColumnWithNulls, drop42AcceptNulls), ccmd, dictionaries));
   }
 
   @Test
