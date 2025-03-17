@@ -44,7 +44,7 @@ abstract class RecordMaterializer<T> {
     /**
      * Called if [.getCurrentRecord] isn't going to be called.
      */
-    open fun skipCurrentRecord() {}
+    open fun skipCurrentRecord() = Unit
 
     /**
      * This exception signals that the current record is cannot be converted from parquet columns to a materialized
@@ -55,10 +55,10 @@ abstract class RecordMaterializer<T> {
     class RecordMaterializationException : ParquetDecodingException {
         constructor() : super()
 
-        constructor(message: String?, cause: Throwable?) : super(message, cause)
+        constructor(message: String, cause: Throwable) : super(message, cause)
 
-        constructor(message: String?) : super(message)
+        constructor(message: String) : super(message)
 
-        constructor(cause: Throwable?) : super(cause)
+        constructor(cause: Throwable) : super(cause)
     }
 }

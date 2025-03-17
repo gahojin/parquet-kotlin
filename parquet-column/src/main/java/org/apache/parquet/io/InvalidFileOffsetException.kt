@@ -20,7 +20,7 @@ package org.apache.parquet.io
 
 import org.apache.parquet.ParquetRuntimeException
 
-class InvalidFileOffsetException(message: String?) : ParquetRuntimeException(message) {
+class InvalidFileOffsetException(message: String) : ParquetRuntimeException(message) {
     companion object {
         private const val serialVersionUID = 1L
     }
