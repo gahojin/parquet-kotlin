@@ -36,7 +36,7 @@ junit-benchmarks = "0.7.2"
 
 fastutil = "8.5.15"
 
-kotlin = "2.1.10"
+kotlin = "2.1.20"
 
 kotlin-kover = "0.9.1"
 
@@ -64,7 +64,7 @@ thrifty = "4.5.1"
 
 zero-allocation-hashing = "0.27ea0"
 
-zstd = "1.5.7-1"
+zstd = "1.5.7-2"
 
 [libraries]
 
