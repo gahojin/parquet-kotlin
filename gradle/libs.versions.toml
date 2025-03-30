@@ -52,7 +52,7 @@ mockk = "1.13.17"
 
 okio = "3.10.2"
 
-parquet-format = "2.10.0"
+parquet-format = "2.11.0"
 
 semver = "0.9.33"
 
