@@ -27,7 +27,7 @@ private val LOG: Logger = LoggerFactory.getLogger(LemireBitPackingTest::class.ja
 
 class LemireBitPackingTest : StringSpec({
     "packUnPack" {
-        for (packer in Packer.values()) {
+        for (packer in Packer.entries) {
             LOG.debug("")
             LOG.debug("testPackUnPack")
             for (i in 1..<32) {

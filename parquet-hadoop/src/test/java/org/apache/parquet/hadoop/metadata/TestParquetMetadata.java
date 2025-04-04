@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.Objects;
+
 import org.apache.parquet.schema.LogicalTypeAnnotation;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.Types;
@@ -47,7 +49,7 @@ public class TestParquetMetadata {
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private static JsonNode expectedJson() throws IOException, URISyntaxException {
-    URI path = TestParquetMetadata.class.getResource(EXPECTED_JSON).toURI();
+    URI path = Objects.requireNonNull(TestParquetMetadata.class.getResource(EXPECTED_JSON)).toURI();
     return mapper.readTree(path.toURL());
   }
 
