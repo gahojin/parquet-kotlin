@@ -191,3 +191,7 @@ node_modules/
 
 # Test
 parquet-hadoop/target
+
+# Lefthook
+lefthook-local.*
+

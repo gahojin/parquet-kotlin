@@ -3,16 +3,15 @@
   "private": true,
   "scripts": {
     "preinstall": "pnpm dlx only-allow pnpm",
-    "prepare": "husky",
     "ncu": "npm-check-updates -u"
   },
-  "devDependencies": {
-    "@commitlint/cli": "19.6.1",
-    "@commitlint/config-conventional": "19.6.0",
-    "husky": "9.1.7",
-    "npm-check-updates": "17.1.14"
+  "dependencies": {
+    "@commitlint/cli": "19.8.0",
+    "@commitlint/config-conventional": "19.8.0",
+    "lefthook": "1.11.8",
+    "npm-check-updates": "17.1.18"
   },
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@10.8.0",
   "engines": {
     "node": ">=20.x",
     "npm": "use pnpm",
