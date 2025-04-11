@@ -92,6 +92,7 @@ import org.apache.parquet.format.JsonType;
 import org.apache.parquet.format.KeyValue;
 import org.apache.parquet.format.ListType;
 import org.apache.parquet.format.LogicalType;
+import org.apache.parquet.format.LogicalTypes;
 import org.apache.parquet.format.MapType;
 import org.apache.parquet.format.MicroSeconds;
 import org.apache.parquet.format.MilliSeconds;
@@ -451,33 +452,32 @@ public class ParquetMetadataConverter {
       implements LogicalTypeAnnotation.LogicalTypeAnnotationVisitor<LogicalType> {
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.StringLogicalTypeAnnotation stringLogicalType) {
-      return of(new LogicalType.STRING(new StringType()));
+      return of(LogicalTypes.UTF8);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.MapLogicalTypeAnnotation mapLogicalType) {
-      return of(new LogicalType.MAP(new MapType()));
+      return of(LogicalTypes.MAP);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.ListLogicalTypeAnnotation listLogicalType) {
-      return of(new LogicalType.LIST(new ListType()));
+      return of(LogicalTypes.LIST);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.EnumLogicalTypeAnnotation enumLogicalType) {
-      return of(new LogicalType.ENUM(new EnumType()));
+      return of(LogicalTypes.ENUM);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.DecimalLogicalTypeAnnotation decimalLogicalType) {
-      return of(new LogicalType.DECIMAL(
-          new DecimalType(decimalLogicalType.getScale(), decimalLogicalType.getPrecision())));
+      return of(LogicalTypes.DECIMAL(decimalLogicalType.getScale(), decimalLogicalType.getPrecision()));
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.DateLogicalTypeAnnotation dateLogicalType) {
-      return of(new LogicalType.DATE(new DateType()));
+      return of(LogicalTypes.DATE);
     }
 
     @Override
@@ -499,17 +499,17 @@ public class ParquetMetadataConverter {
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.JsonLogicalTypeAnnotation jsonLogicalType) {
-      return of(new LogicalType.JSON(new JsonType()));
+      return of(LogicalTypes.JSON);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.BsonLogicalTypeAnnotation bsonLogicalType) {
-      return of(new LogicalType.BSON(new BsonType()));
+      return of(LogicalTypes.BSON);
     }
 
     @Override
     public Optional<LogicalType> visit(UUIDLogicalTypeAnnotation uuidLogicalType) {
-      return of(new LogicalType.UUID(new UUIDType()));
+      return of(LogicalTypes.UUID);
     }
 
     @Override
@@ -518,13 +518,13 @@ public class ParquetMetadataConverter {
     }
 
     @Override
-    public Optional<LogicalType> visit(LogicalTypeAnnotation.UnknownLogicalTypeAnnotation intervalLogicalType) {
-      return of(new LogicalType.UNKNOWN(new NullType()));
+    public Optional<LogicalType> visit(LogicalTypeAnnotation.UnknownLogicalTypeAnnotation unknownLogicalType) {
+      return of(LogicalTypes.UNKNOWN);
     }
 
     @Override
     public Optional<LogicalType> visit(LogicalTypeAnnotation.IntervalLogicalTypeAnnotation intervalLogicalType) {
-      return of(new LogicalType.UNKNOWN(new NullType()));
+      return of(LogicalTypes.UNKNOWN);
     }
   }
 

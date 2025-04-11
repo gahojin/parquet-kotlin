@@ -53,4 +53,5 @@ object LogicalTypes {
     @JvmField val JSON = LogicalType.JSON(JsonType())
     @JvmField val BSON = LogicalType.BSON(BsonType())
     @JvmField val FLOAT16 = LogicalType.FLOAT16(Float16Type())
+    @JvmField val UUID = LogicalType.UUID(UUIDType())
 }
