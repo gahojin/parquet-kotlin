@@ -16,7 +16,7 @@ jackson = "2.18.3"
 ##      ^ "3.0-rc1"
 ##      ^ "3.0-rc2"
 
-junit = "5.12.1"
+junit = "5.12.2"
 ##    ^ "5.13.0-M1"
 ##    ^ "5.13.0-M2"
 
@@ -39,9 +39,9 @@ maven-publish = "0.31.0"
 
 mockito = "5.17.0"
 
-mockk = "1.13.17"
+mockk = "1.14.0"
 
-okio = "3.10.2"
+okio = "3.11.0"
 
 parquet-format = "2.11.0"
 
@@ -53,7 +53,7 @@ slf4j = "2.0.17"
 
 snappy = "1.1.10.7"
 
-thrifty = "4.6.0"
+thrifty = "4.6.1"
 
 zero-allocation-hashing = "0.27ea0"
 
