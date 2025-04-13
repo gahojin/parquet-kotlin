@@ -570,6 +570,7 @@ data class ParquetProperties private constructor(
         }
 
         fun withStatisticsEnabled(enabled: Boolean): Builder = apply {
+            statistics.withDefaultValue(enabled)
             statisticsEnabled = enabled
         }
 
