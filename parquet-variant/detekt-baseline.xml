@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:VariantUtil.kt$VariantUtil$fun getType(value: ByteBuffer): Variant.Type</ID>
+    <ID>LargeClass:TestVariantScalar.kt$TestVariantScalar</ID>
+    <ID>MaxLineLength:TestVariantScalar.kt$TestVariantScalar$"Cannot read STRING value as one of [BYTE, SHORT, INT, DATE, LONG, TIMESTAMP_TZ, TIMESTAMP_NTZ, TIME, TIMESTAMP_NANOS_TZ, TIMESTAMP_NANOS_NTZ]"</ID>
+    <ID>ReturnCount:Variant.kt$Variant$fun getFieldByKey(key: String): Variant?</ID>
+    <ID>UnusedPrivateMember:TestVariantScalar.kt$TestVariantScalar.Companion$private fun getMinIntegerSize(value: Int): Int</ID>
+    <ID>UnusedPrivateMember:TestVariantScalar.kt$TestVariantScalar.Companion$private fun metadataHeader(isSorted: Boolean, offsetSize: Int): Byte</ID>
+    <ID>UnusedPrivateMember:TestVariantScalar.kt$TestVariantScalar.Companion$private fun writeVarlenInt(buffer: ByteBuffer, value: Int, valueSize: Int)</ID>
+  </CurrentIssues>
+</SmellBaseline>
