@@ -12,11 +12,11 @@ detekt = "1.23.8"
 
 dokka = "2.0.0"
 
+guava = "33.4.8-jre"
+
 hadoop = "3.4.1"
 
-junit = "5.12.1"
-##    ^ "5.13.0-M1"
-##    ^ "5.13.0-M2"
+junit = "5.12.2"
 
 junit-benchmarks = "0.7.2"
 
@@ -29,9 +29,6 @@ kotlin-kover = "0.9.1"
 kotlin-poet = "2.1.0"
 
 kotest = "5.9.1"
-##     ^ "6.0.0.M1"
-##     ^ "6.0.0.M2"
-##     ^ "6.0.0.M3"
 
 libthrift = "0.21.0"
 
@@ -39,33 +36,17 @@ maven-publish = "0.31.0"
 
 mockito = "5.16.1"
 
-mockk = "1.13.17"
+mockk = "1.14.0"
 
-okio = "3.10.2"
+okio = "3.11.0"
 
 okhttp3 = "4.12.0"
-##      ^ "5.0.0-alpha.1"
-##      ^ "5.0.0-alpha.2"
-##      ^ "5.0.0-alpha.3"
-##      ^ "5.0.0-alpha.4"
-##      ^ "5.0.0-alpha.5"
-##      ^ "5.0.0-alpha.6"
-##      ^ "5.0.0-alpha.7"
-##      ^ "5.0.0-alpha.8"
-##      ^ "5.0.0-alpha.9"
-##      ^ "5.0.0-alpha.10"
-##      ^ "5.0.0-alpha.11"
-##      ^ "5.0.0-alpha.12"
-##      ^ "5.0.0-alpha.13"
-##      ^ "5.0.0-alpha.14"
 
 parquet-format = "2.11.0"
 
 semver = "0.9.33"
 
 slf4j = "2.0.17"
-##    ^ "2.1.0-alpha0"
-##    ^ "2.1.0-alpha1"
 
 snappy = "1.1.10.7"
 
@@ -84,6 +65,8 @@ commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.
 commons-pool = { group = "commons-pool", name = "commons-pool", version.ref = "commons-pool" }
 
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 hadoop-client = { group = "org.apache.hadoop", name = "hadoop-client", version.ref = "hadoop" }
 
