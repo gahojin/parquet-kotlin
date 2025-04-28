@@ -27,11 +27,6 @@ object LogicalTypes {
         @JvmField val MICROS = TimeUnit.MICROS(MicroSeconds())
     }
 
-    @Suppress("FunctionName")
-    @JvmStatic fun DECIMAL(scale: Int, precision: Int): LogicalType {
-        return LogicalType.DECIMAL(DecimalType(scale, precision))
-    }
-
     @JvmField val UTF8 = LogicalType.STRING(StringType())
     @JvmField val MAP = LogicalType.MAP(MapType())
     @JvmField val LIST = LogicalType.LIST(ListType())
@@ -54,4 +49,15 @@ object LogicalTypes {
     @JvmField val BSON = LogicalType.BSON(BsonType())
     @JvmField val FLOAT16 = LogicalType.FLOAT16(Float16Type())
     @JvmField val UUID = LogicalType.UUID(UUIDType())
+
+
+    @Suppress("FunctionName")
+    @JvmStatic fun DECIMAL(scale: Int, precision: Int): LogicalType {
+        return LogicalType.DECIMAL(DecimalType(scale, precision))
+    }
+
+    @Suppress("FunctionName")
+    @JvmStatic fun VARIANT(specificationVersion: Byte): LogicalType {
+        return LogicalType.VARIANT(VariantType(specificationVersion = specificationVersion))
+    }
 }
