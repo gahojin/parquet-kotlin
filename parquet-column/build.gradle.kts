@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.okio)
     implementation(libs.fastutil)
     implementation(libs.slf4j.api)
+    implementation(libs.jts.core)
     implementation(libs.zero.allocation.hashing)
 
     testImplementation(libs.commons.lang3)
