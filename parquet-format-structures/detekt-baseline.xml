@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ClassOrdering:LogicalTypes.kt$LogicalTypes$@Suppress("FunctionName") @JvmStatic fun DECIMAL(scale: Int, precision: Int): LogicalType</ID>
     <ID>CyclomaticComplexMethod:Util.kt$SkipFileMetaDataAdapter$override fun read(protocol: Protocol): FileMetaData</ID>
     <ID>FunctionParameterNaming:BlockCipher.kt$BlockCipher.Decryptor$AAD: ByteArray</ID>
     <ID>FunctionParameterNaming:BlockCipher.kt$BlockCipher.Encryptor$AAD: ByteArray</ID>

@@ -10,6 +10,8 @@ detekt = "1.23.8"
 
 dokka = "2.0.0"
 
+guava = "33.4.8-jre"
+
 hadoop = "3.4.1"
 
 jackson = "2.19.0"
@@ -31,9 +33,6 @@ kotlin-kover = "0.9.1"
 kotlin-poet = "2.1.0"
 
 kotest = "5.9.1"
-##     ^ "6.0.0.M1"
-##     ^ "6.0.0.M2"
-##     ^ "6.0.0.M3"
 
 maven-publish = "0.31.0"
 
@@ -48,8 +47,6 @@ parquet-format = "2.11.0"
 semver = "0.9.33"
 
 slf4j = "2.0.17"
-##    ^ "2.1.0-alpha0"
-##    ^ "2.1.0-alpha1"
 
 snappy = "1.1.10.7"
 
@@ -66,6 +63,8 @@ aircompressor = { group = "io.airlift", name = "aircompressor", version.ref = "a
 commons-pool = { group = "commons-pool", name = "commons-pool", version.ref = "commons-pool" }
 
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 hadoop-client = { group = "org.apache.hadoop", name = "hadoop-client", version.ref = "hadoop" }
 
