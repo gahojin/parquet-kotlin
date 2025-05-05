@@ -212,6 +212,29 @@ internal object VariantUtil {
     // The size (in bytes) of a UUID.
     const val UUID_SIZE: Int = 16
 
+    // header bytes
+    val HEADER_NULL: Byte = primitiveHeader(NULL)
+    val HEADER_LONG_STRING: Byte = primitiveHeader(LONG_STR)
+    val HEADER_TRUE: Byte = primitiveHeader(TRUE)
+    val HEADER_FALSE: Byte = primitiveHeader(FALSE)
+    val HEADER_INT8: Byte = primitiveHeader(INT8)
+    val HEADER_INT16: Byte = primitiveHeader(INT16)
+    val HEADER_INT32: Byte = primitiveHeader(INT32)
+    val HEADER_INT64: Byte = primitiveHeader(INT64)
+    val HEADER_DOUBLE: Byte = primitiveHeader(DOUBLE)
+    val HEADER_DECIMAL4: Byte = primitiveHeader(DECIMAL4)
+    val HEADER_DECIMAL8: Byte = primitiveHeader(DECIMAL8)
+    val HEADER_DECIMAL16: Byte = primitiveHeader(DECIMAL16)
+    val HEADER_DATE: Byte = primitiveHeader(DATE)
+    val HEADER_TIMESTAMP_TZ: Byte = primitiveHeader(TIMESTAMP_TZ)
+    val HEADER_TIMESTAMP_NTZ: Byte = primitiveHeader(TIMESTAMP_NTZ)
+    val HEADER_TIME: Byte = primitiveHeader(TIME)
+    val HEADER_TIMESTAMP_NANOS_TZ: Byte = primitiveHeader(TIMESTAMP_NANOS_TZ)
+    val HEADER_TIMESTAMP_NANOS_NTZ: Byte = primitiveHeader(TIMESTAMP_NANOS_NTZ)
+    val HEADER_FLOAT: Byte = primitiveHeader(FLOAT)
+    val HEADER_BINARY: Byte = primitiveHeader(BINARY)
+    val HEADER_UUID: Byte = primitiveHeader(UUID)
+
     fun primitiveHeader(type: Int): Byte {
         return (type shl 2 or PRIMITIVE).toByte()
     }
@@ -246,6 +269,20 @@ internal object VariantUtil {
     }
 
     /**
+     * Write the least significant `numBytes` bytes in `value` into `bytes[pos, pos + numBytes)` in
+     * little endian.
+     * @param bytes The byte array to write into
+     * @param pos The starting index of the byte array to write into
+     * @param value The value to write
+     * @param numBytes The number of bytes to write
+     */
+    fun writeLong(bytes: ByteArray, pos: Int, value: Long, numBytes: Int) {
+        for (i in 0..<numBytes) {
+            bytes[pos + i] = ((value ushr (8 * i)) and 0xFFL).toByte()
+        }
+    }
+
+    /**
      * Reads a little-endian signed long value from `buffer[pos, pos + numBytes)`.
      * @param buffer The ByteBuffer to read from
      * @param pos The starting index of the buffer to read from
@@ -260,10 +297,10 @@ internal object VariantUtil {
         // (so we need & 0xFF`). The most significant byte should be sign-extended and is handled
         // after the loop.
         for (i in 0..<numBytes - 1) {
-            val unsignedByteValue = (buffer.get(pos + i).toInt() and 0xFF).toLong()
+            val unsignedByteValue = (buffer[pos + i].toInt() and 0xFF).toLong()
             result = result or (unsignedByteValue shl (8 * i))
         }
-        val signedByteValue = buffer.get(pos + numBytes - 1).toLong()
+        val signedByteValue = buffer[pos + numBytes - 1].toLong()
         return result or (signedByteValue shl (8 * (numBytes - 1)))
     }
 
@@ -277,7 +314,7 @@ internal object VariantUtil {
         var result = 0
         // Similar to the `readLong` loop, but all bytes should be unsigned-extended.
         for (i in 0..<numBytes) {
-            val unsignedByteValue = bytes.get(pos + i).toInt() and 0xFF
+            val unsignedByteValue = bytes[pos + i].toInt() and 0xFF
             result = result or (unsignedByteValue shl (8 * i))
         }
         require(result >= 0) { "Failed to read unsigned int. numBytes: %d".format(numBytes) }
@@ -338,8 +375,8 @@ internal object VariantUtil {
         return try {
             getType(value).toString()
         } catch (_: Exception) {
-            val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-            val valueHeader = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+            val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+            val valueHeader = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
             "unknownType(basicType: %d, valueHeader: %d)".format(basicType, valueHeader)
         }
     }
@@ -384,8 +421,8 @@ internal object VariantUtil {
      */
     fun getLong(value: ByteBuffer): Long {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE) {
             throw unexpectedType(
                 types = arrayOf(
@@ -437,8 +474,8 @@ internal object VariantUtil {
      */
     fun getInt(value: ByteBuffer): Int {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE) {
             throw unexpectedType(
                 types = arrayOf(Variant.Type.BYTE, Variant.Type.SHORT, Variant.Type.INT, Variant.Type.DATE),
@@ -463,8 +500,8 @@ internal object VariantUtil {
      */
     fun getShort(value: ByteBuffer): Short {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE) {
             throw unexpectedType(types = arrayOf(Variant.Type.BYTE, Variant.Type.SHORT), actualValue = value)
         }
@@ -485,8 +522,8 @@ internal object VariantUtil {
      */
     fun getByte(value: ByteBuffer): Byte {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE) {
             throw unexpectedType(Variant.Type.BYTE, value)
         }
@@ -498,8 +535,8 @@ internal object VariantUtil {
 
     fun getDouble(value: ByteBuffer): Double {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE || typeInfo != DOUBLE) {
             throw unexpectedType(Variant.Type.DOUBLE, value)
         }
@@ -508,8 +545,8 @@ internal object VariantUtil {
 
     fun getDecimalWithOriginalScale(value: ByteBuffer): BigDecimal {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE) {
             throw unexpectedType(
                 types = arrayOf(Variant.Type.DECIMAL4, Variant.Type.DECIMAL8, Variant.Type.DECIMAL16),
@@ -518,7 +555,7 @@ internal object VariantUtil {
         }
         // Interpret the scale byte as unsigned. If it is a negative byte, the unsigned value must be
         // greater than `MAX_DECIMAL16_PRECISION` and will trigger an error in `checkDecimal`.
-        val scale = value.get(value.position() + 1).toInt() and 0xFF
+        val scale = value[value.position() + 1].toInt() and 0xFF
         val result: BigDecimal
         when (typeInfo) {
             DECIMAL4 -> result = BigDecimal.valueOf(readLong(value, value.position() + 2, 4), scale)
@@ -530,7 +567,7 @@ internal object VariantUtil {
                 // representation.
                 var i = 0
                 while (i < 16) {
-                    bytes[i] = value.get(value.position() + 17 - i)
+                    bytes[i] = value[value.position() + 17 - i]
                     ++i
                 }
                 result = BigDecimal(BigInteger(bytes), scale)
@@ -550,8 +587,8 @@ internal object VariantUtil {
 
     fun getFloat(value: ByteBuffer): Float {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE || typeInfo != FLOAT) {
             throw unexpectedType(Variant.Type.FLOAT, value)
         }
@@ -560,8 +597,8 @@ internal object VariantUtil {
 
     fun getBinary(value: ByteBuffer): ByteBuffer {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE || typeInfo != BINARY) {
             throw unexpectedType(Variant.Type.BINARY, value)
         }
@@ -573,8 +610,8 @@ internal object VariantUtil {
 
     fun getString(value: ByteBuffer): String {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType == SHORT_STR || (basicType == PRIMITIVE && typeInfo == LONG_STR)) {
             val start: Int
             val length: Int
@@ -601,8 +638,8 @@ internal object VariantUtil {
 
     fun getUUID(value: ByteBuffer): UUID {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != PRIMITIVE || typeInfo != UUID) {
             throw unexpectedType(Variant.Type.UUID, value)
         }
@@ -629,8 +666,8 @@ internal object VariantUtil {
      */
     fun getObjectInfo(value: ByteBuffer): ObjectInfo {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != OBJECT) {
             throw unexpectedType(Variant.Type.OBJECT, value)
         }
@@ -655,8 +692,8 @@ internal object VariantUtil {
      */
     fun getArrayInfo(value: ByteBuffer): ArrayInfo {
         checkIndex(value.position(), value.limit())
-        val basicType = value.get(value.position()).toInt() and BASIC_TYPE_MASK
-        val typeInfo = (value.get(value.position()).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+        val basicType = value[value.position()].toInt() and BASIC_TYPE_MASK
+        val typeInfo = (value[value.position()].toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
         if (basicType != ARRAY) {
             throw unexpectedType(Variant.Type.ARRAY, value)
         }
@@ -685,7 +722,7 @@ internal object VariantUtil {
     fun getMetadataKey(metadata: ByteBuffer, id: Int): String {
         // Extracts the highest 2 bits in the metadata header to determine the integer size of the
         // offset list.
-        val offsetSize = ((metadata.get(metadata.position()).toInt() shr 6) and 0x3) + 1
+        val offsetSize = ((metadata[metadata.position()].toInt() shr 6) and 0x3) + 1
         val dictSize = readUnsigned(metadata, metadata.position() + 1, offsetSize)
         require(id < dictSize) { "Invalid dictionary id: %d. dictionary size: %d".format(id, dictSize) }
         // The offset list after the header byte, and a `dictSize` with `offsetSize` bytes.
