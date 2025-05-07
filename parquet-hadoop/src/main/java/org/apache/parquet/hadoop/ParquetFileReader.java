@@ -732,7 +732,7 @@ public class ParquetFileReader implements Closeable {
     return new ParquetFileReader(file, options, f);
   }
 
-  protected final SeekableInputStream f;
+  protected SeekableInputStream f;
   private final InputFile file;
   private final ParquetReadOptions options;
   private final Map<ColumnPath, ColumnDescriptor> paths = new HashMap<>();
@@ -1742,6 +1742,14 @@ public class ParquetFileReader implements Closeable {
     }
     return ParquetMetadataConverter.fromParquetOffsetIndex(
         Util.readOffsetIndex(f, offsetIndexDecryptor, offsetIndexAAD));
+  }
+
+  /**
+   * Explicitly detach the the input stream for the file to avoid being closed via
+   * {@link ParquetFileReader#close()}.
+   */
+  public void detachFileInputStream() {
+    f = null;
   }
 
   @Override

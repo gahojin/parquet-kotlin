@@ -18,48 +18,21 @@
  */
 package org.apache.parquet.variant
 
+import org.apache.parquet.variant.VariantTestUtil.EMPTY_METADATA
+import org.apache.parquet.variant.VariantTestUtil.checkType
+import org.apache.parquet.variant.VariantTestUtil.primitiveHeader
+import org.apache.parquet.variant.VariantTestUtil.testVariant
 import org.junit.Assert
 import org.junit.Test
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import java.util.Arrays
 import java.util.UUID
 
 class TestVariantScalar {
-    private fun checkType(v: Variant, expectedBasicType: Int, expectedType: Variant.Type?) {
-        Assert.assertEquals(
-            expectedBasicType.toLong(),
-            (v.value.get(v.value.position()).toInt() and VariantUtil.BASIC_TYPE_MASK).toLong()
-        )
-        Assert.assertEquals(expectedType, v.type)
-    }
-
-    private fun testVariant(v: Variant, consumer: (Variant) -> Unit) {
-        consumer(v)
-        // Create new Variant with different byte offsets
-        val newValue = ByteArray(v.value.capacity() + 50)
-        val newMetadata = ByteArray(v.metadata.capacity() + 50)
-        Arrays.fill(newValue, 0xFF.toByte())
-        Arrays.fill(newMetadata, 0xFF.toByte())
-        v.value.position(0)
-        v.value.get(newValue, 25, v.value.capacity())
-        v.value.position(0)
-        v.metadata.position(0)
-        v.metadata.get(newMetadata, 25, v.metadata.capacity())
-        v.metadata.position(0)
-        val v2 = Variant(
-            ByteBuffer.wrap(newValue, 25, v.value.capacity()),
-            ByteBuffer.wrap(newMetadata, 25, v.metadata.capacity()),
-        )
-        consumer(v2)
-    }
-
     @Test
     fun testNull() {
         val value = Variant(ByteBuffer.wrap(byteArrayOf(primitiveHeader(0))), EMPTY_METADATA)
@@ -891,35 +864,6 @@ class TestVariantScalar {
             Assert.fail("Expected exception not thrown")
         } catch (e: Exception) {
             Assert.assertEquals("Cannot read LONG value as BINARY", e.message)
-        }
-    }
-
-    companion object {
-        private val EMPTY_METADATA: ByteBuffer = ByteBuffer.wrap(byteArrayOf(1))
-
-        private fun primitiveHeader(type: Int): Byte {
-            return (type shl 2).toByte()
-        }
-
-        private fun metadataHeader(isSorted: Boolean, offsetSize: Int): Byte {
-            return (((offsetSize - 1) shl 6) or (if (isSorted) 16 else 0) or 1).toByte()
-        }
-
-        private fun getMinIntegerSize(value: Int): Int {
-            return if (value <= 0xFF) 1 else if (value <= 0xFFFF) 2 else if (value <= 0xFFFFFF) 3 else 4
-        }
-
-        private fun writeVarlenInt(buffer: ByteBuffer, value: Int, valueSize: Int) {
-            when (valueSize) {
-                1 -> buffer.put(value.toByte())
-                2 -> buffer.putShort(value.toShort())
-                3 -> {
-                    buffer.put((value and 0xFF).toByte())
-                    buffer.put(((value shr 8) and 0xFF).toByte())
-                    buffer.put(((value shr 16) and 0xFF).toByte())
-                }
-                else -> buffer.putInt(value)
-            }
         }
     }
 }
