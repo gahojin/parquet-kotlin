@@ -48,9 +48,7 @@ open class VariantObjectBuilder internal constructor(
      */
     fun validateAndGetFields(): ArrayList<FieldEntry> {
         check(fields.size.toLong() == numValues) {
-            String.format(
-                "Number of object keys (%d) do not match the number of values (%d).", fields.size, numValues
-            )
+            "Number of object keys (%d) do not match the number of values (%d).".format(fields.size, numValues)
         }
         checkMultipleNested("Cannot call endObject() while a nested object/array is still open.")
         updateLastValueSize()

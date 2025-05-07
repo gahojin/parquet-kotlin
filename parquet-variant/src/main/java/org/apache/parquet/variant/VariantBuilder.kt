@@ -287,7 +287,7 @@ open class VariantBuilder {
      * @param microsSinceMidnight the number of microseconds since midnight
      */
     fun appendTime(microsSinceMidnight: Long) {
-        require(microsSinceMidnight >= 0) { String.format("Time value (%d) cannot be negative.", microsSinceMidnight) }
+        require(microsSinceMidnight >= 0) { "Time value (%d) cannot be negative.".format(microsSinceMidnight) }
         onAppend()
         checkCapacity(1 /* header size */ + 8)
         writeBuffer[writePos] = VariantUtil.HEADER_TIME
@@ -581,15 +581,11 @@ open class VariantBuilder {
 
     protected fun getMinIntegerSize(value: Int): Int {
         assert(value >= 0)
-        if (value <= VariantUtil.U8_MAX) {
-            return VariantUtil.U8_SIZE
+        return when {
+            value <= VariantUtil.U8_MAX -> VariantUtil.U8_SIZE
+            value <= VariantUtil.U16_MAX -> VariantUtil.U16_SIZE
+            value <= VariantUtil.U24_MAX -> VariantUtil.U24_SIZE
+            else -> VariantUtil.U32_SIZE
         }
-        if (value <= VariantUtil.U16_MAX) {
-            return VariantUtil.U16_SIZE
-        }
-        if (value <= VariantUtil.U24_MAX) {
-            return VariantUtil.U24_SIZE
-        }
-        return VariantUtil.U32_SIZE
     }
 }

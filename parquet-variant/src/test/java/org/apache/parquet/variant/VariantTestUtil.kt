@@ -43,7 +43,7 @@ object VariantTestUtil {
     }
 
     fun randomString(len: Int) = buildString(len) {
-        for (i in 0..<len) {
+        repeat(len) {
             append(RANDOM_CHARS[random.nextInt(RANDOM_CHARS.length)])
         }
     }

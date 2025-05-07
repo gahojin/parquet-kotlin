@@ -36,9 +36,7 @@ open class VariantArrayBuilder internal constructor(
      */
     fun validateAndGetOffsets(): ArrayList<Int> {
         check(offsets.size.toLong() == numValues) {
-            String.format(
-                "Number of offsets (%d) do not match the number of values (%d).", offsets.size, numValues
-            )
+            "Number of offsets (%d) do not match the number of values (%d).".format(offsets.size, numValues)
         }
         checkMultipleNested("Cannot call endArray() while a nested object/array is still open.")
         return offsets
