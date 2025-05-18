@@ -54,6 +54,7 @@ dependencies {
     testImplementation(libs.okhttp3)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.zero.allocation.hashing)
+    testImplementation(libs.jts.core)
 }
 
 detekt {
