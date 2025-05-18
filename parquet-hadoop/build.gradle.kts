@@ -57,6 +57,7 @@ dependencies {
     testImplementation(libs.mockito)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.zero.allocation.hashing)
+    testImplementation(libs.jts.core)
 }
 
 detekt {

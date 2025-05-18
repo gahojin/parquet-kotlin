@@ -22,6 +22,7 @@ import org.apache.parquet.column.ColumnDescriptor
 import org.apache.parquet.column.ParquetProperties
 import org.apache.parquet.column.statistics.SizeStatistics
 import org.apache.parquet.column.statistics.Statistics
+import org.apache.parquet.column.statistics.geospatial.GeospatialStatistics
 import org.apache.parquet.column.values.bloomfilter.AdaptiveBlockSplitBloomFilter
 import org.apache.parquet.column.values.bloomfilter.BlockSplitBloomFilter
 import org.apache.parquet.column.values.bloomfilter.BloomFilter
@@ -29,6 +30,7 @@ import org.apache.parquet.column.values.bloomfilter.BloomFilterWriter
 import org.apache.parquet.io.api.Binary
 import java.io.IOException
 import java.io.OutputStream
+
 
 // An internal class to collect column values to build column statistics and bloom filter.
 internal class ColumnValueCollector(
@@ -45,6 +47,9 @@ internal class ColumnValueCollector(
     private lateinit var sizeStatisticsBuilder: SizeStatistics.Builder
     val sizeStatistics: SizeStatistics
         get() = sizeStatisticsBuilder.build()
+    private lateinit var geospatialStatisticsBuilder: GeospatialStatistics.Builder
+    val geospatialStatistics: GeospatialStatistics
+        get() = geospatialStatisticsBuilder.build()
 
     init {
         resetPageStatistics()
@@ -61,6 +66,11 @@ internal class ColumnValueCollector(
             SizeStatistics.newBuilder(path.primitiveType, path.maxRepetitionLevel, path.maxDefinitionLevel)
         } else {
             SizeStatistics.noopBuilder(path.primitiveType, path.maxRepetitionLevel, path.maxDefinitionLevel)
+        }
+        geospatialStatisticsBuilder = if (statisticsEnabled) {
+            GeospatialStatistics.newBuilder(path.primitiveType)
+        } else {
+            GeospatialStatistics.noopBuilder()
         }
     }
 
@@ -101,6 +111,7 @@ internal class ColumnValueCollector(
     fun write(value: Binary, repetitionLevel: Int, definitionLevel: Int) {
         statistics.updateStats(value)
         sizeStatisticsBuilder.add(repetitionLevel, definitionLevel, value)
+        geospatialStatisticsBuilder.update(value)
         bloomFilter.insertHash(bloomFilter.hash(value))
     }
 

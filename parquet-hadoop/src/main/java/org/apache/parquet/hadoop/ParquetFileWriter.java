@@ -58,6 +58,7 @@ import org.apache.parquet.column.ParquetProperties;
 import org.apache.parquet.column.page.DictionaryPage;
 import org.apache.parquet.column.statistics.SizeStatistics;
 import org.apache.parquet.column.statistics.Statistics;
+import org.apache.parquet.column.statistics.geospatial.GeospatialStatistics;
 import org.apache.parquet.column.values.bloomfilter.BloomFilter;
 import org.apache.parquet.crypto.AesCipher;
 import org.apache.parquet.crypto.ColumnEncryptionProperties;
@@ -159,6 +160,7 @@ public class ParquetFileWriter implements AutoCloseable {
   private long compressedLength;
   private Statistics<?> currentStatistics; // accumulated in writePage(s)
   private SizeStatistics currentSizeStatistics; // accumulated in writePage(s)
+  private GeospatialStatistics currentGeospatialStatistics; // accumulated in writePage(s)
   private ColumnIndexBuilder columnIndexBuilder;
   private OffsetIndexBuilder offsetIndexBuilder;
 
@@ -626,6 +628,8 @@ public class ParquetFileWriter implements AutoCloseable {
             descriptor.getMaxRepetitionLevel(),
             descriptor.getMaxDefinitionLevel())
         .build();
+    currentGeospatialStatistics =
+        GeospatialStatistics.newBuilder(descriptor.getPrimitiveType()).build();
 
     columnIndexBuilder = ColumnIndexBuilder.getBuilder(currentChunkType, columnIndexTruncateLength);
     offsetIndexBuilder = OffsetIndexBuilder.getBuilder();
@@ -1401,6 +1405,7 @@ public class ParquetFileWriter implements AutoCloseable {
       long compressedTotalPageSize,
       Statistics<?> totalStats,
       SizeStatistics totalSizeStats,
+      GeospatialStatistics totalGeospatialStats,
       ColumnIndexBuilder columnIndexBuilder,
       OffsetIndexBuilder offsetIndexBuilder,
       BloomFilter bloomFilter,
@@ -1418,6 +1423,7 @@ public class ParquetFileWriter implements AutoCloseable {
         compressedTotalPageSize,
         totalStats,
         totalSizeStats,
+        totalGeospatialStats,
         columnIndexBuilder,
         offsetIndexBuilder,
         bloomFilter,
@@ -1440,6 +1446,7 @@ public class ParquetFileWriter implements AutoCloseable {
       long compressedTotalPageSize,
       Statistics<?> totalStats,
       SizeStatistics totalSizeStats,
+      GeospatialStatistics totalGeospatialStats,
       ColumnIndexBuilder columnIndexBuilder,
       OffsetIndexBuilder offsetIndexBuilder,
       BloomFilter bloomFilter,
@@ -1497,6 +1504,7 @@ public class ParquetFileWriter implements AutoCloseable {
     currentEncodings.addAll(dataEncodings);
     currentStatistics = totalStats;
     currentSizeStatistics = totalSizeStats;
+    currentGeospatialStatistics = totalGeospatialStats;
 
     this.columnIndexBuilder = columnIndexBuilder;
     this.offsetIndexBuilder = offsetIndexBuilder;
@@ -1543,7 +1551,8 @@ public class ParquetFileWriter implements AutoCloseable {
         currentChunkValueCount,
         compressedLength,
         uncompressedLength,
-        currentSizeStatistics));
+        currentSizeStatistics,
+        currentGeospatialStatistics));
     this.currentBlock.setTotalByteSize(currentBlock.getTotalByteSize() + uncompressedLength);
     this.uncompressedLength = 0;
     this.compressedLength = 0;

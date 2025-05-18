@@ -53,6 +53,7 @@ import org.apache.parquet.Preconditions;
 import org.apache.parquet.column.EncodingStats;
 import org.apache.parquet.column.ParquetProperties;
 import org.apache.parquet.column.statistics.BinaryStatistics;
+import org.apache.parquet.column.statistics.geospatial.GeospatialTypes;
 import org.apache.parquet.column.values.bloomfilter.BloomFilter;
 import org.apache.parquet.crypto.AesCipher;
 import org.apache.parquet.crypto.AesGcmEncryptor;
@@ -68,6 +69,7 @@ import org.apache.parquet.format.BloomFilterCompression;
 import org.apache.parquet.format.BloomFilterHash;
 import org.apache.parquet.format.BloomFilterHeader;
 import org.apache.parquet.format.BoundaryOrder;
+import org.apache.parquet.format.BoundingBox;
 import org.apache.parquet.format.ColumnChunk;
 import org.apache.parquet.format.ColumnCryptoMetaData;
 import org.apache.parquet.format.ColumnIndex;
@@ -88,6 +90,7 @@ import org.apache.parquet.format.FileMetaData;
 import org.apache.parquet.format.Float16Type;
 import org.apache.parquet.format.GeographyType;
 import org.apache.parquet.format.GeometryType;
+import org.apache.parquet.format.GeospatialStatistics;
 import org.apache.parquet.format.IntType;
 import org.apache.parquet.format.KeyValue;
 import org.apache.parquet.format.LogicalType;
@@ -611,6 +614,11 @@ public class ParquetMetadataConverter {
         metaData.sizeStatistics = toParquetSizeStatistics(columnMetaData.getSizeStatistics());
       }
 
+      if (columnMetaData.getGeospatialStatistics() != null
+          && columnMetaData.getGeospatialStatistics().isValid()) {
+        metaData.geospatialStatistics = toParquetGeospatialStatistics(columnMetaData.getGeospatialStatistics());
+      }
+
       if (!encryptMetaData) {
         columnChunk.metaData = metaData;
       } else {
@@ -798,6 +806,36 @@ public class ParquetMetadataConverter {
     return formatStats;
   }
 
+  private static BoundingBox toParquetBoundingBox(org.apache.parquet.column.statistics.geospatial.BoundingBox bbox) {
+    // Check if any of the required bounding box is valid.
+    if (!bbox.isXYValid() || bbox.isXYEmpty()) {
+      // According to the Thrift-generated class, these fields are marked as required and must be set explicitly.
+      // If any of them is NaN, it indicates the bounding box is invalid or uninitialized,
+      // so we return null to avoid creating a malformed BoundingBox object that would later fail serialization
+      // or validation.
+      return null;
+    }
+
+    // Now we can safely create the BoundingBox object
+    BoundingBox formatBbox = new BoundingBox();
+    formatBbox.xmin = bbox.getXMin();
+    formatBbox.xmax = bbox.getXMax();
+    formatBbox.ymin = bbox.getYMin();
+    formatBbox.ymax = bbox.getYMax();
+
+    if (bbox.isZValid() && !bbox.isZEmpty()) {
+      formatBbox.zmin = bbox.getZMin();
+      formatBbox.zmax = bbox.getZMax();
+    }
+
+    if (bbox.isMValid() && !bbox.isMEmpty()) {
+      formatBbox.mmin = bbox.getMMin();
+      formatBbox.mmax = bbox.getMMax();
+    }
+
+    return formatBbox;
+  }
+
   private static boolean withinLimit(org.apache.parquet.column.statistics.Statistics stats, int truncateLength) {
     if (stats.isSmallerThan(MAX_STATS_SIZE)) {
       return true;
@@ -874,7 +912,7 @@ public class ParquetMetadataConverter {
         }
       } else {
         boolean isSet = formatStats.max != null && formatStats.min != null;
-        boolean maxEqualsMin = isSet ? Arrays.equals(formatStats.min.toByteArray(), formatStats.max.toByteArray()) : false;
+        boolean maxEqualsMin = isSet && Arrays.equals(formatStats.min.toByteArray(), formatStats.max.toByteArray());
         boolean sortOrdersMatch = SortOrder.SIGNED == typeSortOrder;
         // NOTE: See docs in CorruptStatistics for explanation of why this check is needed
         // The sort order is checked to avoid returning min/max stats that are not
@@ -901,6 +939,75 @@ public class ParquetMetadataConverter {
       String createdBy, Statistics statistics, PrimitiveType type) {
     SortOrder expectedOrder = overrideSortOrderToSigned(type) ? SortOrder.SIGNED : sortOrder(type);
     return fromParquetStatisticsInternal(createdBy, statistics, type, expectedOrder);
+  }
+
+  GeospatialStatistics toParquetGeospatialStatistics(
+      org.apache.parquet.column.statistics.geospatial.GeospatialStatistics geospatialStatistics) {
+    if (geospatialStatistics == null) {
+      return null;
+    }
+
+    GeospatialStatistics formatStats = new GeospatialStatistics();
+    boolean hasStats = false;
+
+    if (geospatialStatistics.getBoundingBox() != null
+        && geospatialStatistics.getBoundingBox().isValid()
+        && !geospatialStatistics.getBoundingBox().isXYEmpty()) {
+      formatStats.bbox = toParquetBoundingBox(geospatialStatistics.getBoundingBox());
+      hasStats = true;
+    }
+
+    if (geospatialStatistics.getGeospatialTypes() != null
+        && geospatialStatistics.getGeospatialTypes().isValid()) {
+      List<Integer> geometryTypes =
+          new ArrayList<>(geospatialStatistics.getGeospatialTypes().getTypes());
+      if (!geometryTypes.isEmpty()) {
+        Collections.sort(geometryTypes);
+        formatStats.geospatialTypes = geometryTypes;
+        hasStats = true;
+      }
+    }
+
+    if (!hasStats) {
+      return null;
+    }
+
+    return formatStats;
+  }
+
+  static org.apache.parquet.column.statistics.geospatial.GeospatialStatistics fromParquetStatistics(
+      GeospatialStatistics formatGeomStats, PrimitiveType type) {
+    org.apache.parquet.column.statistics.geospatial.BoundingBox bbox = null;
+    if (formatGeomStats == null) {
+      return null;
+    }
+    if (formatGeomStats.bbox != null) {
+      BoundingBox formatBbox = formatGeomStats.bbox;
+      bbox = new org.apache.parquet.column.statistics.geospatial.BoundingBox(
+          formatBbox.xmin,
+          formatBbox.xmax,
+          formatBbox.ymin,
+          formatBbox.ymax,
+          formatBbox.zmin == null ? Double.NaN : formatBbox.zmin,
+          formatBbox.zmax == null ? Double.NaN : formatBbox.zmax,
+          formatBbox.mmin == null ? Double.NaN : formatBbox.mmin,
+          formatBbox.mmax == null ? Double.NaN : formatBbox.mmax);
+    }
+    GeospatialTypes geospatialTypes = null;
+    if (formatGeomStats.geospatialTypes != null) {
+      geospatialTypes = new GeospatialTypes(new HashSet<>(formatGeomStats.geospatialTypes));
+    }
+
+    // get the logical type annotation data from the type
+    LogicalTypeAnnotation logicalType = type.getLogicalTypeAnnotation();
+    if (logicalType instanceof LogicalTypeAnnotation.GeometryLogicalTypeAnnotation) {
+      LogicalTypeAnnotation.GeometryLogicalTypeAnnotation geometryLogicalType =
+          (LogicalTypeAnnotation.GeometryLogicalTypeAnnotation) logicalType;
+      return new org.apache.parquet.column.statistics.geospatial.GeospatialStatistics(bbox, geospatialTypes);
+    }
+    return new org.apache.parquet.column.statistics.geospatial.GeospatialStatistics(
+        // this case should not happen in normal cases
+        bbox, geospatialTypes);
   }
 
   /**
@@ -1066,6 +1173,12 @@ public class ParquetMetadataConverter {
             public Optional<SortOrder> visit(
                 LogicalTypeAnnotation.TimestampLogicalTypeAnnotation timestampLogicalType) {
               return of(SortOrder.SIGNED);
+            }
+
+            @Override
+            public Optional<SortOrder> visit(
+                LogicalTypeAnnotation.GeometryLogicalTypeAnnotation geometryLogicalType) {
+              return of(SortOrder.UNKNOWN);
             }
           })
           .orElse(defaultSortOrder(primitive.getPrimitiveTypeName()));
@@ -1654,7 +1767,8 @@ public class ParquetMetadataConverter {
         metaData.numValues,
         metaData.totalCompressedSize,
         metaData.totalUncompressedSize,
-        fromParquetSizeStatistics(metaData.sizeStatistics, type));
+        fromParquetSizeStatistics(metaData.sizeStatistics, type),
+        fromParquetStatistics(metaData.geospatialStatistics, type));
   }
 
   public ParquetMetadata fromParquetMetadata(FileMetaData parquetMetadata) throws IOException {
@@ -1677,7 +1791,6 @@ public class ParquetMetadataConverter {
     List<BlockMetaData> blocks = new ArrayList<>();
     List<RowGroup> row_groups = parquetMetadata.rowGroups;
 
-    if (row_groups != null) {
       for (RowGroup rowGroup : row_groups) {
         BlockMetaData blockMetaData = new BlockMetaData();
         blockMetaData.setRowCount(rowGroup.numRows);
@@ -1794,7 +1907,6 @@ public class ParquetMetadataConverter {
         blockMetaData.setPath(filePath);
         blocks.add(blockMetaData);
       }
-    }
     Map<String, String> keyValueMetaData = new HashMap<>();
     List<KeyValue> key_value_metadata = parquetMetadata.keyValueMetadata;
     if (key_value_metadata != null) {
