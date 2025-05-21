@@ -33,7 +33,9 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
     @JvmField
     val value: ByteBuffer = value.asReadOnlyBuffer()
 
-    /** The buffer that contains the Variant metadata.  */
+    /**
+     * The buffer that contains the Variant metadata.
+     */
     @JvmField
     val metadata: ByteBuffer = metadata.asReadOnlyBuffer()
 
@@ -121,6 +123,13 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
     val type: Type?
         get() = VariantUtil.getType(value)
 
+    constructor(
+        value: ByteBuffer,
+        metadata: Metadata,
+    ) : this(
+        value = value,
+        metadata = metadata.encodedBuffer,
+    )
 
     constructor(value: ByteArray, metadata: ByteArray) : this(
         value = value,
@@ -212,7 +221,7 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
     /**
      * A field in a Variant object.
      */
-    internal class ObjectField(val key: String, val value: Variant?)
+    class ObjectField(val key: String, val value: Variant)
 
     /**
      * @return the number of array elements
@@ -225,6 +234,7 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
     /**
      * Returns the array element Variant value at the `index` slot. Returns null if `index` is
      * out of the bound of `[0, arraySize())`.
+     *
      * @param index the index of the array element to get
      * @return the array element Variant at the `index` slot, or null if `index` is out of bounds
      * @throws IllegalArgumentException if `getType()` does not return `Type.ARRAY`
@@ -241,6 +251,32 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
             info.offsetSize,
             value.position() + info.offsetStartOffset,
             value.position() + info.dataStartOffset,
+        )
+    }
+
+    /**
+     * Returns the field at index idx, lexicographically ordered.
+     *
+     * @param idx the index to look up
+     * @return the field value whose key is equal to `key`, or null if key is not found
+     * @throws IllegalArgumentException if `getType()` does not return `Type.OBJECT`
+     */
+    fun getFieldAtIndex(idx: Int): ObjectField {
+        val info = VariantUtil.getObjectInfo(value)
+
+        val pos = value.position()
+
+        // Use linear search for a short list. Switch to binary search when the length reaches
+        // `BINARY_SEARCH_THRESHOLD`.
+        return getFieldAtIndex(
+            idx,
+            value,
+            metadata,
+            info.idSize,
+            info.idStartOffset,
+            pos + info.idStartOffset,
+            pos + info.offsetStartOffset,
+            pos + info.dataStartOffset,
         )
     }
 

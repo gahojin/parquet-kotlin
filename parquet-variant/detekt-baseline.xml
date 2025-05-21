@@ -2,11 +2,13 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
+    <ID>CyclomaticComplexMethod:VariantConverters.kt$VariantConverters$fun newScalarConverter( primitive: PrimitiveType, parent: ParentConverter&lt;out VariantBuilder>, ): Converter</ID>
     <ID>CyclomaticComplexMethod:VariantUtil.kt$VariantUtil$fun getType(value: ByteBuffer): Variant.Type</ID>
+    <ID>ForbiddenComment:MetadataBuilder.kt$MetadataBuilder$// TODO: Support sorted dictionary keys.</ID>
     <ID>ForbiddenComment:VariantBuilder.kt$VariantBuilder$// TODO: Reduce the copying, and look into builder reuse.</ID>
-    <ID>ForbiddenComment:VariantBuilder.kt$VariantBuilder$// TODO: Support sorted dictionary keys.</ID>
     <ID>LargeClass:TestVariantScalar.kt$TestVariantScalar</ID>
     <ID>MaxLineLength:TestVariantScalar.kt$TestVariantScalar$"Cannot read STRING value as one of [BYTE, SHORT, INT, DATE, LONG, TIMESTAMP_TZ, TIMESTAMP_NTZ, TIME, TIMESTAMP_NANOS_TZ, TIMESTAMP_NANOS_NTZ]"</ID>
     <ID>ReturnCount:Variant.kt$Variant$fun getFieldByKey(key: String): Variant?</ID>
+    <ID>ThrowsCount:VariantConverters.kt$VariantConverters$fun newScalarConverter( primitive: PrimitiveType, parent: ParentConverter&lt;out VariantBuilder>, ): Converter</ID>
   </CurrentIssues>
 </SmellBaseline>

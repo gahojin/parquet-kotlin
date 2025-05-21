@@ -22,7 +22,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.UUID
+import java.util.*
+
 
 /**
  * This class defines constants related to the Variant format and provides functions for
@@ -656,9 +657,9 @@ internal object VariantUtil {
      * @return The sliced ByteBuffer
      */
     fun slice(value: ByteBuffer, start: Int): ByteBuffer {
-        val newSlice = value.duplicate()
-        newSlice.position(start)
-        return newSlice
+        return value.duplicate().also {
+            it.position(start)
+        }
     }
 
     /**
@@ -675,7 +676,7 @@ internal object VariantUtil {
         // Suppose `typeInfo` has a bit representation of 0_b4_b3b2_b1b0, the following line extracts
         // b4 to determine whether the object uses a 1/4-byte size.
         val largeSize = ((typeInfo shr 4) and 0x1) != 0
-        val sizeBytes = (if (largeSize) U32_SIZE else 1)
+        val sizeBytes = if (largeSize) U32_SIZE else 1
         val numElements = readUnsigned(value, value.position() + 1, sizeBytes)
         // Extracts b3b2 to determine the integer size of the field id list.
         val idSize = ((typeInfo shr 2) and 0x3) + 1
@@ -733,7 +734,7 @@ internal object VariantUtil {
         val nextOffset = readUnsigned(metadata, offsetListPos + (id + 1) * offsetSize, offsetSize)
         check(offset <= nextOffset) { "Invalid offset: %d. next offset: %d".format(offset, nextOffset) }
         checkIndex(dataPos + nextOffset - 1, metadata.limit())
-        if (metadata.hasArray()) {
+        if (metadata.hasArray() && !metadata.isReadOnly) {
             return String(metadata.array(), metadata.arrayOffset() + dataPos + offset, nextOffset - offset)
         } else {
             // ByteBuffer does not have an array, so we need to use the `get` method to read the bytes.
@@ -741,6 +742,46 @@ internal object VariantUtil {
             slice(metadata, dataPos + offset).get(metadataArray)
             return String(metadataArray)
         }
+    }
+
+    /**
+     * Returns a map from each string to its ID in the Variant metadata.
+     * @param metadata The Variant metadata
+     * @return A map from metadata key to its position.
+     */
+    fun getMetadataMap(metadata: ByteBuffer): Map<String, Int> {
+        val pos = metadata.position()
+        checkIndex(pos, metadata.limit())
+
+        // Extracts the highest 2 bits in the metadata header to determine the integer size of the
+        // offset list.
+        val offsetSize = ((metadata.get(pos).toInt() shr 6) and 0x3) + 1
+        val dictSize = readUnsigned(metadata, pos + 1, offsetSize)
+        val result = mutableMapOf<String, Int>()
+        var offset = readUnsigned(metadata, pos + 1 + offsetSize, offsetSize)
+        for (id in 0..<dictSize) {
+            val stringStart = 1 + (dictSize + 2) * offsetSize
+            val nextOffset = readUnsigned(metadata, pos + 1 + (id + 2) * offsetSize, offsetSize)
+            if (offset > nextOffset) {
+                throw java.lang.UnsupportedOperationException("Invalid offset: %d. next offset: %d".format(offset, nextOffset))
+            }
+            checkIndex(pos + stringStart + nextOffset - 1, metadata.limit())
+            val key = if (metadata.hasArray() && !metadata.isReadOnly()) {
+                String(
+                    metadata.array(),
+                    metadata.arrayOffset() + pos + stringStart + offset,
+                    nextOffset - offset,
+                )
+            } else {
+                // ByteBuffer does not have an array, so we need to use the `get` method to read the bytes.
+                val metadataArray = ByteArray(nextOffset - offset)
+                slice(metadata, stringStart + offset).get(metadataArray)
+                String(metadataArray)
+            }
+            result.put(key, id)
+            offset = nextOffset
+        }
+        return result
     }
 
     /**

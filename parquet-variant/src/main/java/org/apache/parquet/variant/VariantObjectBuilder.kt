@@ -22,14 +22,14 @@ package org.apache.parquet.variant
  * Builder for creating Variant object, used by VariantBuilder.
  */
 open class VariantObjectBuilder internal constructor(
-    /** The parent VariantBuilder.  */
-    private val parent: VariantBuilder
-) : VariantBuilder() {
+    metadata: Metadata,
+) : VariantBuilder(metadata) {
     /** The FieldEntry list for the fields of this object.  */
     private val fields = arrayListOf<FieldEntry>()
 
     /** The number of values appended to this object.  */
-    protected var numValues: Long = 0
+    var numValues: Long = 0
+        protected set
 
     /**
      * Appends an object key to this object. This method must be called before appending any value.
@@ -39,6 +39,16 @@ open class VariantObjectBuilder internal constructor(
         check(fields.size <= numValues) { "Cannot call appendKey() before appending a value for the previous key." }
         updateLastValueSize()
         fields.add(FieldEntry(key, addDictionaryKey(key), writePos))
+    }
+
+    /**
+     * Revert the last call to appendKey. May only be done if the corresponding value was not yet
+     * added. Used when reading data from Parquet, where a field may be non-null, but turn out to be
+     * missing (i.e. has null value and typed_value fields).
+     */
+    fun dropLastKey() {
+        check(fields.size.toLong() == numValues + 1) { "Can only drop the last added key with no corresponding value." }
+        fields.removeAt(fields.size - 1)
     }
 
     /**
@@ -64,11 +74,6 @@ open class VariantObjectBuilder internal constructor(
     override fun onStartNested() {
         checkMultipleNested("Cannot call startObject()/startArray() without calling endObject()/endArray() first.")
         numValues++
-    }
-
-    override fun addDictionaryKey(key: String): Int {
-        // Add to the parent dictionary.
-        return parent.addDictionaryKey(key)
     }
 
     private fun updateLastValueSize() {

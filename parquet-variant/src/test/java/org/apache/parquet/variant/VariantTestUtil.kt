@@ -51,19 +51,19 @@ object VariantTestUtil {
     fun testVariant(v: Variant, consumer: (Variant) -> Unit) {
         consumer(v)
         // Create new Variant with different byte offsets
-        val newValue = ByteArray(v.value.capacity() + 50)
-        val newMetadata = ByteArray(v.metadata.capacity() + 50)
+        val newValue = ByteArray(v.value.limit() + 50)
+        val newMetadata = ByteArray(v.metadata.limit() + 50)
         Arrays.fill(newValue, 0xFF.toByte())
         Arrays.fill(newMetadata, 0xFF.toByte())
         v.value.position(0)
-        v.value.get(newValue, 25, v.value.capacity())
+        v.value.get(newValue, 25, v.value.limit())
         v.value.position(0)
         v.metadata.position(0)
-        v.metadata.get(newMetadata, 25, v.metadata.capacity())
+        v.metadata.get(newMetadata, 25, v.metadata.limit())
         v.metadata.position(0)
         val v2 = Variant(
-            ByteBuffer.wrap(newValue, 25, v.value.capacity()),
-            ByteBuffer.wrap(newMetadata, 25, v.metadata.capacity())
+            ByteBuffer.wrap(newValue, 25, v.value.limit()),
+            ByteBuffer.wrap(newMetadata, 25, v.metadata.limit())
         )
         consumer(v2)
     }
