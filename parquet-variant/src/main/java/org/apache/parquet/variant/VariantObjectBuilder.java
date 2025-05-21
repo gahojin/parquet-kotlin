@@ -22,15 +22,13 @@ import java.util.ArrayList;
  * Builder for creating Variant object, used by VariantBuilder.
  */
 public class VariantObjectBuilder extends VariantBuilder {
-  /** The parent VariantBuilder. */
-  private final VariantBuilder parent;
   /** The FieldEntry list for the fields of this object. */
-  private final ArrayList<VariantBuilder.FieldEntry> fields;
+  private final ArrayList<FieldEntry> fields;
   /** The number of values appended to this object. */
   protected long numValues = 0;
 
-  VariantObjectBuilder(VariantBuilder parent) {
-    this.parent = parent;
+  VariantObjectBuilder(Metadata metadata) {
+    super(metadata);
     this.fields = new ArrayList<>();
   }
 
@@ -38,12 +36,24 @@ public class VariantObjectBuilder extends VariantBuilder {
    * Appends an object key to this object. This method must be called before appending any value.
    * @param key the key to append
    */
-  void appendKey(String key) {
+  public void appendKey(String key) {
     if (fields.size() > numValues) {
       throw new IllegalStateException("Cannot call appendKey() before appending a value for the previous key.");
     }
     updateLastValueSize();
-    fields.add(new VariantBuilder.FieldEntry(key, addDictionaryKey(key), writePos));
+    fields.add(new FieldEntry(key, addDictionaryKey(key), writePos));
+  }
+
+  /**
+   * Revert the last call to appendKey. May only be done if the corresponding value was not yet
+   * added. Used when reading data from Parquet, where a field may be non-null, but turn out to be
+   * missing (i.e. has null value and typed_value fields).
+   */
+  void dropLastKey() {
+    if (fields.size() != numValues + 1) {
+      throw new IllegalStateException("Can only drop the last added key with no corresponding value.");
+    }
+    fields.remove(fields.size() - 1);
   }
 
   /**
@@ -51,7 +61,7 @@ public class VariantObjectBuilder extends VariantBuilder {
    * object is guaranteed to have the same number of keys and values.
    * @return the list of fields in this object
    */
-  ArrayList<VariantBuilder.FieldEntry> validateAndGetFields() {
+  ArrayList<FieldEntry> validateAndGetFields() {
     if (fields.size() != numValues) {
       throw new IllegalStateException(String.format(
           "Number of object keys (%d) do not match the number of values (%d).", fields.size(), numValues));
@@ -76,15 +86,9 @@ public class VariantObjectBuilder extends VariantBuilder {
     numValues++;
   }
 
-  @Override
-  int addDictionaryKey(String key) {
-    // Add to the parent dictionary.
-    return parent.addDictionaryKey(key);
-  }
-
   private void updateLastValueSize() {
     if (!fields.isEmpty()) {
-      VariantBuilder.FieldEntry lastField = fields.get(fields.size() - 1);
+      FieldEntry lastField = fields.get(fields.size() - 1);
       lastField.updateValueSize(writePos() - lastField.offset);
     }
   }
