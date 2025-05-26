@@ -22,14 +22,14 @@ package org.apache.parquet.variant
  * Builder for creating Variant arrays, used by VariantBuilder.
  */
 open class VariantArrayBuilder internal constructor(
-    /** The parent VariantBuilder.  */
-    private val parent: VariantBuilder
-) : VariantBuilder() {
+    metadata: Metadata,
+) : VariantBuilder(metadata) {
     /** The offsets of the elements in this array.  */
     private val offsets: ArrayList<Int> = ArrayList()
 
     /** The number of values appended to this array.  */
-    protected var numValues: Long = 0
+    var numValues: Long = 0L
+        private set
 
     /**
      * @return the list of element offsets in this array
@@ -52,10 +52,5 @@ open class VariantArrayBuilder internal constructor(
         checkMultipleNested("Cannot call startObject()/startArray() without calling endObject()/endArray() first.")
         offsets.add(writePos)
         numValues++
-    }
-
-    override fun addDictionaryKey(key: String): Int {
-        // Add to the parent dictionary.
-        return parent.addDictionaryKey(key)
     }
 }

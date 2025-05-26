@@ -26,6 +26,7 @@ import org.apache.parquet.column.impl.StatusManager.Companion.create
 import org.apache.parquet.column.page.PageWriter
 import org.apache.parquet.column.statistics.SizeStatistics
 import org.apache.parquet.column.statistics.Statistics
+import org.apache.parquet.column.statistics.geospatial.GeospatialStatistics
 import org.apache.parquet.column.values.ValuesWriter
 import org.apache.parquet.column.values.bloomfilter.BloomFilterWriter
 import org.apache.parquet.io.ParquetEncodingException
@@ -329,6 +330,7 @@ internal abstract class ColumnWriterBase(
                     valueCount,
                     collector.statistics,
                     collector.sizeStatistics,
+                    collector.geospatialStatistics,
                     repetitionLevelColumn,
                     definitionLevelColumn,
                     dataColumn,
@@ -354,6 +356,7 @@ internal abstract class ColumnWriterBase(
         valueCount: Int,
         statistics: Statistics<*>,
         sizeStatistics: SizeStatistics,
+        geospatialStatistics: GeospatialStatistics,
         repetitionLevels: ValuesWriter,
         definitionLevels: ValuesWriter,
         values: ValuesWriter,

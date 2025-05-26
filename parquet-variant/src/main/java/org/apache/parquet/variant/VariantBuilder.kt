@@ -20,28 +20,29 @@ package org.apache.parquet.variant
 
 import org.apache.parquet.variant.VariantUtil.arrayHeader
 import org.apache.parquet.variant.VariantUtil.objectHeader
+import org.apache.parquet.variant.VariantUtil.primitiveHeader
 import org.apache.parquet.variant.VariantUtil.shortStrHeader
 import org.apache.parquet.variant.VariantUtil.writeLong
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
-import java.util.UUID
+import java.util.*
 
 /**
  * Builder for creating Variant value and metadata.
+ *
+ * @property metadata Object and array builders share the same Metadata object as the main builder.
  */
-open class VariantBuilder {
-    /** The buffer for building the Variant value. The first `writePos` bytes have been written.  */
+open class VariantBuilder(
+    protected val metadata: Metadata,
+) {
+    /**
+     * The buffer for building the Variant value. The first `writePos` bytes have been written.
+     */
     protected var writeBuffer = ByteArray(1024)
 
     protected var writePos: Int = 0
-
-    /** The dictionary for mapping keys to monotonically increasing ids.  */
-    private val dictionary = hashMapOf<String, Int>()
-
-    /** The keys in the dictionary, in id order.  */
-    private val dictionaryKeys = ArrayList<ByteArray>()
 
     /**
      * These are used to build nested objects and arrays, via startObject() and startArray().
@@ -52,50 +53,43 @@ open class VariantBuilder {
 
     protected var arrayBuilder: VariantArrayBuilder? = null
 
+    constructor() : this(MetadataBuilder())
+
     /**
      * @return the Variant value
      */
     fun build(): Variant {
         check(objectBuilder == null) { "Cannot call build() while an object is being built. Must call endObject() first." }
         check(arrayBuilder == null) { "Cannot call build() while an array is being built. Must call endArray() first." }
-        val numKeys = dictionaryKeys.size
-        // Use long to avoid overflow in accumulating lengths.
-        var dictionaryTotalDataSize: Long = 0
-        for (key in dictionaryKeys) {
-            dictionaryTotalDataSize += key.size.toLong()
-        }
-        // Determine the number of bytes required per offset entry.
-        // The largest offset is the one-past-the-end value, which is total data size. It's very
-        // unlikely that the number of keys could be larger, but incorporate that into the calculation
-        // in case of pathological data.
-        val maxSize = maxOf(dictionaryTotalDataSize, numKeys.toLong())
-        val offsetSize = getMinIntegerSize(maxSize.toInt())
 
-        val offsetListOffset = 1 + offsetSize
-        val dataOffset = offsetListOffset + (numKeys + 1) * offsetSize
-        val metadataSize = dataOffset + dictionaryTotalDataSize
-
-        val metadata = ByteArray(metadataSize.toInt())
-        // Only unsorted dictionary keys are supported.
-        // TODO: Support sorted dictionary keys.
-        val headerByte = VariantUtil.VERSION or ((offsetSize - 1) shl 6)
-        writeLong(metadata, 0, headerByte.toLong(), 1)
-        writeLong(metadata, 1, numKeys.toLong(), offsetSize)
-        var currentOffset = 0
-        for (i in 0..<numKeys) {
-            writeLong(metadata, offsetListOffset + i * offsetSize, currentOffset.toLong(), offsetSize)
-            val key = dictionaryKeys[i]
-            System.arraycopy(key, 0, metadata, dataOffset + currentOffset, key.size)
-            currentOffset += key.size
-        }
-        writeLong(metadata, offsetListOffset + numKeys * offsetSize, currentOffset.toLong(), offsetSize)
+        val metadataBuffer = metadata.encodedBuffer
         // Copying the data to a new buffer, to retain only the required data length, not the capacity.
         // TODO: Reduce the copying, and look into builder reuse.
-        return Variant(writeBuffer.copyOfRange(0, writePos), metadata)
+        return Variant(ByteBuffer.wrap(writeBuffer, 0, writePos), metadataBuffer)
+    }
+
+    /**
+     * @return the constructed Variant value binary, without metadata.
+     */
+    fun encodedValue(): ByteBuffer {
+        return ByteBuffer.wrap(writeBuffer, 0, writePos)
+    }
+
+    /**
+     * Directly append a Variant value. Its keys must already be in the metadata
+     * dictionary.
+     */
+    fun appendEncodedValue(value: ByteBuffer) {
+        onAppend()
+        val size = value.remaining()
+        checkCapacity(size)
+        value.duplicate().get(writeBuffer, writePos, size)
+        writePos += size
     }
 
     /**
      * Appends a string value to the Variant builder.
+     *
      * @param str the string value to append
      */
     fun appendString(str: String) {
@@ -104,16 +98,20 @@ open class VariantBuilder {
         val longStr = data.size > VariantUtil.MAX_SHORT_STR_SIZE
         checkCapacity((if (longStr) 1 + VariantUtil.U32_SIZE else 1) + data.size)
         if (longStr) {
-            writeBuffer[writePos] = VariantUtil.HEADER_LONG_STRING
-            writePos += 1
+            writeBuffer[writePos++] = VariantUtil.HEADER_LONG_STRING
             writeLong(writeBuffer, writePos, data.size.toLong(), VariantUtil.U32_SIZE)
             writePos += VariantUtil.U32_SIZE
         } else {
-            writeBuffer[writePos] = shortStrHeader(data.size)
-            writePos += 1
+            writeBuffer[writePos++] = shortStrHeader(data.size)
         }
         System.arraycopy(data, 0, writeBuffer, writePos, data.size)
         writePos += data.size
+    }
+
+    fun appendNullIfEmpty() {
+        if (writePos == 0) {
+            appendNull()
+        }
     }
 
     /**
@@ -122,23 +120,23 @@ open class VariantBuilder {
     fun appendNull() {
         onAppend()
         checkCapacity(1)
-        writeBuffer[writePos] = VariantUtil.HEADER_NULL
-        writePos += 1
+        writeBuffer[writePos++] = VariantUtil.HEADER_NULL
     }
 
     /**
      * Appends a boolean value to the Variant builder.
+     *
      * @param b the boolean value to append
      */
     fun appendBoolean(b: Boolean) {
         onAppend()
         checkCapacity(1)
-        writeBuffer[writePos] = if (b) VariantUtil.HEADER_TRUE else VariantUtil.HEADER_FALSE
-        writePos += 1
+        writeBuffer[writePos++] = if (b) VariantUtil.HEADER_TRUE else VariantUtil.HEADER_FALSE
     }
 
     /**
      * Appends a long value to the variant builder.
+     *
      * @param l the long value to append
      */
     fun appendLong(l: Long) {
@@ -151,6 +149,7 @@ open class VariantBuilder {
 
     /**
      * Appends an int value to the variant builder.
+     *
      * @param i the int to append
      */
     fun appendInt(i: Int) {
@@ -163,6 +162,7 @@ open class VariantBuilder {
 
     /**
      * Appends a short value to the variant builder.
+     *
      * @param s the short to append
      */
     fun appendShort(s: Short) {
@@ -175,6 +175,7 @@ open class VariantBuilder {
 
     /**
      * Appends a byte value to the variant builder.
+     *
      * @param b the byte to append
      */
     fun appendByte(b: Byte) {
@@ -187,6 +188,7 @@ open class VariantBuilder {
 
     /**
      * Appends a double value to the variant builder.
+     *
      * @param d the double to append
      */
     fun appendDouble(d: Double) {
@@ -200,6 +202,7 @@ open class VariantBuilder {
     /**
      * Appends a decimal value to the variant builder. The actual encoded decimal type depends on the
      * precision and scale of the decimal value.
+     *
      * @param d the decimal value to append
      */
     fun appendDecimal(d: BigDecimal) {
@@ -245,6 +248,7 @@ open class VariantBuilder {
     /**
      * Appends a date value to the variant builder. The date is represented as the number of days
      * since the epoch.
+     *
      * @param daysSinceEpoch the number of days since the epoch
      */
     fun appendDate(daysSinceEpoch: Int) {
@@ -258,6 +262,7 @@ open class VariantBuilder {
     /**
      * Appends a TimestampTz value to the variant builder. The timestamp is represented as the number
      * of microseconds since the epoch.
+     *
      * @param microsSinceEpoch the number of microseconds since the epoch
      */
     fun appendTimestampTz(microsSinceEpoch: Long) {
@@ -271,6 +276,7 @@ open class VariantBuilder {
     /**
      * Appends a TimestampNtz value to the variant builder. The timestamp is represented as the number
      * of microseconds since the epoch.
+     *
      * @param microsSinceEpoch the number of microseconds since the epoch
      */
     fun appendTimestampNtz(microsSinceEpoch: Long) {
@@ -284,6 +290,7 @@ open class VariantBuilder {
     /**
      * Appends a Time value to the variant builder. The time is represented as the number of
      * microseconds since midnight.
+     *
      * @param microsSinceMidnight the number of microseconds since midnight
      */
     fun appendTime(microsSinceMidnight: Long) {
@@ -298,6 +305,7 @@ open class VariantBuilder {
     /**
      * Appends a TimestampNanosTz value to the variant builder. The timestamp is represented as the
      * number of nanoseconds since the epoch.
+     *
      * @param nanosSinceEpoch the number of nanoseconds since the epoch
      */
     fun appendTimestampNanosTz(nanosSinceEpoch: Long) {
@@ -311,6 +319,7 @@ open class VariantBuilder {
     /**
      * Appends a TimestampNanosNtz value to the variant builder. The timestamp is represented as the
      * number of nanoseconds since the epoch.
+     *
      * @param nanosSinceEpoch the number of nanoseconds since the epoch
      */
     fun appendTimestampNanosNtz(nanosSinceEpoch: Long) {
@@ -323,6 +332,7 @@ open class VariantBuilder {
 
     /**
      * Appends a float value to the variant builder.
+     *
      * @param f the float to append
      */
     fun appendFloat(f: Float) {
@@ -335,14 +345,14 @@ open class VariantBuilder {
 
     /**
      * Appends binary data to the variant builder.
+     *
      * @param binary the binary data to append
      */
     fun appendBinary(binary: ByteBuffer) {
         onAppend()
         val binarySize = binary.remaining()
         checkCapacity(1 /* header size */ + VariantUtil.U32_SIZE + binarySize)
-        writeBuffer[writePos] = VariantUtil.HEADER_BINARY
-        writePos += 1
+        writeBuffer[writePos++] = VariantUtil.HEADER_BINARY
         writeLong(writeBuffer, writePos, binarySize.toLong(), VariantUtil.U32_SIZE)
         writePos += VariantUtil.U32_SIZE
         ByteBuffer.wrap(writeBuffer, writePos, binarySize).put(binary)
@@ -351,18 +361,33 @@ open class VariantBuilder {
 
     /**
      * Appends a UUID value to the variant builder.
+     *
      * @param uuid the UUID to append
      */
     fun appendUUID(uuid: UUID) {
         onAppend()
         checkCapacity(1 /* header size */ + VariantUtil.UUID_SIZE)
-        writeBuffer[writePos] = VariantUtil.HEADER_UUID
-        writePos += 1
+        writeBuffer[writePos++] = VariantUtil.HEADER_UUID
 
         val bb =
             ByteBuffer.wrap(writeBuffer, writePos, VariantUtil.UUID_SIZE).order(ByteOrder.BIG_ENDIAN)
         bb.putLong(uuid.mostSignificantBits)
         bb.putLong(uuid.leastSignificantBits)
+        writePos += VariantUtil.UUID_SIZE
+    }
+
+    /**
+     * Append raw bytes in the form stored in Variant.
+     *
+     * @param bytes a 16-byte value.
+     */
+    fun appendUUIDBytes(bytes: ByteBuffer) {
+        checkCapacity(1 + VariantUtil.UUID_SIZE)
+        writeBuffer[writePos++] = primitiveHeader(VariantUtil.UUID)
+        require(bytes.remaining() >= VariantUtil.UUID_SIZE) {
+            "UUID must be exactly 16 bytes"
+        }
+        bytes.duplicate().get(writeBuffer, writePos, VariantUtil.UUID_SIZE)
         writePos += VariantUtil.UUID_SIZE
     }
 
@@ -384,18 +409,48 @@ open class VariantBuilder {
         onStartNested()
         check(objectBuilder == null) { "Cannot call startObject() without calling endObject() first." }
         check(arrayBuilder == null) { "Cannot call startObject() without calling endArray() first." }
-        return VariantObjectBuilder(this).also {
-            this.objectBuilder = it
+        return VariantObjectBuilder(metadata).also {
+            objectBuilder = it
         }
+    }
+
+
+    fun startOrContinueObject(): VariantObjectBuilder {
+        return objectBuilder ?: startOrContinueObject()
+    }
+
+    fun startOrContinuePartialObject(
+        value: ByteBuffer,
+        suppressedKeys: Set<String>,
+    ): VariantObjectBuilder {
+        val objectBuilder = startOrContinueObject()
+
+        // copy values to a new builder
+        val variant = Variant(value, metadata)
+        var index = 0
+        while (index < variant.numObjectElements()) {
+            val field = variant.getFieldAtIndex(index)
+            if (!suppressedKeys.contains(field.key)) {
+                objectBuilder.appendKey(field.key)
+                objectBuilder.appendEncodedValue(field.value.value)
+            }
+            index += 1
+        }
+
+        return objectBuilder
+    }
+
+    fun endObjectIfExists() {
+        objectBuilder?.also { endObject() }
     }
 
     /**
      * Finishes appending the object to this builder. This method must be called after startObject(),
      * before other append*() methods can be called on this builder.
      */
-    internal fun endObject() {
+    fun endObject() {
         val objectBuilder = checkNotNull(objectBuilder) { "Cannot call endObject() without calling startObject() first." }
-        val fields: ArrayList<FieldEntry> = objectBuilder.validateAndGetFields()
+        val fields = objectBuilder.validateAndGetFields()
         var numFields = fields.size
         fields.sort()
         var maxId = if (numFields == 0) 0 else fields[0].id
@@ -477,8 +532,8 @@ open class VariantBuilder {
         onStartNested()
         check(objectBuilder == null) { "Cannot call startArray() without calling endObject() first." }
         check(arrayBuilder == null) { "Cannot call startArray() without calling endArray() first." }
-        return VariantArrayBuilder(this).also {
-            this.arrayBuilder = it
+        return VariantArrayBuilder(metadata).also {
+            arrayBuilder = it
         }
     }
 
@@ -520,10 +575,13 @@ open class VariantBuilder {
 
     protected open fun onStartNested() {
         checkMultipleNested("Cannot call startObject()/startArray() without calling endObject()/endArray() first.")
+        check(writePos <= 0) {
+            "Cannot call startObject()/startArray() after appending a value."
+        }
     }
 
     protected fun checkMultipleNested(message: String) {
-        check(!(objectBuilder != null || arrayBuilder != null)) { message }
+        check(objectBuilder == null && arrayBuilder == null) { message }
     }
 
     protected fun checkAppendWhileNested() {
@@ -533,15 +591,12 @@ open class VariantBuilder {
 
     /**
      * Adds a key to the Variant dictionary. If the key already exists, the dictionary is unmodified.
+     *
      * @param key the key to add
      * @return the id of the key
      */
     open fun addDictionaryKey(key: String): Int {
-        return dictionary.computeIfAbsent(key) { newKey ->
-            dictionaryKeys.size.also {
-                dictionaryKeys.add(newKey.toByteArray(StandardCharsets.UTF_8))
-            }
-        }
+        return metadata.getOrInsert(key)
     }
 
     /**
@@ -579,13 +634,16 @@ open class VariantBuilder {
         }
     }
 
-    protected fun getMinIntegerSize(value: Int): Int {
-        assert(value >= 0)
-        return when {
-            value <= VariantUtil.U8_MAX -> VariantUtil.U8_SIZE
-            value <= VariantUtil.U16_MAX -> VariantUtil.U16_SIZE
-            value <= VariantUtil.U24_MAX -> VariantUtil.U24_SIZE
-            else -> VariantUtil.U32_SIZE
+    companion object {
+        @JvmStatic
+        fun getMinIntegerSize(value: Int): Int {
+            assert(value >= 0)
+            return when {
+                value <= VariantUtil.U8_MAX -> VariantUtil.U8_SIZE
+                value <= VariantUtil.U16_MAX -> VariantUtil.U16_SIZE
+                value <= VariantUtil.U24_MAX -> VariantUtil.U24_SIZE
+                else -> VariantUtil.U32_SIZE
+            }
         }
     }
 }

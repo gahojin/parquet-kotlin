@@ -21,6 +21,10 @@ group = Maven.GROUP_ID
 version = Maven.VERSION
 
 dependencies {
+    api(project(":parquet-column"))
+    api(project(":parquet-common"))
+
+    testImplementation(libs.guava)
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
     testImplementation(libs.slf4j.api)

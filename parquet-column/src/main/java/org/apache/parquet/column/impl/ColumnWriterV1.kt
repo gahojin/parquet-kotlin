@@ -24,6 +24,7 @@ import org.apache.parquet.column.ParquetProperties
 import org.apache.parquet.column.page.PageWriter
 import org.apache.parquet.column.statistics.SizeStatistics
 import org.apache.parquet.column.statistics.Statistics
+import org.apache.parquet.column.statistics.geospatial.GeospatialStatistics
 import org.apache.parquet.column.values.ValuesWriter
 import org.apache.parquet.column.values.bloomfilter.BloomFilterWriter
 import java.io.IOException
@@ -56,6 +57,7 @@ internal class ColumnWriterV1 : ColumnWriterBase {
         valueCount: Int,
         statistics: Statistics<*>,
         sizeStatistics: SizeStatistics,
+        geospatialStatistics: GeospatialStatistics,
         repetitionLevels: ValuesWriter,
         definitionLevels: ValuesWriter,
         values: ValuesWriter
@@ -66,6 +68,7 @@ internal class ColumnWriterV1 : ColumnWriterBase {
             rowCount,
             statistics,
             sizeStatistics,
+            geospatialStatistics,
             repetitionLevels.encoding,
             definitionLevels.encoding,
             values.encoding,
