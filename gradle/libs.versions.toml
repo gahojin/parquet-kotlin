@@ -24,21 +24,21 @@ fastutil = "8.5.15"
 
 jts = "1.20.0"
 
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 
 kotlin-kover = "0.9.1"
 
-kotlin-poet = "2.1.0"
+kotlin-poet = "2.2.0"
 
 kotest = "5.9.1"
 
 libthrift = "0.21.0"
 
-maven-publish = "0.31.0"
+maven-publish = "0.32.0"
 
-mockito = "5.16.1"
+mockito = "5.18.0"
 
-mockk = "1.14.0"
+mockk = "1.14.2"
 
 okio = "3.11.0"
 
@@ -56,7 +56,7 @@ thrift = "0.6.1"
 
 zero-allocation-hashing = "0.27ea0"
 
-zstd = "1.5.7-2"
+zstd = "1.5.7-3"
 
 [libraries]
 
