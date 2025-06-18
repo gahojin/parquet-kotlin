@@ -65,6 +65,7 @@ data class ParquetProperties private constructor(
     private val bloomFilterEnabled: ColumnProperty<Boolean>,
     private val adaptiveBloomFilterEnabled: ColumnProperty<Boolean>,
     private val numBloomFilterCandidates: ColumnProperty<Int>,
+    val rowGroupRowCountLimit: Int,
     val pageRowCountLimit: Int,
     val pageWriteChecksumEnabled: Boolean,
     private val byteStreamSplitEnabled: ColumnProperty<ByteStreamSplitMode>,
@@ -123,6 +124,7 @@ data class ParquetProperties private constructor(
         maxBloomFilterBytes = builder.maxBloomFilterBytes,
         adaptiveBloomFilterEnabled = builder.adaptiveBloomFilterEnabled.build(),
         numBloomFilterCandidates = builder.numBloomFilterCandidates.build(),
+        rowGroupRowCountLimit = builder.rowGroupRowCountLimit,
         pageRowCountLimit = builder.pageRowCountLimit,
         pageWriteChecksumEnabled = builder.pageWriteChecksumEnabled,
         byteStreamSplitEnabled = builder.byteStreamSplitEnabled.build(),
@@ -290,6 +292,7 @@ data class ParquetProperties private constructor(
         internal var maxBloomFilterBytes: Int = DEFAULT_MAX_BLOOM_FILTER_BYTES
         internal val adaptiveBloomFilterEnabled: ColumnProperty.Builder<Boolean>
         internal val numBloomFilterCandidates: ColumnProperty.Builder<Int>
+        internal var rowGroupRowCountLimit: Int = DEFAULT_ROW_GROUP_ROW_COUNT_LIMIT
         internal val bloomFilterEnabled: ColumnProperty.Builder<Boolean>
         internal var pageRowCountLimit: Int = DEFAULT_PAGE_ROW_COUNT_LIMIT
         internal var pageWriteChecksumEnabled: Boolean = DEFAULT_PAGE_WRITE_CHECKSUM_ENABLED
@@ -320,7 +323,7 @@ data class ParquetProperties private constructor(
 
         internal constructor(toCopy: ParquetProperties) {
             this.pageSize = toCopy.pageSizeThreshold
-            this.enableDict = ColumnProperty.builder<Boolean?>(toCopy.dictionaryEnabled)
+            this.enableDict = ColumnProperty.builder<Boolean>(toCopy.dictionaryEnabled)
             this.dictPageSize = toCopy.dictionaryPageSizeThreshold
             this.writerVersion = toCopy.writerVersion
             this.minRowCountForPageSizeCheck = toCopy.minRowCountForPageSizeCheck
@@ -332,14 +335,15 @@ data class ParquetProperties private constructor(
             this.pageWriteChecksumEnabled = toCopy.pageWriteChecksumEnabled
             this.bloomFilterNDVs = ColumnProperty.builder<Long?>(toCopy.bloomFilterNDVs)
             this.bloomFilterFPPs = ColumnProperty.builder<Double?>(toCopy.bloomFilterFPPs)
-            this.bloomFilterEnabled = ColumnProperty.builder<Boolean?>(toCopy.bloomFilterEnabled)
-            this.adaptiveBloomFilterEnabled = ColumnProperty.builder<Boolean?>(toCopy.adaptiveBloomFilterEnabled)
-            this.numBloomFilterCandidates = ColumnProperty.builder<Int?>(toCopy.numBloomFilterCandidates)
+            this.bloomFilterEnabled = ColumnProperty.builder<Boolean>(toCopy.bloomFilterEnabled)
+            this.adaptiveBloomFilterEnabled = ColumnProperty.builder<Boolean>(toCopy.adaptiveBloomFilterEnabled)
+            this.numBloomFilterCandidates = ColumnProperty.builder<Int>(toCopy.numBloomFilterCandidates)
+            this.rowGroupRowCountLimit = toCopy.rowGroupRowCountLimit
             this.maxBloomFilterBytes = toCopy.maxBloomFilterBytes
-            this.byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode?>(toCopy.byteStreamSplitEnabled)
+            this.byteStreamSplitEnabled = ColumnProperty.builder<ByteStreamSplitMode>(toCopy.byteStreamSplitEnabled)
             this.extraMetaData = toCopy.extraMetaData
-            this.statistics = ColumnProperty.builder<Boolean?>(toCopy.statistics)
-            this.sizeStatistics = ColumnProperty.builder<Boolean?>(toCopy.sizeStatistics)
+            this.statistics = ColumnProperty.builder<Boolean>(toCopy.statistics)
+            this.sizeStatistics = ColumnProperty.builder<Boolean>(toCopy.sizeStatistics)
         }
 
         /**
@@ -545,6 +549,11 @@ data class ParquetProperties private constructor(
             bloomFilterEnabled.withValue(columnPath, enabled)
         }
 
+        fun withRowGroupRowCountLimit(rowCount: Int): Builder = apply {
+            require(rowCount > 0) { "Invalid row count limit for row groups: $rowCount" }
+            rowGroupRowCountLimit = rowCount
+        }
+
         fun withPageRowCountLimit(rowCount: Int): Builder = apply {
             require(rowCount > 0) { "Invalid row count limit for pages: $rowCount" }
             pageRowCountLimit = rowCount
@@ -617,9 +626,10 @@ data class ParquetProperties private constructor(
         const val DEFAULT_ESTIMATE_ROW_COUNT_FOR_PAGE_SIZE_CHECK: Boolean = true
         const val DEFAULT_MINIMUM_RECORD_COUNT_FOR_CHECK: Int = 100
         const val DEFAULT_MAXIMUM_RECORD_COUNT_FOR_CHECK: Int = 10000
-        const val DEFAULT_PAGE_VALUE_COUNT_THRESHOLD: Int = Int.Companion.MAX_VALUE / 2
+        const val DEFAULT_PAGE_VALUE_COUNT_THRESHOLD: Int = Int.MAX_VALUE / 2
         const val DEFAULT_COLUMN_INDEX_TRUNCATE_LENGTH: Int = 64
-        const val DEFAULT_STATISTICS_TRUNCATE_LENGTH: Int = Int.Companion.MAX_VALUE
+        const val DEFAULT_STATISTICS_TRUNCATE_LENGTH: Int = Int.MAX_VALUE
+        const val DEFAULT_ROW_GROUP_ROW_COUNT_LIMIT: Int = Int.MAX_VALUE
         const val DEFAULT_PAGE_ROW_COUNT_LIMIT: Int = 20000
         const val DEFAULT_MAX_BLOOM_FILTER_BYTES: Int = 1024 * 1024
         const val DEFAULT_BLOOM_FILTER_ENABLED: Boolean = false
