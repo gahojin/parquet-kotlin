@@ -24,7 +24,7 @@ junit = "5.13.1"
 
 junit-benchmarks = "0.7.2"
 
-fastutil = "8.5.15"
+fastutil = "8.5.16"
 
 jts = "1.20.0"
 
@@ -40,7 +40,7 @@ maven-publish = "0.32.0"
 
 mockito = "5.18.0"
 
-mockk = "1.14.2"
+mockk = "1.14.3"
 
 okio = "3.13.0"
 
