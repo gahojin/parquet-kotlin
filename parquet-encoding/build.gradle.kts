@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.kotlin.dsl.withType
@@ -145,7 +144,7 @@ mavenPublishing {
         sourcesJar = true,
     ))
 
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
 
     coordinates(Maven.GROUP_ID, artifactId, Maven.VERSION)
 
