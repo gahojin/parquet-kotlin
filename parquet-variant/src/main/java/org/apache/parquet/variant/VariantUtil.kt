@@ -784,6 +784,58 @@ internal object VariantUtil {
         return result
     }
 
+
+    /**
+     * Computes the actual size (in bytes) of the Variant value.
+     * @param value The Variant value binary
+     * @return The size (in bytes) of the Variant value, including the header byte
+     */
+    fun valueSize(value: ByteBuffer): Int {
+        val pos = value.position()
+        val basicType = value.get(pos).toInt() and BASIC_TYPE_MASK
+        return when (basicType) {
+            SHORT_STR -> {
+                val stringSize = (value.get(pos).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+                1 + stringSize
+            }
+
+            OBJECT -> {
+                val info = getObjectInfo(slice(value, pos))
+                info.dataStartOffset + readUnsigned(
+                    value,
+                    pos + info.offsetStartOffset + info.numElements * info.offsetSize,
+                    info.offsetSize,
+                )
+            }
+
+            ARRAY -> {
+                val info = getArrayInfo(slice(value, pos))
+                info.dataStartOffset + readUnsigned(
+                    value,
+                    pos + info.offsetStartOffset + info.numElements * info.offsetSize,
+                    info.offsetSize
+                )
+            }
+
+            else -> {
+                val typeInfo = (value.get(pos).toInt() shr BASIC_TYPE_BITS) and PRIMITIVE_TYPE_MASK
+                when (typeInfo) {
+                    NULL, TRUE, FALSE -> 1
+                    INT8 -> 2
+                    INT16 -> 3
+                    INT32, DATE, FLOAT -> 5
+                    INT64, DOUBLE, TIMESTAMP_TZ, TIMESTAMP_NTZ, TIME, TIMESTAMP_NANOS_TZ, TIMESTAMP_NANOS_NTZ -> 9
+                    DECIMAL4 -> 6
+                    DECIMAL8 -> 10
+                    DECIMAL16 -> 18
+                    BINARY, LONG_STR -> 1 + U32_SIZE + readUnsigned(value, pos + 1, U32_SIZE)
+                    UUID -> 1 + UUID_SIZE
+                    else -> throw java.lang.UnsupportedOperationException("Unknown type in Variant. primitive type: $typeInfo")
+                }
+            }
+        }
+    }
+
     /**
      * A helper class representing the details of a Variant object, used for `ObjectHandler`.
      */
