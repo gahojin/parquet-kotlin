@@ -72,7 +72,7 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
         get() = VariantUtil.getDouble(value)
 
     /** the decimal value */
-    val decimal: BigDecimal?
+    val decimal: BigDecimal
         get() = VariantUtil.getDecimal(value)
 
     /** the float value */
@@ -120,7 +120,7 @@ class Variant(value: ByteBuffer, metadata: ByteBuffer) {
     }
 
     /** the type of the variant value */
-    val type: Type?
+    val type: Type
         get() = VariantUtil.getType(value)
 
     constructor(

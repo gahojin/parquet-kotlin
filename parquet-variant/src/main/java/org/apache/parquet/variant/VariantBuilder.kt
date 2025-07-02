@@ -81,7 +81,7 @@ open class VariantBuilder(
      */
     fun appendEncodedValue(value: ByteBuffer) {
         onAppend()
-        val size = value.remaining()
+        val size = VariantUtil.valueSize(value)
         checkCapacity(size)
         value.duplicate().get(writeBuffer, writePos, size)
         writePos += size
