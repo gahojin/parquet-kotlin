@@ -54,7 +54,7 @@ snappy = "1.1.10.7"
 
 thrifty = "4.6.3"
 
-zero-allocation-hashing = "0.27ea0"
+zero-allocation-hashing = "0.27ea1"
 
 zstd = "1.5.7-4"
 
