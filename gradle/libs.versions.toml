@@ -36,11 +36,11 @@ kotlin-poet = "2.2.0"
 
 kotest = "5.9.1"
 
-maven-publish = "0.33.0"
+maven-publish = "0.34.0"
 
 mockito = "5.18.0"
 
-mockk = "1.14.4"
+mockk = "1.14.5"
 
 okio = "3.15.0"
 
@@ -50,7 +50,7 @@ semver = "0.9.33"
 
 slf4j = "2.0.17"
 
-snappy = "1.1.10.7"
+snappy = "1.1.10.8"
 
 thrifty = "4.6.3"
 
