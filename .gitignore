@@ -195,3 +195,5 @@ parquet-hadoop/target
 # Lefthook
 lefthook-local.*
 
+# mise
+mise.local.toml

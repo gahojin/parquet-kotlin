@@ -5,28 +5,36 @@ on:
   push:
     branches: ['main']
     paths-ignore:
-      - '.npmignore'
-      - '.husky/**'
-      - '.idea/**'
       - '.vscode/**'
-      - 'doc/**'
+      - '.idea/**'
+      - '.npmignore'
+      - '.npmrc'
       - 'LICENSE'
+      - 'NOTICE'
       - '*.md'
+      - "commitlint.config.js"
       - 'bumpver.toml'
+      - "lefthook.yaml"
+      - "mise.toml"
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
   pull_request:
     paths-ignore:
-      - '.npmignore'
-      - '.husky/**'
       - '.idea/**'
       - '.vscode/**'
-      - 'doc/**'
+      - '.npmignore'
+      - '.npmrc'
       - 'LICENSE'
+      - 'NOTICE'
       - '*.md'
+      - "commitlint.config.js"
       - 'bumpver.toml'
+      - "lefthook.yaml"
+      - "mise.toml"
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
 
 permissions:
   contents: write
