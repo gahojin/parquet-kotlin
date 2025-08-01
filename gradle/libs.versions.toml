@@ -15,12 +15,8 @@ guava = "33.4.8-jre"
 hadoop = "3.4.1"
 
 jackson = "2.19.2"
-##      ^ "3.0-rc1"
-##      ^ "3.0-rc2"
 
 junit = "5.13.4"
-##    ^ "5.13.0-M1"
-##    ^ "5.13.0-M2"
 
 junit-benchmarks = "0.7.2"
 
@@ -42,7 +38,7 @@ mockito = "5.18.0"
 
 mockk = "1.14.5"
 
-okio = "3.15.0"
+okio = "3.16.0"
 
 parquet-format = "2.11.0"
 
