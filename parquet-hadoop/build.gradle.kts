@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.aircompressor)
     implementation(libs.zstd.jni)
 
-    testImplementation(project(":parquet-column").dependencyProject.sourceSets["test"].output)
+    testImplementation(project.project(":parquet-column").sourceSets["test"].output)
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
     testImplementation(platform(libs.kotest.bom))
