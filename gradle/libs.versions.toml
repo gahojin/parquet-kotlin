@@ -30,7 +30,7 @@ kotlin-kover = "0.9.1"
 
 kotlin-poet = "2.2.0"
 
-kotest = "5.9.1"
+kotest = "6.0.0"
 
 maven-publish = "0.34.0"
 
