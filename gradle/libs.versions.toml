@@ -28,7 +28,7 @@ jts = "1.20.0"
 
 kotlin = "2.2.20"
 
-kotlin-kover = "0.9.1"
+kotlin-kover = "0.9.2"
 
 kotlin-poet = "2.2.0"
 
