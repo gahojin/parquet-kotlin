@@ -36,7 +36,7 @@ kotest = "6.0.3"
 
 maven-publish = "0.34.0"
 
-mockito = "5.19.0"
+mockito = "5.20.0"
 
 mockk = "1.14.5"
 
