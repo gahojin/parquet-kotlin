@@ -18,11 +18,11 @@ jackson = "2.20.0"
 
 jackson-annotations = "2.20"
 
-junit = "5.13.4"
+junit = "6.0.0"
 
 junit-benchmarks = "0.7.2"
 
-fastutil = "8.5.16"
+fastutil = "8.5.17"
 
 jts = "1.20.0"
 
@@ -38,7 +38,7 @@ maven-publish = "0.34.0"
 
 mockito = "5.20.0"
 
-mockk = "1.14.5"
+mockk = "1.14.6"
 
 okio = "3.16.0"
 
