@@ -18,11 +18,11 @@ jackson = "2.20.0"
 
 jackson-annotations = "2.20"
 
-junit = "5.13.4"
+junit = "6.0.0"
 
 junit-benchmarks = "0.7.2"
 
-fastutil = "8.5.16"
+fastutil = "8.5.18"
 
 jts = "1.20.0"
 
@@ -50,7 +50,7 @@ slf4j = "2.0.17"
 
 snappy = "1.1.10.8"
 
-thrifty = "4.6.3"
+thrifty = "4.7.0"
 
 zero-allocation-hashing = "0.27ea1"
 
