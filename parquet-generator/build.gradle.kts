@@ -31,14 +31,14 @@ detekt {
 
 java {
     toolchain {
-        sourceCompatibility = Build.sourceCompatibility
-        targetCompatibility = Build.targetCompatibility
+        sourceCompatibility = Build.jvmTarget
+        targetCompatibility = Build.jvmTarget
     }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = JvmTarget.fromTarget(Build.jvmTarget.toString())
         freeCompilerArgs.add("-Xjvm-default=all")
     }
 }
@@ -52,7 +52,7 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.withType<Detekt>().configureEach {
-    jvmTarget = "11"
+    jvmTarget = Build.jvmTarget.toString()
     reports {
         html.required.set(false)
         xml.required.set(false)
@@ -65,7 +65,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "11"
+    jvmTarget = Build.jvmTarget.toString()
     exclude("build/")
     exclude("resources/")
 }
