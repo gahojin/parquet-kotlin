@@ -40,7 +40,7 @@ mockito = "5.20.0"
 
 mockk = "1.14.6"
 
-okio = "3.16.1"
+okio = "3.16.2"
 
 parquet-format = "2.12.0"
 
