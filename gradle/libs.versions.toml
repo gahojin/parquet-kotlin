@@ -54,7 +54,7 @@ thrifty = "4.7.0"
 
 zero-allocation-hashing = "0.27ea1"
 
-zstd = "1.5.7-5"
+zstd = "1.5.7-6"
 
 [libraries]
 
