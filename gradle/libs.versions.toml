@@ -18,7 +18,7 @@ jackson = "2.20.1"
 
 jackson-annotations = "2.20"
 
-junit = "5.14.0"
+junit = "5.14.1"
 
 junit-benchmarks = "0.7.2"
 
