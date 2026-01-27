@@ -14,7 +14,7 @@ guava = "33.5.0-jre"
 
 hadoop = "3.4.2"
 
-jackson = "2.20.1"
+jackson = "2.21.0"
 
 jackson-annotations = "2.21"
 
@@ -32,7 +32,7 @@ kotlin-kover = "0.9.4"
 
 kotlin-poet = "2.2.0"
 
-kotest = "6.0.7"
+kotest = "6.1.0"
 
 maven-publish = "0.36.0"
 
